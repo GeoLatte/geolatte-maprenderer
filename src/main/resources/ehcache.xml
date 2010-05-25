@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+CacheManager Configuration
+==========================
+An ehcache.xml corresponds to a single CacheManager.
+
+See instructions below or the ehcache schema (ehcache.xsd) on how to configure.
+
+System property tokens can be specified in this file which are replaced when the configuration
+is loaded. For example multicastGroupPort=${multicastGroupPort} can be replaced with the
+System property either from an environment variable or a system property specified with a
+command line switch such as -DmulticastGroupPort=4446.
+
+The attributes of <ehcache> are:
+* name - an optional name for the CacheManager.  The name is optional and primarily used
+for documentation or to distinguish Terracotta clustered cache state.  With Terracotta
+clustered caches, a combination of CacheManager name and cache name uniquely identify a
+particular cache store in the Terracotta clustered memory.
+* updateCheck - an optional boolean flag specifying whether this CacheManager should check
+for new versions of Ehcache over the Internet.  If not specified, updateCheck="true".
+* dynamicConfig - an optional setting that can be used to disable dynamic configuration of caches
+associated with this CacheManager.  By default this is set to true - i.e. dynamic configuration
+is enabled.  Dynamically configurable caches can have their TTI, TTL and maximum disk and
+in-memory capacity changed at runtime through the cache's configuration object.
+* monitoring - an optional setting that determines whether the CacheManager should
+automatically register the SampledCacheMBean with the system MBean server.
+
+Currently, this monitoring is only useful when using Terracotta clustering and using the
+Terracotta Developer Console. With the "autodetect" value, the presence of Terracotta clustering
+will be detected and monitoring, via the Developer Console, will be enabled. Other allowed values
+are "on" and "off".  The default is "autodetect". This setting does not perform any function when
+used with JMX monitors.
+-->
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="ehcache.xsd"
+         updateCheck="true" monitoring="autodetect"
+         dynamicConfig="true">
+
+
+    <cacheManagerEventListenerFactory class="" properties=""/>
+
+
+    <!--
+    The defaultCache has an implicit name "default" which is a reserved cache name.
+    -->
+    <defaultCache
+            maxElementsInMemory="1000"
+            eternal="false"
+            timeToIdleSeconds="300"
+            timeToLiveSeconds="600"
+            overflowToDisk="false"
+            memoryStoreEvictionPolicy="LRU"
+            />
+
+    <cache name="mapCache"
+           maxElementsInMemory="10000"
+           eternal="false"
+           overflowToDisk="false"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="600"
+           memoryStoreEvictionPolicy="LRU"
+
+            />
+
+</ehcache>
