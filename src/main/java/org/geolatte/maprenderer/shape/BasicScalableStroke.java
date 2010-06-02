@@ -89,6 +89,8 @@ public class BasicScalableStroke implements ScalableStroke {
         float lastX = 0, lastY = 0;
         float thisX = 0, thisY = 0;
         float loX = 0, loY = 0;
+        double lastOffsetX = 0, lastOffsetY = 0;
+        double offsetX= 0, offsetY = 0;
         int type = 0;
         boolean first = true;
         float offset = this.perpendicularOffset / getScale();
@@ -112,26 +114,45 @@ public class BasicScalableStroke implements ScalableStroke {
                     float dx = thisX - lastX;
                     float dy = thisY - lastY;
                     float angle = (float) Math.atan2(dy, dx);
-                    float nloX = (float) (lastX + offset * Math.cos(angle + Math.PI / 2.0));
-                    float nloY = (float) (lastY + offset * Math.sin(angle + Math.PI / 2.0));
+                    offsetX = offset * Math.cos(angle + Math.PI / 2.0);
+                    offsetY = offset * Math.sin(angle + Math.PI / 2.0);
+                    float nloX = (float) (lastX + offsetX);
+                    float nloY = (float) (lastY + offsetY);
                     if (first) {
                         moveX = nloX;
                         moveY = nloY;
                         result.moveTo(moveX, moveY);
                         first = false;
                     } else if (nloX != loX || nloY != loY) {
-                        result.lineTo(nloX, nloY);
+                        //place intermediate point (iloX,oloY)
+                        // halfOffsetAngle is (angle between two consecutive offset vectors)/2
+                        //we use the cross product to determine whether the angle is positive (clockwise)
+                        // or negative (counter-clockwise)
+                        // iRadius is the length of the vector from last point to intermediate point
+                        double dotProduct = offsetX * lastOffsetY - offsetY*lastOffsetX;
+                        double sign = Math.signum(dotProduct);
+                        double halfOffsetAngle = sign*Math.acos((offsetX * lastOffsetX + offsetY * lastOffsetY)/(offset*offset))/2.0;
+                        double iRadius =offset * ( Math.cos(halfOffsetAngle) + Math.sin(halfOffsetAngle)*Math.tan(halfOffsetAngle));
+                        //TODO -- in very large angles, iRadius can become excessively large. Need to insert two points
+                        float iloX = lastX + (float) (iRadius * Math.sin(halfOffsetAngle));
+                        float iloY = lastY + (float)(iRadius * Math.cos(halfOffsetAngle));
+                        result.lineTo(iloX, iloY);
+//                        result.lineTo(nloX, nloY);
+
                     }
 
                     loX = nloX + dx;
                     loY = nloY + dy;
-                    result.lineTo(loX, loY);
+//                    result.lineTo(loX, loY);
                     lastX = thisX;
                     lastY = thisY;
+                    lastOffsetX = offsetX;
+                    lastOffsetY = offsetY;
                     break;
             }
             it.next();
         }
+        result.lineTo(loX, loY);        
         return stroke.createStrokedShape(result);
     }
 

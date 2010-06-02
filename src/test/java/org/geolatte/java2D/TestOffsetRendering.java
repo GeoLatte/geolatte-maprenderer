@@ -47,7 +47,7 @@ public class TestOffsetRendering {
 
 
     private static final float LINE_WIDTH = 4.0f;
-    private static final int NUM_IMG = 12;
+    private static final int NUM_IMG = 36;
 
     private SpatialReference spatialReference;
     private SpatialExtent extent;
@@ -60,9 +60,9 @@ public class TestOffsetRendering {
     public void setUp() throws SpatialReferenceCreationException {
         this.spatialReference = new GTSpatialReference("4236", true);
         this.extent = new SpatialExtent(-90,-90, 90, 90, spatialReference);
-        this.stroke = new BasicScalableStroke(LINE_WIDTH, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.offsetStroke = new BasicScalableStroke(1.0f, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.offsetStroke.setPerpendicularOffset(2.0f);
+        this.stroke = new BasicScalableStroke(LINE_WIDTH); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
+        this.offsetStroke = new BasicScalableStroke(2.0f) ; //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
+        this.offsetStroke.setPerpendicularOffset(6.0f);
         geomFactory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4236);
 
     }
@@ -73,6 +73,8 @@ public class TestOffsetRendering {
 
         double theta = 2*Math.PI / NUM_IMG;
         for (int i = 0; i < NUM_IMG; i++) {
+            System.out.println("i = " + i);
+            
             MapGraphics mapGraphics = new JAIMapGraphics(dim, spatialReference);
             mapGraphics.setToExtent(extent);
 
