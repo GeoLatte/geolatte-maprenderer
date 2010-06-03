@@ -29,7 +29,7 @@ public class MockLineStringFeature extends AbstractMockFeature{
 
         Coordinate[] coordinates = new Coordinate[]{
                 new Coordinate(startx, starty),
-                new Coordinate(startx + 10.0, starty + 10.0),
+                new Coordinate(startx + 10.0, starty + 12.0),
                 new Coordinate(startx + 20.0, starty),
                 new Coordinate(startx + 30, starty+10.0)
         };

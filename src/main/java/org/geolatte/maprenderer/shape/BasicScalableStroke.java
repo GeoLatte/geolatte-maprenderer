@@ -14,12 +14,17 @@
 
 package org.geolatte.maprenderer.shape;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.awt.geom.FlatteningPathIterator;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 
 public class BasicScalableStroke implements ScalableStroke {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(BasicScalableStroke.class);
 
     private int join = BasicStroke.JOIN_BEVEL;
     private int cap = BasicStroke.CAP_BUTT;
@@ -124,26 +129,36 @@ public class BasicScalableStroke implements ScalableStroke {
                         result.moveTo(moveX, moveY);
                         first = false;
                     } else if (nloX != loX || nloY != loY) {
-                        //place intermediate point (iloX,oloY)
                         // halfOffsetAngle is (angle between two consecutive offset vectors)/2
-                        //we use the cross product to determine whether the angle is positive (clockwise)
+                        // we use the cross product to determine whether the angle is positive (clockwise)
                         // or negative (counter-clockwise)
-                        // iRadius is the length of the vector from last point to intermediate point
                         double dotProduct = offsetX * lastOffsetY - offsetY*lastOffsetX;
                         double sign = Math.signum(dotProduct);
                         double halfOffsetAngle = sign*Math.acos((offsetX * lastOffsetX + offsetY * lastOffsetY)/(offset*offset))/2.0;
+                        //iRadius is the length of the vector along the bisector of the two consecutive offset vectors that starts
+                        // at the last point, and ends in the intersection of the two offset lines.
                         double iRadius =offset * ( Math.cos(halfOffsetAngle) + Math.sin(halfOffsetAngle)*Math.tan(halfOffsetAngle));
-                        //TODO -- in very large angles, iRadius can become excessively large. Need to insert two points
-                        float iloX = lastX + (float) (iRadius * Math.sin(halfOffsetAngle));
-                        float iloY = lastY + (float)(iRadius * Math.cos(halfOffsetAngle));
-                        result.lineTo(iloX, iloY);
-//                        result.lineTo(nloX, nloY);
+//                        LOGGER.debug("offsetAngle = " + 2.0*halfOffsetAngle);
+//                        LOGGER.debug("iRadius = " + iRadius);
 
+                        if ( Math.abs(halfOffsetAngle) > Math.PI/4.0  && Math.signum(halfOffsetAngle) == Math.signum(offset) ){
+                            // in this case, we create a quadratic segment determined by last vertex + offset-vector,
+                            // this vertex + offset-vector and a point along the bisector                            
+                            result.lineTo((float)(lastX + lastOffsetX), (float)(lastY + lastOffsetY));
+                            iRadius = Math.signum(iRadius)*Math.min(Math.abs(iRadius), Math.abs(offset));
+                            float iloX = lastX + (float) (iRadius * Math.sin(halfOffsetAngle));
+                            float iloY = lastY + (float)(iRadius * Math.cos(halfOffsetAngle));
+                            result.quadTo(iloX, iloY, lastX+offsetX, lastY + offsetY);
+                        }  else {
+                            // in this case, we insert a linesegment that ends at the intersection between the two offset lines
+                            float iloX = lastX + (float) (iRadius * Math.cos(angle + Math.PI / 2.0 + halfOffsetAngle));
+                            float iloY = lastY + (float)(iRadius * Math.sin(angle + Math.PI / 2.0 + halfOffsetAngle));
+                            result.lineTo(iloX, iloY);
+                        }
                     }
 
                     loX = nloX + dx;
                     loY = nloY + dy;
-//                    result.lineTo(loX, loY);
                     lastX = thisX;
                     lastY = thisY;
                     lastOffsetX = offsetX;

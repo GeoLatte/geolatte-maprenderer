@@ -46,8 +46,8 @@ import java.io.IOException;
 public class TestOffsetRendering {
 
 
-    private static final float LINE_WIDTH = 4.0f;
-    private static final int NUM_IMG = 36;
+    private static final float LINE_WIDTH = 10.0f;
+    private static final int NUM_IMG = 90;
 
     private SpatialReference spatialReference;
     private SpatialExtent extent;
@@ -61,8 +61,8 @@ public class TestOffsetRendering {
         this.spatialReference = new GTSpatialReference("4236", true);
         this.extent = new SpatialExtent(-90,-90, 90, 90, spatialReference);
         this.stroke = new BasicScalableStroke(LINE_WIDTH); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.offsetStroke = new BasicScalableStroke(2.0f) ; //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.offsetStroke.setPerpendicularOffset(6.0f);
+        this.offsetStroke = new BasicScalableStroke(1.0f) ; //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
+        this.offsetStroke.setPerpendicularOffset(-5.0f);
         geomFactory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4236);
 
     }
@@ -73,8 +73,7 @@ public class TestOffsetRendering {
 
         double theta = 2*Math.PI / NUM_IMG;
         for (int i = 0; i < NUM_IMG; i++) {
-            System.out.println("i = " + i);
-            
+            System.out.println("i = " + i);            
             MapGraphics mapGraphics = new JAIMapGraphics(dim, spatialReference);
             mapGraphics.setToExtent(extent);
 
@@ -107,6 +106,7 @@ public class TestOffsetRendering {
         Coordinate[] coordinates = new Coordinate[3];
         coordinates[0] = new Coordinate(-90, 0.0f);
         coordinates[1] = new Coordinate(0.0f, 0.0f);
+        System.out.println("theta = " + i*theta);
         coordinates[2] = new Coordinate(90.0*Math.cos(i*theta), 90.0*Math.sin(i*theta));
         return geomFactory.createLineString(coordinates);
     }
