@@ -16,7 +16,7 @@ package org.geolatte.maprenderer.sld.symbolizer;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
-import org.geolatte.core.reflection.Feature;
+import org.geolatte.core.Feature;
 
 import java.awt.*;
 

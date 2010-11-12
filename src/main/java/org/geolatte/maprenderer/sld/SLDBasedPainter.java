@@ -15,7 +15,7 @@
 package org.geolatte.maprenderer.sld;
 
 
-import org.geolatte.core.reflection.Feature;
+import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.maprenderer.sld.filter.Filter;

@@ -14,13 +14,12 @@
 
 package org.geolatte.java2D;
 
-import org.geolatte.core.reflection.Feature;
+import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.geotools.GTSpatialReference;
-import org.geolatte.maprenderer.map.Painter;
-import org.geolatte.maprenderer.map.SpatialExtent;
-import org.geolatte.maprenderer.sld.SLDBasedPainter;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;
+import org.geolatte.maprenderer.map.Painter;
+import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.test.MockLineStringFeature;
@@ -28,7 +27,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;

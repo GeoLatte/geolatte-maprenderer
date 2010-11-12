@@ -14,7 +14,7 @@
 
 package org.geolatte.maprenderer.sld.symbolizer;
 
-import org.geolatte.core.reflection.Feature;
+import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.sld.SymbolizerBuilder;
 

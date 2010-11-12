@@ -35,4 +35,6 @@ public class MockLineStringFeature extends AbstractMockFeature{
         };
         return geomFactory.createLineString(coordinates);
     }
+
+
 }

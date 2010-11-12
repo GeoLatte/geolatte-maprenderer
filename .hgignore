@@ -1,0 +1,8 @@
+syntax: glob
+
+maprenderer.iml
+maprenderer.ipr
+maprenderer.iws
+*.class
+target
+.idea

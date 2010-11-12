@@ -14,7 +14,7 @@
 
 package org.geolatte.render;
 
-import org.geolatte.core.reflection.Feature;
+import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.geotools.GTSpatialReference;
 import org.geolatte.maprenderer.sld.SLDBasedPainter;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;

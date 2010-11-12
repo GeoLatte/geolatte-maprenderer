@@ -14,7 +14,7 @@
 
 package org.geolatte.maprenderer.java2D;
 
-import org.geolatte.core.reflection.Feature;
+import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.geotools.GTSpatialReferenceFactory;
 import org.geolatte.maprenderer.map.*;
 import org.geolatte.maprenderer.reference.Projector;

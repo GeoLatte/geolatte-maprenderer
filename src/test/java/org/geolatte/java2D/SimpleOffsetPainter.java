@@ -14,8 +14,7 @@
 
 package org.geolatte.java2D;
 
-import com.vividsolutions.jts.geom.Geometry;
-import org.geolatte.core.reflection.Feature;
+import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.maprenderer.shape.BasicScalableStroke;

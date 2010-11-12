@@ -14,7 +14,7 @@
 
 package org.geolatte.test;
 
-import org.geolatte.core.reflection.Feature;
+import org.geolatte.core.Feature;
 
 import java.util.ArrayList;
 import java.util.Iterator;

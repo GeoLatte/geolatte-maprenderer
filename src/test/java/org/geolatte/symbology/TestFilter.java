@@ -14,18 +14,16 @@
 
 package org.geolatte.symbology;
 
-import java.io.File;
-import java.util.Collection;
-
-import org.geolatte.core.reflection.Feature;
-import org.geolatte.maprenderer.sld.filter.Filter;
+import com.vividsolutions.jts.geom.Geometry;
 import net.opengis.ogc.FilterType;
 import net.opengis.se.FeatureTypeStyleType;
 import net.opengis.se.RuleType;
-
+import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.sld.*;
+import org.geolatte.maprenderer.sld.filter.Filter;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.File;
+import java.util.Collection;
 
 public class TestFilter {
 
@@ -87,7 +85,19 @@ public class TestFilter {
             return null;
         }
 
+        public boolean hasId() {
+            return true;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public boolean hasGeometry() {
+            return false;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
         public boolean hasProperty(String s) {
+            return false;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public boolean hasProperty(String s, boolean b) {
             return false;  //To change body of implemented methods use File | Settings | File Templates.
         }
 

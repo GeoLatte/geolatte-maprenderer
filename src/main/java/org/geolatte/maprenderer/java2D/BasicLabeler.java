@@ -15,7 +15,7 @@
 package org.geolatte.maprenderer.java2D;
 
 
-import org.geolatte.core.reflection.Feature;
+import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.map.Labeler;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.reference.Projector;

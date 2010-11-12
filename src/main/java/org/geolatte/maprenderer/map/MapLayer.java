@@ -14,7 +14,7 @@
 
 package org.geolatte.maprenderer.map;
 
-import org.geolatte.core.reflection.Feature;
+import org.geolatte.core.Feature;
 
 public interface MapLayer {
 

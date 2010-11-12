@@ -15,7 +15,7 @@
 package org.geolatte.test;
 
 import com.vividsolutions.jts.geom.*;
-import org.geolatte.core.reflection.Feature;
+import org.geolatte.core.Feature;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,5 +62,21 @@ public abstract class AbstractMockFeature implements Feature {
 
     public Geometry getGeometry() {
         return this.geom;
+    }
+
+    public boolean hasProperty(String s, boolean b) {
+        if (!b) {
+            return b;
+        } else {
+            return hasProperty(s);
+        }
+    }
+
+    public boolean hasId() {
+        return this.id != null;
+    }
+
+    public boolean hasGeometry() {
+        return this.geom != null;
     }
 }

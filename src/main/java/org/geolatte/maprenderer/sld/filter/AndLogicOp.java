@@ -14,7 +14,7 @@
 
 package org.geolatte.maprenderer.sld.filter;
 
-import org.geolatte.core.reflection.Feature;
+import org.geolatte.core.Feature;
 
 
 public class AndLogicOp extends BinaryLogicOp {
