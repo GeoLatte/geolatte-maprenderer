@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: May 23, 2010
  */
+//TODO Replace by Mockito
 public abstract class AbstractMockFeature implements Feature {
     protected static final GeometryFactory geomFactory = new GeometryFactory();
     protected Geometry geom;

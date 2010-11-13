@@ -14,8 +14,6 @@
 
 package org.geolatte.maprenderer.sld.filter;
 
-import org.geolatte.maprenderer.sld.FilterBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
 

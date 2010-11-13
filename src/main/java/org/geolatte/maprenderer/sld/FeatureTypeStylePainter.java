@@ -12,16 +12,36 @@
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.maprenderer.sld.symbolizer;
+package org.geolatte.maprenderer.sld;
+
 
 import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
+import org.geolatte.maprenderer.map.Painter;
+import org.geolatte.maprenderer.sld.filter.Filter;
+import org.geolatte.maprenderer.sld.symbolizer.Rule;
+import org.geolatte.maprenderer.sld.symbolizer.Symbolizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.List;
+
+public class FeatureTypeStylePainter implements Painter {
 
 
-/**
- * @author Karel Maesen, Geovise BVBA
- *         creation-date: May 23, 2010
- */
-public interface Symbolizer {
+    private final List<RulePainter> rulePainters;
 
+    FeatureTypeStylePainter(List<RulePainter> painters){
+        this.rulePainters = painters;
+    }
+
+    @Override
+    public void paint(MapGraphics graphics, Iterable<Feature> features) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public List<RulePainter> getRulePainters() {
+        return Collections.unmodifiableList(rulePainters);
+    }
 }

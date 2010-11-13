@@ -1,94 +1,147 @@
-/*
- * This file is part of the GeoLatte project. This code is licenced under
- * the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing permissions and limitations under the
- * License.
- *
- * Copyright (C) 2010 - 2010 and Ownership of code is shared by:
- * Qmino bvba - Romeinsestraat 18 - 3001 Heverlee (http://www.Qmino.com)
- * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
- */
-
 package org.geolatte.maprenderer.sld;
 
-import org.geolatte.maprenderer.sld.symbolizer.Rule;
+import net.opengis.filter.v_1_1_0.LiteralType;
+import net.opengis.se.v_1_1_0.*;
 
-import javax.xml.namespace.QName;
+import javax.xml.bind.JAXBElement;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+/**
+ *
+ *
+ *
+ * @author Karel Maesen
+ *         Copyright Geovise BVBA, 2010
+ */
 public class FeatureTypeStyle {
 
-    private String name;
-    private String title;
-    private String abstractText;
-    private QName featureTypeName;
-    private final List<Rule> rules = new ArrayList<Rule>();
-    private String version;
+    private final FeatureTypeStyleType type;
 
-
-    public FeatureTypeStyle() {
+    FeatureTypeStyle(FeatureTypeStyleType type){
+        this.type = type;
     }
 
-
-    public String getAbstractText() {
-        return abstractText;
+    public FeatureTypeStylePainter painter(){
+        List<RulePainter> rulePainters = createRulePainters();
+        Collections.reverse(rulePainters);
+        return new FeatureTypeStylePainter(rulePainters);        
     }
 
-
-    public void setAbstractText(String abstractText) {
-        this.abstractText = abstractText;
+    private List<RulePainter> createRulePainters() {
+        List<RulePainter> painters = new ArrayList<RulePainter>();
+        List<Object> rulesOrOnlineResources = type.getRuleOrOnlineResource();
+        for(Object ruleOrInlineResource : rulesOrOnlineResources){
+            if (ruleOrInlineResource instanceof RuleType){
+                createAndaddRulePainter((RuleType)ruleOrInlineResource, painters);
+            }
+        }
+        return painters;
     }
 
-
-    public String getTitle() {
-        return title;
+    private void createAndaddRulePainter(RuleType ruleType, List<RulePainter> painters) {
+        List<SymbolizerPainter> symbolizerPainters = createSymbolizerPainters(ruleType);
+        RulePainter painter = new RulePainter(ruleType.getName(), symbolizerPainters);
+        painters.add(painter);
     }
 
+    private List<SymbolizerPainter> createSymbolizerPainters(RuleType ruleType) {
+        List<SymbolizerPainter> painters = new ArrayList<SymbolizerPainter>();
+        for (JAXBElement<? extends SymbolizerType> symbolizerElement : ruleType.getSymbolizer()){
+            createAndAddSymbolizerPainter(symbolizerElement.getValue(), symbolizerElement.getDeclaredType(), painters);
 
-    public void setTitle(String title) {
-        this.title = title;
+        }
+        return painters;
+
     }
 
-
-    public QName getFeatureTypeName() {
-        return featureTypeName;
-    }
-
-
-    public void setFeatureTypeName(QName featureTypeName) {
-        this.featureTypeName = featureTypeName;
-    }
-
-    public void setFeatureTypeName(String featureTypeName) {
-        this.featureTypeName = new QName(featureTypeName);
+    private void createAndAddSymbolizerPainter(SymbolizerType value, Class<? extends SymbolizerType> declaredType, List<SymbolizerPainter> painters) {
+        SymbolizerPainter painter = null;
+        if (value instanceof LineSymbolizerType){
+            painter = createSymbolizerPainter((LineSymbolizerType)value);
+        }
+        painters.add(painter);        
     }
 
     public String getName() {
-        return name;
+        return type.getName();
     }
 
-
-    public void setName(String name) {
-        this.name = name;
+    public LineSymbolizerPainter createSymbolizerPainter(LineSymbolizerType type) {
+        LineSymbolizerPainter painter = new LineSymbolizerPainter();
+        setUOM(type,painter);
+        copyGeometryProperty(type, painter);
+        copyPerpendicularOffset(type,painter);
+        return painter;
     }
 
-
-    public List<Rule> getRules() {
-        return this.rules;
+    private void copyPerpendicularOffset(LineSymbolizerType type, LineSymbolizerPainter painter) {
+        ParameterValueType pv = type.getPerpendicularOffset();
+        if (pv == null) return;
+        List<Serializable> content = pv.getContent();
+        if (content == null || content.isEmpty()) return;
+        String valueStr = extractValueToString(content);
+        Value<Float> value = Value.of(valueStr.toString(), painter.getUOM());
+        painter.setPerpendicularOffset(value);
     }
 
-    public String getVersion() {
-        return version;
+    private void setUOM(SymbolizerType type, SymbolizerPainter painter) {
+        if (type.getUom() != null){
+            UOM uom = UOM.fromURI(type.getUom());
+            painter.setUnitsOfMeasure(uom);
+        }
     }
 
-
-    public void setVersion(String version) {
-        this.version = version;
+    private void copyGeometryProperty(LineSymbolizerType type, LineSymbolizerPainter painter) {
+        String geomProp = extractGeometryProperty(type);
+        painter.setGeometryProperty(geomProp);
     }
 
+    //TODO -- this extraction only works for simple property names.
+    //XPath expressions or more complex operations are not supported.
+    private String extractGeometryProperty(LineSymbolizerType type) {
+        if (type.getGeometry() == null) return null;
+        if (type.getGeometry().getPropertyName() == null) return null;
+        List<Object> list = type.getGeometry().getPropertyName().getContent();
+        return extractValueToString(list);
+    }
 
+    /**
+     * Combines all string-elements in a node list.
+     *
+     * The node list is assumed to contains either JAXBElements or String elements
+     * @param contentList
+     * @param type
+     * @param <T>
+     * @return
+     */
+    protected String extractValueToString(List<?> contentList){
+        StringBuilder builder = new StringBuilder();
+        extractValueToString(contentList, builder);
+        return builder.toString();
+    }
+
+    protected void extractValueToString(List<?> contentList, StringBuilder builder){
+        for(Object o : contentList){
+            if (o == null) continue;
+            if (o instanceof String){
+                String str = ((String)o).trim();
+                builder.append(str);
+            } else if (o instanceof JAXBElement){
+                addJAXBElementToValueString((JAXBElement)o, builder);
+            }
+        }
+
+    }
+
+    private void addJAXBElementToValueString(JAXBElement element, StringBuilder builder) {
+        Object value = element.getValue();
+        Class<?> type = element.getDeclaredType();
+        if (LiteralType.class.isAssignableFrom(type)){
+            LiteralType literal = LiteralType.class.cast(value);
+            extractValueToString(literal.getContent(), builder);
+        }
+    }
 }

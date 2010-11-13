@@ -14,66 +14,9 @@
 
 package org.geolatte.maprenderer.sld.symbolizer;
 
-import org.geolatte.maprenderer.sld.SymbolizerBuilder;
-
 
 public abstract class AbstractSymbolizer implements Symbolizer {
 
 
-    private String name;
-    private String title;
-    private String abstractText;
-    private SymbolizerBuilder.UnitsOfMeasure uom = SymbolizerBuilder.UnitsOfMeasure.PIXEL;
-    private String version;
-    private String geometryPropertyName;
-
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getAbstractText() {
-        return abstractText;
-    }
-
-    public void setAbstractText(String abstractText) {
-        this.abstractText = abstractText;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public SymbolizerBuilder.UnitsOfMeasure getUom() {
-        return uom;
-    }
-
-    public void setUom(SymbolizerBuilder.UnitsOfMeasure uom) {
-        this.uom = uom;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getGeometryPropertyName() {
-        return geometryPropertyName;
-    }
-
-    public void setGeometryPropertyName(String geometryPropertyName) {
-        this.geometryPropertyName = geometryPropertyName;
-    }
 
 }
