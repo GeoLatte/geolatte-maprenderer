@@ -18,11 +18,6 @@ package org.geolatte.maprenderer.sld;
 import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
-import org.geolatte.maprenderer.sld.filter.Filter;
-import org.geolatte.maprenderer.sld.symbolizer.Rule;
-import org.geolatte.maprenderer.sld.symbolizer.Symbolizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,18 +25,22 @@ import java.util.List;
 public class FeatureTypeStylePainter implements Painter {
 
 
-    private final List<RulePainter> rulePainters;
+    private final List<Rule> rules;
 
-    FeatureTypeStylePainter(List<RulePainter> painters){
-        this.rulePainters = painters;
+    FeatureTypeStylePainter(List<Rule> rules){
+        this.rules = rules;
     }
 
     @Override
     public void paint(MapGraphics graphics, Iterable<Feature> features) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
-    public List<RulePainter> getRulePainters() {
-        return Collections.unmodifiableList(rulePainters);
+    /**
+     * Returns the rules in the order defined by the SLD document.
+     * @return
+     */
+    protected List<Rule> getRules() {
+        return rules;
     }
 }

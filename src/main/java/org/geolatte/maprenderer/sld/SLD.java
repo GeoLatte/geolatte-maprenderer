@@ -60,7 +60,7 @@ public class SLD {
      * @param <E>
      * @return
      */
-    <E> E read(String xmlFragment, Class<E> elementClass) {
+     <E> E read(String xmlFragment, Class<E> elementClass) {
         StringReader reader = new StringReader(xmlFragment);
         try {
             Unmarshaller unmarshaller = ctxt.createUnmarshaller();

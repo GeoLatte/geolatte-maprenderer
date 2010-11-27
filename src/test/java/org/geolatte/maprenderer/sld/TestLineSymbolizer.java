@@ -12,9 +12,9 @@ import static org.junit.Assert.fail;
  * @author Karel Maesen
  *         Copyright Geovise BVBA, 2010
  */
-public class TestLineSymbolizerPainter extends SLDPainterTest {
+public class TestLineSymbolizer extends SLDPainterTest {
 
-    LineSymbolizerPainter painter;
+    LineSymbolizer painter;
     LineSymbolizerType type;
 
     public LineSymbolizerType createSymbolizerType() {
@@ -40,7 +40,7 @@ public class TestLineSymbolizerPainter extends SLDPainterTest {
     public void before(){
         super.before();
         type = createSymbolizerType();
-        painter = getFeatureTypeStyle().createSymbolizerPainter(type);
+        painter = getFeatureTypeStyle().createSymbolizer(type);
     }
 
 
@@ -58,10 +58,10 @@ public class TestLineSymbolizerPainter extends SLDPainterTest {
     @Test
     public void test_uom_is_foot_or_metre() {
         type.setUom("http://www.opengeospatial.org/se/units/foot");
-        painter = getFeatureTypeStyle().createSymbolizerPainter(type);
+        painter = getFeatureTypeStyle().createSymbolizer(type);
         assertEquals(UOM.FOOT, painter.getUOM());
         type.setUom("http://www.opengeospatial.org/se/units/metre");
-        painter = getFeatureTypeStyle().createSymbolizerPainter(type);
+        painter = getFeatureTypeStyle().createSymbolizer(type);
         assertEquals(UOM.METRE, painter.getUOM());
         
     }
@@ -86,7 +86,7 @@ public class TestLineSymbolizerPainter extends SLDPainterTest {
                         "</Stroke>" +
                         "</LineSymbolizer>";
         LineSymbolizerType type = SLD.instance().read(xmlFragment, LineSymbolizerType.class);
-        LineSymbolizerPainter painter = getFeatureTypeStyle().createSymbolizerPainter(type);
+        LineSymbolizer painter = getFeatureTypeStyle().createSymbolizer(type);
         assertNull(painter.getGeometryProperty());
     }
 

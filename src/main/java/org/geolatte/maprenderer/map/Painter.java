@@ -18,8 +18,9 @@ import org.geolatte.core.Feature;
 
 /**
  * Paints the feature in the reader onto the graphics.
- * <p/>
- * Painters must be thread-safe.
+ *
+ * @author Karel Maesen, Geovise BVBA
+ *
  */
 public interface Painter {
 

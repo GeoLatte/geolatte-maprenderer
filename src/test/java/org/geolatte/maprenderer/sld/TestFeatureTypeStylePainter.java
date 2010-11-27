@@ -15,22 +15,21 @@ import static org.junit.Assert.assertNotNull;
 public class TestFeatureTypeStylePainter extends SLDPainterTest{
 
 
-    
+    @Before
+    public void before(){
+        super.before();
+    }
 
     @Test
     public void test_constructor(){
         assertNotNull(painter);
     }
 
-    /**
-     * We need to retrieve painters in reverse order, so that higher-priority
-     * elements are rendered last (i.e. on top of other elements).
-     */
     @Test
-    public void test_get_rules_in_reverse_order(){
-        List<RulePainter> rulePainters = painter.getRulePainters();
-        assertEquals("bottom", rulePainters.get(0).getName());
-        assertEquals("top", rulePainters.get(1).getName());
+    public void test_get_rules(){
+        List<Rule> rules = painter.getRules();
+        assertEquals("top", rules.get(0).getName());
+        assertEquals("bottom", rules.get(1).getName());
     }
 
 

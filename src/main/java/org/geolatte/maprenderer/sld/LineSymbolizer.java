@@ -3,26 +3,19 @@ package org.geolatte.maprenderer.sld;
 import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
 
+import java.awt.*;
+
 /**
  * @author Karel Maesen
  *         Copyright Geovise BVBA, 2010
  */
-public class LineSymbolizerPainter extends SymbolizerPainter{
+public class LineSymbolizer extends AbstractSymbolizer {
 
-    private String geometryProperty;
     private Value<Float> perpendicularOffset = Value.of(0f, UOM.PIXEL);
 
     @Override
-    public void paint(MapGraphics graphics, Iterable<Feature> features) {
+    public void paint(MapGraphics graphics, Shape[] shapes) {
         throw new UnsupportedOperationException();
-    }
-
-    void setGeometryProperty(String geometryProperty) {
-        this.geometryProperty = geometryProperty;
-    }
-
-    public String getGeometryProperty() {
-        return geometryProperty;
     }
 
     void setPerpendicularOffset(Value<Float> perpendicularOffset) {

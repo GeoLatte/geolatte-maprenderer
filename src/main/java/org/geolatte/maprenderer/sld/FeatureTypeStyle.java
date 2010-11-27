@@ -2,14 +2,15 @@ package org.geolatte.maprenderer.sld;
 
 import net.opengis.filter.v_1_1_0.LiteralType;
 import net.opengis.se.v_1_1_0.*;
+import org.geolatte.maprenderer.sld.filter.*;
 
 import javax.xml.bind.JAXBElement;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
+ * A Style that determines how features are painted.
  *
  *
  *
@@ -19,65 +20,78 @@ import java.util.List;
 public class FeatureTypeStyle {
 
     private final FeatureTypeStyleType type;
+    private final List<Rule> rules;
 
     FeatureTypeStyle(FeatureTypeStyleType type){
         this.type = type;
+        this.rules = createRules();
     }
 
-    public FeatureTypeStylePainter painter(){
-        List<RulePainter> rulePainters = createRulePainters();
-        Collections.reverse(rulePainters);
-        return new FeatureTypeStylePainter(rulePainters);        
+    public FeatureTypeStylePainter createPainter(){
+        return new FeatureTypeStylePainter(rules);
     }
 
-    private List<RulePainter> createRulePainters() {
-        List<RulePainter> painters = new ArrayList<RulePainter>();
+    private List<Rule> createRules() {
+        List<Rule> rules = new ArrayList<Rule>();
         List<Object> rulesOrOnlineResources = type.getRuleOrOnlineResource();
         for(Object ruleOrInlineResource : rulesOrOnlineResources){
-            if (ruleOrInlineResource instanceof RuleType){
-                createAndaddRulePainter((RuleType)ruleOrInlineResource, painters);
-            }
+            addIfRule(rules, ruleOrInlineResource);
         }
-        return painters;
+        return rules;
     }
 
-    private void createAndaddRulePainter(RuleType ruleType, List<RulePainter> painters) {
-        List<SymbolizerPainter> symbolizerPainters = createSymbolizerPainters(ruleType);
-        RulePainter painter = new RulePainter(ruleType.getName(), symbolizerPainters);
-        painters.add(painter);
+    private void addIfRule(List<Rule> rules, Object ruleOrInlineResource) {
+        if (ruleOrInlineResource instanceof RuleType){
+            Rule rule = createRule((RuleType)ruleOrInlineResource, rules);
+            rules.add(rule);
+        }
     }
 
-    private List<SymbolizerPainter> createSymbolizerPainters(RuleType ruleType) {
-        List<SymbolizerPainter> painters = new ArrayList<SymbolizerPainter>();
+    private Rule createRule(RuleType ruleType, List<Rule> rules) {
+        List<AbstractSymbolizer> symbolizers = createSymbolizers(ruleType);
+        Filter filter = createFilter(ruleType);
+        Double minScale = ruleType.getMinScaleDenominator();
+        Double maxScale = ruleType.getMaxScaleDenominator();
+        return new Rule(ruleType.getName(), filter, minScale, maxScale, symbolizers);
+    }
+
+    private Filter createFilter(RuleType ruleType) {
+        if (ruleType.getElseFilter() != null) return new ElseFilter();
+        if (ruleType.getFilter() == null ) return new AlwaysTrueFilter();
+        FilterDecoder decoder = new FilterDecoder(ruleType.getFilter());
+        return decoder.decode();
+    }
+
+    private List<AbstractSymbolizer> createSymbolizers(RuleType ruleType) {
+        List<AbstractSymbolizer> symbolizers = new ArrayList<AbstractSymbolizer>();
         for (JAXBElement<? extends SymbolizerType> symbolizerElement : ruleType.getSymbolizer()){
-            createAndAddSymbolizerPainter(symbolizerElement.getValue(), symbolizerElement.getDeclaredType(), painters);
+            createAndAddSymbolizer(symbolizerElement.getValue(), symbolizerElement.getDeclaredType(), symbolizers);
 
         }
-        return painters;
-
+        return symbolizers;
     }
 
-    private void createAndAddSymbolizerPainter(SymbolizerType value, Class<? extends SymbolizerType> declaredType, List<SymbolizerPainter> painters) {
-        SymbolizerPainter painter = null;
+    private void createAndAddSymbolizer(SymbolizerType value, Class<? extends SymbolizerType> declaredType, List<AbstractSymbolizer> symbolizers) {
+        AbstractSymbolizer symbolizer = null;
         if (value instanceof LineSymbolizerType){
-            painter = createSymbolizerPainter((LineSymbolizerType)value);
+            symbolizer = createSymbolizer((LineSymbolizerType)value);
         }
-        painters.add(painter);        
+        symbolizers.add(symbolizer);
     }
 
     public String getName() {
         return type.getName();
     }
 
-    public LineSymbolizerPainter createSymbolizerPainter(LineSymbolizerType type) {
-        LineSymbolizerPainter painter = new LineSymbolizerPainter();
+    public LineSymbolizer createSymbolizer(LineSymbolizerType type) {
+        LineSymbolizer painter = new LineSymbolizer();
         setUOM(type,painter);
         copyGeometryProperty(type, painter);
         copyPerpendicularOffset(type,painter);
         return painter;
     }
 
-    private void copyPerpendicularOffset(LineSymbolizerType type, LineSymbolizerPainter painter) {
+    private void copyPerpendicularOffset(LineSymbolizerType type, LineSymbolizer painter) {
         ParameterValueType pv = type.getPerpendicularOffset();
         if (pv == null) return;
         List<Serializable> content = pv.getContent();
@@ -87,19 +101,18 @@ public class FeatureTypeStyle {
         painter.setPerpendicularOffset(value);
     }
 
-    private void setUOM(SymbolizerType type, SymbolizerPainter painter) {
+    private void setUOM(SymbolizerType type, AbstractSymbolizer symbolizer) {
         if (type.getUom() != null){
             UOM uom = UOM.fromURI(type.getUom());
-            painter.setUnitsOfMeasure(uom);
+            symbolizer.setUnitsOfMeasure(uom);
         }
     }
 
-    private void copyGeometryProperty(LineSymbolizerType type, LineSymbolizerPainter painter) {
+    private void copyGeometryProperty(LineSymbolizerType type, LineSymbolizer painter) {
         String geomProp = extractGeometryProperty(type);
         painter.setGeometryProperty(geomProp);
     }
 
-    //TODO -- this extraction only works for simple property names.
     //XPath expressions or more complex operations are not supported.
     private String extractGeometryProperty(LineSymbolizerType type) {
         if (type.getGeometry() == null) return null;
@@ -113,8 +126,6 @@ public class FeatureTypeStyle {
      *
      * The node list is assumed to contains either JAXBElements or String elements
      * @param contentList
-     * @param type
-     * @param <T>
      * @return
      */
     protected String extractValueToString(List<?> contentList){

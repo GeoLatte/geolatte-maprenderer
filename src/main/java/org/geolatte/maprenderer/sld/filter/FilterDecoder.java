@@ -14,10 +14,17 @@
 
 package org.geolatte.maprenderer.sld.filter;
 
+import net.opengis.filter.v_1_1_0.FilterType;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class FilterBuilderImpl implements FilterBuilder {
+public class FilterDecoder {
+
+    public FilterDecoder(FilterType filterType){
+
+
+    }
 
     List<Expr<?, ?>> filterTokens = new ArrayList<Expr<?, ?>>();
     int currentExpr = 0;
@@ -73,7 +80,7 @@ public class FilterBuilderImpl implements FilterBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    public Filter getResult() {
+    public Filter decode() {
         if (filterTokens.isEmpty()) {
             return new Filter();
         }

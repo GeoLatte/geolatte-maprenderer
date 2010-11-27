@@ -16,14 +16,15 @@ public class TestSLD {
     private static final String TEST_SLD_FILE = "test-sld.xml";
     @Test
     public void test_unmarshal_featuretypestyletype(){        
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("TEST_SLD_FILE");
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(TEST_SLD_FILE);
         FeatureTypeStyleType style = SLD.instance().unmarshal(in);
         assertNotNull(style);
     }
 
     @Test
     public void test_create_FeatureTypeStyle(){
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("TEST_SLD_FILE");
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(TEST_SLD_FILE);
         FeatureTypeStyle style = SLD.instance().create(in);
+        assertNotNull(style);
     }
 }

@@ -1,11 +1,7 @@
 package org.geolatte.maprenderer.sld;
 
-import net.opengis.se.v_1_1_0.FeatureTypeStyleType;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.InputStream;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -17,6 +13,11 @@ import static org.junit.Assert.assertNotNull;
 public class TestFeatureTypeStyle extends SLDPainterTest {
 
 
+    @Before
+    public void before(){
+        super.before();
+    }
+
     @Test
     public void test_constructor(){
         FeatureTypeStyle style = new FeatureTypeStyle(sldRoot);
@@ -27,10 +28,10 @@ public class TestFeatureTypeStyle extends SLDPainterTest {
 
     @Test
     public void test_create_painter(){
-        FeatureTypeStylePainter painter = featureTypeStyle.painter();
+        FeatureTypeStylePainter painter = featureTypeStyle.createPainter();
         assertNotNull(painter);
-        assertNotNull(painter.getRulePainters());
-        assertEquals(2, painter.getRulePainters().size());
+        assertNotNull(painter.getRules());
+        assertEquals(3, painter.getRules().size());
     }
 
     

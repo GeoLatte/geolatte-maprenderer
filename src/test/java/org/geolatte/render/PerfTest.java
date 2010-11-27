@@ -64,10 +64,10 @@
 //        SpatialExtent extent = new SpatialExtent(0, 0, 90, 90, spRef);
 //        graphics.setToExtent(extent);
 //        FeatureTypeStyle fts = createFeatureTypeStyle();
-//        SLDBasedPainter painter = new SLDBasedPainter(fts);
+//        SLDBasedPainter createPainter = new SLDBasedPainter(fts);
 //        long t1 = System.currentTimeMillis();
 //        System.out.print("Start rendering....");
-//        painter.paint(graphics, features);
+//        createPainter.paint(graphics, features);
 //        RenderedImage img = graphics.createRendering();
 //        long t2 = System.currentTimeMillis();
 //        System.out.println("Rendering took: " + (t2 - t1) + " ms.");

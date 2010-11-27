@@ -61,4 +61,11 @@ public class TestValue {
 
     }
 
+    @Test
+    public void test_on_existing_uom_assumes_pixels() {
+        Value<Float> received = Value.of("5 bla", UOM.PIXEL);
+        assertEquals(Float.valueOf(5.0f), received.value());
+        assertEquals(UOM.PIXEL, received.uom());
+    }
+
 }

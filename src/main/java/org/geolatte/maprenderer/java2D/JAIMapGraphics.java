@@ -128,10 +128,9 @@ public class JAIMapGraphics extends MapGraphics {
         double sx = width / extent.getWidth();
         double sy = height / extent.getHeight();
         this.scale = (float) Math.min(sx, sy);
+        //TODO -- shouldn't I maintain aspect-ratio?
         atf.scale(sx, -sy);
         atf.translate(-extent.getMinX(), -extent.getMaxY());
-//        AffineTransform tr = (AffineTransform) projection.clone();
-//        tr.concatenate(modelView);
         setTransform(atf);
     }
 

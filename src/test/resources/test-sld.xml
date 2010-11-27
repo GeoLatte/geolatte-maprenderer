@@ -11,6 +11,8 @@
     <FeatureTypeName>road_arc</FeatureTypeName>
     <Rule>
         <Name>top</Name>
+        <MinScaleDenominator>100</MinScaleDenominator>
+        <MaxScaleDenominator>1000</MaxScaleDenominator>
         <ogc:Filter>
             <ogc:PropertyIsEqualTo>
                 <ogc:PropertyName>num_lanes</ogc:PropertyName>
@@ -86,4 +88,15 @@
             </Stroke>
         </LineSymbolizer>
     </Rule>
+    <Rule>
+        <Name>bottom</Name>
+        <ElseFilter/>
+        <LineSymbolizer>
+            <Geometry><ogc:PropertyName>geometry</ogc:PropertyName></Geometry>
+            <Stroke>
+                <SvgParameter name="stroke">#FFFFFF</SvgParameter>
+            </Stroke>
+        </LineSymbolizer>
+    </Rule>
+
 </FeatureTypeStyle>

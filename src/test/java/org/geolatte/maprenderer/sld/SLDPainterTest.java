@@ -1,7 +1,6 @@
 package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.FeatureTypeStyleType;
-import org.junit.Before;
 import org.junit.BeforeClass;
 
 import java.io.InputStream;
@@ -16,7 +15,7 @@ public class SLDPainterTest {
 
     FeatureTypeStyle featureTypeStyle;
     FeatureTypeStylePainter painter;
-    LineSymbolizerPainter lsPainter;
+
 
 
     @BeforeClass
@@ -27,7 +26,7 @@ public class SLDPainterTest {
 
     public void before(){
         featureTypeStyle = new FeatureTypeStyle(sldRoot);
-        painter = featureTypeStyle.painter();
+        painter = featureTypeStyle.createPainter();
     }
 
 

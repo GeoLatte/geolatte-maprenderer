@@ -52,7 +52,7 @@ public class Value<U extends Number> {
             char c = valueString.charAt(i);
             if (toEnd){
                 uomBuf.append(c);
-            } else if (startedNum && !Character.isLetter(c)){
+            } else if (startedNum && !Character.isLetter(c)){                
                 numBuf.append(c);
             } else if (startedNum && Character.isLetter(c) ){
                 toEnd = true;
