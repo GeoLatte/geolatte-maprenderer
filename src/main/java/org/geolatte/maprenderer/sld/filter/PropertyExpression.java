@@ -16,32 +16,29 @@ package org.geolatte.maprenderer.sld.filter;
 
 import org.geolatte.core.Feature;
 
+public class PropertyExpression extends Expression<Object, Object> {
 
-public class NegationExpr extends Expr<Boolean, Boolean> {
+    private String propertyName;
 
-
-    private Expr<Boolean, ?> operand = null;
-
-
-    public void setOperand(Expr<Boolean, ?> expr) {
-        this.operand = expr;
+    public void setPropertyName(String property) {
+        this.propertyName = property;
     }
 
-    public Boolean evaluate(Feature feature) {
-        return !this.operand.evaluate(feature);
+
+    public Object evaluate(Feature feature) {
+        return feature.getProperty(this.propertyName);
     }
 
-    @Override
     public int getNumArgs() {
-        return 1;
+        // TODO Auto-generated method stub
+        return 0;
     }
 
-    @Override
-    public void setArgs(Expr<Boolean, ?>[] args) {
-        this.operand = args[0];
+    public void setArg(int i, Expression<Object, ?> arg) {
+        //never invoked
     }
 
     public String toString() {
-        return "NOT (" + this.operand.toString() + ")";
+        return this.propertyName;
     }
 }

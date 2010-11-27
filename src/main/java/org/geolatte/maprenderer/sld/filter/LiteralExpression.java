@@ -16,7 +16,7 @@ package org.geolatte.maprenderer.sld.filter;
 
 import org.geolatte.core.Feature;
 
-public class LiteralExpr extends Expr<Object, Object> {
+public class LiteralExpression extends Expression<String, Object> {
 
 
     public String value;
@@ -25,16 +25,15 @@ public class LiteralExpr extends Expr<Object, Object> {
         this.value = value;
     }
 
-    public Object evaluate(Feature feature) {
+    public String evaluate(Feature feature) {
         return this.value;
     }
 
     public int getNumArgs() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
-    public void setArgs(Expr<Object, ?>[] args) {
+    public void setArg(int i, Expression<Object, ?> arg) {
         //never invoked
     }
 

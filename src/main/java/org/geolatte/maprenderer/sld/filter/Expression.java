@@ -17,20 +17,17 @@ package org.geolatte.maprenderer.sld.filter;
 import org.geolatte.core.Feature;
 
 
-public class Filter {
+/**
+ * @author maesenka
+ * @param <T> type that this expression evaluates to
+ * @param <U> type that this expression is built from
+ */
+public abstract class Expression<T, U> {
 
-    private Expression<Boolean, ?> expression = null;
+    abstract public T evaluate(Feature feature);
 
-    public void setFilterExpr(Expression<Boolean, ?> expression) {
-        this.expression = expression;
-    }
+    abstract public int getNumArgs();
 
-    public Boolean evaluate(Feature feature) {
-        return this.expression.evaluate(feature);
-    }
-
-    public String toString() {
-        return this.expression == null ? "NULL FILTER" : this.expression.toString();
-    }
+    abstract public void setArg(int numArg, Expression<U, ?> arg);
 
 }

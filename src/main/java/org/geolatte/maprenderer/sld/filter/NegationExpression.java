@@ -17,17 +17,31 @@ package org.geolatte.maprenderer.sld.filter;
 import org.geolatte.core.Feature;
 
 
-/**
- * @author maesenka
- * @param <T> type that this expression evaluates to
- * @param <U> type that this expression is built from
- */
-public abstract class Expr<T, U> {
+public class NegationExpression extends Expression<Boolean, Boolean> {
 
-    abstract public T evaluate(Feature feature);
 
-    abstract public int getNumArgs();
+    private Expression<Boolean, ?> operand = null;
 
-    abstract public void setArgs(Expr<U, ?>[] args);
 
+    public void setOperand(Expression<Boolean, ?> expression) {
+        this.operand = expression;
+    }
+
+    public Boolean evaluate(Feature feature) {
+        return !this.operand.evaluate(feature);
+    }
+
+    @Override
+    public int getNumArgs() {
+        return 1;
+    }
+
+    @Override
+    public void setArg(int i, Expression<Boolean, ?> arg) {
+        this.operand = arg;
+    }
+
+    public String toString() {
+        return "NOT (" + this.operand.toString() + ")";
+    }
 }

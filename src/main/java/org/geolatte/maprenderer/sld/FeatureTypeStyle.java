@@ -1,8 +1,11 @@
 package org.geolatte.maprenderer.sld;
 
-import net.opengis.filter.v_1_1_0.LiteralType;
 import net.opengis.se.v_1_1_0.*;
-import org.geolatte.maprenderer.sld.filter.*;
+import org.geolatte.maprenderer.sld.filter.AlwaysTrueFilter;
+import org.geolatte.maprenderer.sld.filter.ElseFilter;
+import org.geolatte.maprenderer.sld.filter.Filter;
+import org.geolatte.maprenderer.sld.filter.FilterDecoder;
+import org.geolatte.maprenderer.util.JAXBHelper;
 
 import javax.xml.bind.JAXBElement;
 import java.io.Serializable;
@@ -12,37 +15,40 @@ import java.util.List;
 /**
  * A Style that determines how features are painted.
  *
- *
- *
  * @author Karel Maesen
  *         Copyright Geovise BVBA, 2010
  */
 public class FeatureTypeStyle {
 
-    private final FeatureTypeStyleType type;
     private final List<Rule> rules;
+    private final String name;
 
-    FeatureTypeStyle(FeatureTypeStyleType type){
-        this.type = type;
-        this.rules = createRules();
+
+    FeatureTypeStyle(FeatureTypeStyleType type) {
+        this.name = type.getName();
+        this.rules = createRules(type);
     }
 
-    public FeatureTypeStylePainter createPainter(){
+    public FeatureTypeStylePainter createPainter() {
         return new FeatureTypeStylePainter(rules);
     }
 
-    private List<Rule> createRules() {
+    public String getName() {
+        return this.name;
+    }
+
+    private List<Rule> createRules(FeatureTypeStyleType type) {
         List<Rule> rules = new ArrayList<Rule>();
         List<Object> rulesOrOnlineResources = type.getRuleOrOnlineResource();
-        for(Object ruleOrInlineResource : rulesOrOnlineResources){
+        for (Object ruleOrInlineResource : rulesOrOnlineResources) {
             addIfRule(rules, ruleOrInlineResource);
         }
         return rules;
     }
 
     private void addIfRule(List<Rule> rules, Object ruleOrInlineResource) {
-        if (ruleOrInlineResource instanceof RuleType){
-            Rule rule = createRule((RuleType)ruleOrInlineResource, rules);
+        if (ruleOrInlineResource instanceof RuleType) {
+            Rule rule = createRule((RuleType) ruleOrInlineResource, rules);
             rules.add(rule);
         }
     }
@@ -57,14 +63,14 @@ public class FeatureTypeStyle {
 
     private Filter createFilter(RuleType ruleType) {
         if (ruleType.getElseFilter() != null) return new ElseFilter();
-        if (ruleType.getFilter() == null ) return new AlwaysTrueFilter();
+        if (ruleType.getFilter() == null) return new AlwaysTrueFilter();
         FilterDecoder decoder = new FilterDecoder(ruleType.getFilter());
         return decoder.decode();
     }
 
     private List<AbstractSymbolizer> createSymbolizers(RuleType ruleType) {
         List<AbstractSymbolizer> symbolizers = new ArrayList<AbstractSymbolizer>();
-        for (JAXBElement<? extends SymbolizerType> symbolizerElement : ruleType.getSymbolizer()){
+        for (JAXBElement<? extends SymbolizerType> symbolizerElement : ruleType.getSymbolizer()) {
             createAndAddSymbolizer(symbolizerElement.getValue(), symbolizerElement.getDeclaredType(), symbolizers);
 
         }
@@ -73,21 +79,17 @@ public class FeatureTypeStyle {
 
     private void createAndAddSymbolizer(SymbolizerType value, Class<? extends SymbolizerType> declaredType, List<AbstractSymbolizer> symbolizers) {
         AbstractSymbolizer symbolizer = null;
-        if (value instanceof LineSymbolizerType){
-            symbolizer = createSymbolizer((LineSymbolizerType)value);
+        if (value instanceof LineSymbolizerType) {
+            symbolizer = createSymbolizer((LineSymbolizerType) value);
         }
         symbolizers.add(symbolizer);
     }
 
-    public String getName() {
-        return type.getName();
-    }
-
     public LineSymbolizer createSymbolizer(LineSymbolizerType type) {
         LineSymbolizer painter = new LineSymbolizer();
-        setUOM(type,painter);
+        setUOM(type, painter);
         copyGeometryProperty(type, painter);
-        copyPerpendicularOffset(type,painter);
+        copyPerpendicularOffset(type, painter);
         return painter;
     }
 
@@ -96,13 +98,13 @@ public class FeatureTypeStyle {
         if (pv == null) return;
         List<Serializable> content = pv.getContent();
         if (content == null || content.isEmpty()) return;
-        String valueStr = extractValueToString(content);
+        String valueStr = JAXBHelper.extractValueToString(content);
         Value<Float> value = Value.of(valueStr.toString(), painter.getUOM());
         painter.setPerpendicularOffset(value);
     }
 
     private void setUOM(SymbolizerType type, AbstractSymbolizer symbolizer) {
-        if (type.getUom() != null){
+        if (type.getUom() != null) {
             UOM uom = UOM.fromURI(type.getUom());
             symbolizer.setUnitsOfMeasure(uom);
         }
@@ -114,45 +116,11 @@ public class FeatureTypeStyle {
     }
 
     //XPath expressions or more complex operations are not supported.
+
     private String extractGeometryProperty(LineSymbolizerType type) {
         if (type.getGeometry() == null) return null;
         if (type.getGeometry().getPropertyName() == null) return null;
         List<Object> list = type.getGeometry().getPropertyName().getContent();
-        return extractValueToString(list);
-    }
-
-    /**
-     * Combines all string-elements in a node list.
-     *
-     * The node list is assumed to contains either JAXBElements or String elements
-     * @param contentList
-     * @return
-     */
-    protected String extractValueToString(List<?> contentList){
-        StringBuilder builder = new StringBuilder();
-        extractValueToString(contentList, builder);
-        return builder.toString();
-    }
-
-    protected void extractValueToString(List<?> contentList, StringBuilder builder){
-        for(Object o : contentList){
-            if (o == null) continue;
-            if (o instanceof String){
-                String str = ((String)o).trim();
-                builder.append(str);
-            } else if (o instanceof JAXBElement){
-                addJAXBElementToValueString((JAXBElement)o, builder);
-            }
-        }
-
-    }
-
-    private void addJAXBElementToValueString(JAXBElement element, StringBuilder builder) {
-        Object value = element.getValue();
-        Class<?> type = element.getDeclaredType();
-        if (LiteralType.class.isAssignableFrom(type)){
-            LiteralType literal = LiteralType.class.cast(value);
-            extractValueToString(literal.getContent(), builder);
-        }
+        return JAXBHelper.extractValueToString(list);
     }
 }

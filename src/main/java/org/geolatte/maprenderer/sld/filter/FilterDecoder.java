@@ -14,99 +14,117 @@
 
 package org.geolatte.maprenderer.sld.filter;
 
-import net.opengis.filter.v_1_1_0.FilterType;
+import net.opengis.filter.v_1_1_0.*;
+import org.geolatte.maprenderer.util.JAXBHelper;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.xml.bind.JAXBElement;
 
 public class FilterDecoder {
 
-    public FilterDecoder(FilterType filterType){
+    private JAXBElement<?> expressionRoot;
 
-
-    }
-
-    List<Expr<?, ?>> filterTokens = new ArrayList<Expr<?, ?>>();
-    int currentExpr = 0;
-
-    public void AddLiteral(String litVal) {
-        LiteralExpr expr = new LiteralExpr();
-        expr.SetValue(litVal);
-        filterTokens.add(expr);
-    }
-
-    public void addBinaryComparisonOp(String operator, boolean matchCase) {
-        BinaryComparisonOp op = new BinaryComparisonOp();
-        op.setMatchCase(matchCase);
-        op.setOperator(Comparison.valueOf(operator));
-        filterTokens.add(op);
-    }
-
-    public void addBinaryLogicOp(String operator) {
-        BinaryLogicOp op;
-        if (operator.equalsIgnoreCase("or")) {
-            op = new OrLogicOp();
-        } else {
-            op = new AndLogicOp();
+    public FilterDecoder(FilterType filterType) {
+        if (filterType.getComparisonOps() != null) {
+            this.expressionRoot = filterType.getComparisonOps();
+            return;
         }
-        filterTokens.add(op);
-
+        throw new UnsupportedOperationException();
     }
 
-    public void addIsBetween() {
-        throw new UnsupportedOperationException("Not implemented");
-
-    }
-
-    public void addIsLikeOperator(String wildCard, String singleChar,
-                                  String escape) {
-        throw new UnsupportedOperationException("Not implemented");
-
-    }
-
-    public void addIsNull() {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    public void addNegation() {
-        NegationExpr op = new NegationExpr();
-        filterTokens.add(op);
-    }
-
-    public void addProperty(String content) {
-        PropertyExpr expr = new PropertyExpr();
-        expr.setPropertyName(content);
-        filterTokens.add(expr);
-    }
-
-    @SuppressWarnings("unchecked")
     public Filter decode() {
-        if (filterTokens.isEmpty()) {
-            return new Filter();
-        }
-
-        Expr<Boolean, ?> root = build();
+        Expression<Boolean, ?> expression = (Expression<Boolean, ?>) parse(expressionRoot);
 
         Filter filter = new Filter();
-        filter.setFilterExpr(root);
-
+        filter.setFilterExpr(expression);
         return filter;
     }
 
-    @SuppressWarnings("unchecked")
-    private Expr build() {
-        Expr expression = filterTokens.get(this.currentExpr);
-        int numArgs = expression.getNumArgs();
-        if (numArgs == 0) {
-            return expression;
+    private Expression<?, ?> parse(JAXBElement<?> element) {
+
+        if (element.getDeclaredType() == BinaryComparisonOpType.class) {
+            Comparison comparison = Comparison.valueOf(element.getName().getLocalPart());
+            return binaryComparison((BinaryComparisonOpType) element.getValue(), comparison);
         }
-        Expr[] operands = new Expr[numArgs];
-        for (int i = 0; i < numArgs; i++) {
-            currentExpr++;
-            operands[i] = build();
+
+        if (element.getDeclaredType() == PropertyNameType.class) {
+            return propertyName((PropertyNameType) element.getValue());
         }
-        expression.setArgs(operands);
+
+        if (element.getDeclaredType() == LiteralType.class) {
+            return literal((LiteralType) element.getValue());
+        }
+
+        if (element.getDeclaredType() == PropertyIsLikeType.class) {
+            return propertyIsLike((PropertyIsLikeType) element.getValue());
+        }
+
+
+        throw new UnsupportedOperationException(element.getDeclaredType().getSimpleName());
+    }
+
+
+    private BinaryComparisonOp binaryComparison(BinaryComparisonOpType operator, Comparison comparison) {
+        BinaryComparisonOp op = new BinaryComparisonOp(comparison, operator.isMatchCase());
+        int i = 0;
+        for (JAXBElement<?> expression : operator.getExpression()) {
+            Expression<Object, ?> arg = (Expression<Object, Object>) parse(expression);
+            op.setArg(i++, arg);
+        }
+        return op;
+    }
+
+    private LiteralExpression literal(LiteralType literal) {
+        LiteralExpression expression = new LiteralExpression();
+        expression.SetValue(JAXBHelper.extractValueToString(literal.getContent()));
         return expression;
+    }
+
+    private PropertyIsLikeOp propertyIsLike(PropertyIsLikeType element) {
+        PropertyIsLikeOp op = new PropertyIsLikeOp(element.getWildCard(), element.getSingleChar(), element.getEscapeChar());
+        PropertyExpression property = propertyName(element.getPropertyName());
+        LiteralExpression literal = literal(element.getLiteral());
+        op.setProperty(property);
+        op.setLiteral(literal);
+        return op;
+    }
+//
+//    public void addBinaryLogicOp(String operator) {
+//        BinaryLogicOp op;
+//        if (operator.equalsIgnoreCase("or")) {
+//            op = new OrLogicOp();
+//        } else {
+//            op = new AndLogicOp();
+//        }
+//        filterTokens.add(op);
+//
+//    }
+//
+//    public void addIsBetween() {
+//        throw new UnsupportedOperationException("Not implemented");
+//
+//    }
+//
+//    public void addIsLikeOperator(String wildCard, String singleChar,
+//                                  String escape) {
+//        throw new UnsupportedOperationException("Not implemented");
+//
+//    }
+//
+//    public void addIsNull() {
+//        throw new UnsupportedOperationException("Not implemented");
+//    }
+//
+//    public void addNegation() {
+//        NegationExpression op = new NegationExpression();
+//        filterTokens.add(op);
+//    }
+
+
+    private PropertyExpression propertyName(PropertyNameType propertyElement) {
+        PropertyExpression property = new PropertyExpression();
+        String propertyName = JAXBHelper.extractValueToString(propertyElement.getContent());
+        property.setPropertyName(propertyName);
+        return property;
     }
 
 }

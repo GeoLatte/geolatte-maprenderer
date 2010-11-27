@@ -12,33 +12,16 @@
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.maprenderer.sld.filter;
+package org.geolatte.maprenderer.util;
 
-import org.geolatte.core.Feature;
+/**
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: Nov 27, 2010
+ */
+public class ConversionException extends RuntimeException {
 
-public class PropertyExpr extends Expr<Object, Object> {
-
-    private String propertyName;
-
-    public void setPropertyName(String property) {
-        this.propertyName = property;
+    public ConversionException(Throwable t) {
+        super(t);
     }
 
-
-    public Object evaluate(Feature feature) {
-        return feature.getProperty(this.propertyName);
-    }
-
-    public int getNumArgs() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public void setArgs(Expr<Object, ?>[] args) {
-        //never invoked
-    }
-
-    public String toString() {
-        return this.propertyName;
-    }
 }

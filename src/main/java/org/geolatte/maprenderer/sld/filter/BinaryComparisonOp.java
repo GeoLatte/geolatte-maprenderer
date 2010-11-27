@@ -15,71 +15,51 @@
 package org.geolatte.maprenderer.sld.filter;
 
 import org.geolatte.core.Feature;
-import org.geolatte.maprenderer.util.DataConvertor;
-
-import java.util.Date;
+import org.geolatte.maprenderer.util.TypeConverter;
 
 
-public class BinaryComparisonOp extends Expr<Boolean, Object> {
+public class BinaryComparisonOp extends Expression<Boolean, Object> {
 
-    Expr<Object, ?> operand1;
-    Expr<Object, ?> operand2;
-    Comparison operator;
-    boolean matchCase;
+    private final Comparison operator;
+    private final boolean matchCase;
+    Expression<Object, ?> operand1;
+    Expression<Object, ?> operand2;
 
-    private DataConvertor convertor = new DataConvertor();
-
-    public boolean isMatchCase() {
-        return matchCase;
-    }
-
-    public void setMatchCase(boolean matchCase) {
+    BinaryComparisonOp(Comparison operator, boolean matchCase) {
+        this.operator = operator;
         this.matchCase = matchCase;
     }
-
-    public Comparison getOperator() {
-        return operator;
-    }
-
-    public void setOperator(Comparison operator) {
-        this.operator = operator;
-    }
-
 
     public Boolean evaluate(Feature feature) {
         Object v1 = this.operand1.evaluate(feature);
         Object v2 = this.operand2.evaluate(feature);
+        Comparable c1;
+        Comparable c2;
 
-
-        if (v1 instanceof java.util.Date || v2 instanceof java.util.Date) {
-            Date d1 = this.convertor.convertToDate(v1);
-            Date d2 = this.convertor.convertToDate(v2);
-            return eval(d1.compareTo(d2));
+        if (v1 instanceof String && !(v2 instanceof String)) {
+            c1 = convertToComparable(v1, v2);
+            c2 = (Comparable) v2;
+        } else if (!(v1 instanceof String) && v2 instanceof String) {
+            c2 = convertToComparable(v2, v1);
+            c1 = (Comparable) v1;
+        } else if (v1 instanceof String && v1 instanceof String) {
+            return StringCompare(v1, v2);
+        } else {
+            c1 = (Comparable) v1;
+            c2 = (Comparable) v2;
         }
-
-        if (v1 instanceof Integer || v1 instanceof Long ||
-                v2 instanceof Integer || v2 instanceof Long) {
-            Long l1 = this.convertor.convertToLong(v1);
-            Long l2 = this.convertor.convertToLong(v2);
-            return eval(l1.compareTo(l2));
-        }
-
-        if (v1 instanceof Float || v1 instanceof Double ||
-                v2 instanceof Float || v2 instanceof Double) {
-            Double d1 = this.convertor.convertToDouble(v1);
-            Double d2 = this.convertor.convertToDouble(v2);
-            return eval(d1.compareTo(d2));
-        }
-
-        if (v1 instanceof String || v2 instanceof String) {
-            String s1 = this.convertor.convertToString(v1);
-            String s2 = this.convertor.convertToString(v2);
-            return this.matchCase ? eval(s1.compareTo(s2)) :
-                    eval(s1.compareToIgnoreCase(s2));
-        }
-        throw new RuntimeException("Objects do not match known type.");
+        return eval(c1.compareTo(c2));
     }
 
+    private boolean StringCompare(Object v1, Object v2) {
+        String s1 = (String) v1;
+        String s2 = (String) v2;
+        return this.matchCase ? eval(s1.compareTo(s1)) : eval(s1.compareToIgnoreCase(s2));
+    }
+
+    private Comparable convertToComparable(Object v1, Object v2) {
+        return TypeConverter.instance().convert((String) v1, (Class<Comparable>) v2.getClass());
+    }
 
     private Boolean eval(int compare) {
 
@@ -107,9 +87,9 @@ public class BinaryComparisonOp extends Expr<Boolean, Object> {
     }
 
     @Override
-    public void setArgs(Expr<Object, ?>[] args) {
-        this.operand1 = args[0];
-        this.operand2 = args[1];
+    public void setArg(int i, Expression<Object, ?> arg) {
+        if (i == 0) this.operand1 = arg;
+        if (i == 1) this.operand2 = arg;
     }
 
     public String toString() {

@@ -14,22 +14,22 @@
 
 package org.geolatte.maprenderer.sld.filter;
 
-public abstract class BinaryLogicOp extends Expr<Boolean,Boolean>{
-	
-	private Expr<Boolean,?>[] operands;
-	
-	
-	public Expr<Boolean,?>[] getOperands() {
-		return operands;
-	}
-	
-	public void setArgs(Expr<Boolean,?>[] operands) {
-		this.operands = operands;
-	}
-	
-	public int getNumArgs(){
-		return 2;
-	}
-	
+public abstract class BinaryLogicOp extends Expression<Boolean, Boolean> {
+
+    private Expression<Boolean, ?>[] operands;
+
+
+    public Expression<Boolean, ?>[] getOperands() {
+        return operands;
+    }
+
+    public void setArg(int i, Expression<Boolean, ?> operand) {
+        this.operands[i] = operand;
+    }
+
+    public int getNumArgs() {
+        return 2;
+    }
+
 
 }
