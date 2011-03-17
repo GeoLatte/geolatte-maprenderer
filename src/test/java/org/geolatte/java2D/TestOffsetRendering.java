@@ -21,20 +21,17 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 import org.geolatte.maprenderer.geotools.GTSpatialReference;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.maprenderer.shape.BasicScalableStroke;
 import org.geolatte.maprenderer.shape.ScalableStroke;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
-import org.geolatte.test.MockLineStringFeature;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.geom.Line2D;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +43,9 @@ import java.io.IOException;
 public class TestOffsetRendering {
 
 
-    private static final float LINE_WIDTH = 10.0f;
+    private static final float LINE_WIDTH = 5.0f;
+    private static final float OFFSET  = 8.0f;
+    private static final float OFFSET_LINE_WIDTH = 1.0f;
     private static final int NUM_IMG = 90;
 
     private SpatialReference spatialReference;
@@ -54,45 +53,73 @@ public class TestOffsetRendering {
     private java.awt.Dimension dim = new java.awt.Dimension(512, 512);
     private ScalableStroke stroke;
     private ScalableStroke offsetStroke;
+    private ScalableStroke negOffsetStroke;
     private GeometryFactory geomFactory;
 
     @Before
     public void setUp() throws SpatialReferenceCreationException {
         this.spatialReference = new GTSpatialReference("4236", true);
-        this.extent = new SpatialExtent(-90,-90, 90, 90, spatialReference);
+        this.extent = new SpatialExtent(-90, -90, 90, 90, spatialReference);
         this.stroke = new BasicScalableStroke(LINE_WIDTH); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.offsetStroke = new BasicScalableStroke(1.0f) ; //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.offsetStroke.setPerpendicularOffset(-5.0f);
+        this.offsetStroke = new BasicScalableStroke(OFFSET_LINE_WIDTH); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
+        this.offsetStroke.setPerpendicularOffset(-OFFSET);
+        this.negOffsetStroke = new BasicScalableStroke(OFFSET_LINE_WIDTH); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
+        this.negOffsetStroke.setPerpendicularOffset(OFFSET);
+
+
         geomFactory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4236);
 
     }
 
 
     @Test
-    public void test_paint_lines_with_offset() throws IOException {
+    public void test_paint_lines_left_to_right_with_offset() throws IOException {
+        renderImage(offsetStroke, "/tmp/img/offset-left-to-right-painter-", true);
+    }
 
-        double theta = 2*Math.PI / NUM_IMG;
+    @Test
+    public void test_paint_lines_right_to_left_with_offset() throws IOException {
+        renderImage(offsetStroke, "/tmp/img/offset-right-to-left-painter-", false);
+    }
+
+
+    @Test
+    public void test_paint_lines_left_to_right_with_negative_offset() throws IOException {
+        renderImage(negOffsetStroke, "/tmp/img/negative-offset-left-to-right-", true);
+    }
+
+    @Test
+    public void test_paint_lines_right_to_left_with_negative_offset() throws IOException {
+        renderImage(negOffsetStroke, "/tmp/img/negative-offset-right-to-left-", false);
+    }
+
+    private void renderImage(ScalableStroke offsetStroke, String path, boolean leftToRight) throws IOException {
+
+        double theta = 2 * Math.PI / NUM_IMG;
         for (int i = 0; i < NUM_IMG; i++) {
-            System.out.println("i = " + i);            
+            System.out.println("i = " + i);
             MapGraphics mapGraphics = new JAIMapGraphics(dim, spatialReference);
             mapGraphics.setToExtent(extent);
 
-            LineString line = generateLineStrings(i, theta);
+            LineString line = generateLineStrings(i, theta, leftToRight);
             mapGraphics.setStroke(stroke);
             mapGraphics.setColor(Color.BLACK);
             drawLineString(line, mapGraphics);
 
             mapGraphics.setStroke(offsetStroke);
-            mapGraphics.setColor(Color.RED);
+            Color red = new Color(255,0,0,120);
+//            mapGraphics.setColor(Color.RED);
+            mapGraphics.setColor(red);
             drawLineString(line, mapGraphics);
 
             RenderedImage img = mapGraphics.createRendering();
-            File file = new File("/tmp/img/" + i + "-offset-painter.png");
+            File file = new File(path + i + ".png");
             ImageIO.write(img, "PNG", file);
 
         }
 
     }
+
 
     private void drawLineString(LineString line, MapGraphics mapGraphics) {
         ShapeAdapter adapter = new ShapeAdapter(mapGraphics.getTransform());
@@ -102,12 +129,20 @@ public class TestOffsetRendering {
         }
     }
 
-    private LineString generateLineStrings(int i, double theta) {
+    private LineString generateLineStrings(int i, double theta, boolean leftToRight) {
+
         Coordinate[] coordinates = new Coordinate[3];
-        coordinates[0] = new Coordinate(-90, 0.0f);
-        coordinates[1] = new Coordinate(0.0f, 0.0f);
-        System.out.println("theta = " + i*theta);
-        coordinates[2] = new Coordinate(90.0*Math.cos(i*theta), 90.0*Math.sin(i*theta));
+        if (leftToRight) {
+            coordinates[0] = new Coordinate(-90, 0.0f);
+            coordinates[1] = new Coordinate(0.0f, 0.0f);
+            System.out.println("theta = " + i * theta);
+            coordinates[2] = new Coordinate(90.0 * Math.cos(i * theta), 90.0 * Math.sin(i * theta));
+        } else {
+            coordinates[0] = new Coordinate(90, 0.0f);
+            coordinates[1] = new Coordinate(0.0f, 0.0f);
+            System.out.println("theta = " + i * theta);
+            coordinates[2] = new Coordinate(-90.0 * Math.cos(i * theta), -90.0 * Math.sin(i * theta));
+        }
         return geomFactory.createLineString(coordinates);
     }
 
