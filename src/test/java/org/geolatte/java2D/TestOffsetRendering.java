@@ -42,6 +42,12 @@ import java.io.IOException;
  */
 public class TestOffsetRendering {
 
+    /*TODO -- add tests for these cases:
+        1. linestring with very small linesegments (relative to offset)
+        2. Perpendicular offset == 0
+        3. non-contigous paths (i.e. with intermediate moveTo's
+     */
+
 
     private static final float LINE_WIDTH = 5.0f;
     private static final float OFFSET  = 8.0f;
