@@ -146,8 +146,10 @@ public class BasicScalableStroke implements ScalableStroke {
                             // this vertex + offset-vector and a point along the bisector                            
                             result.lineTo((float)(lastX + lastOffsetX), (float)(lastY + lastOffsetY));
                             iRadius = Math.signum(iRadius)*Math.min(Math.abs(iRadius), Math.abs(offset));
-                            float iloX = lastX + (float) (iRadius * Math.sin(halfOffsetAngle));
-                            float iloY = lastY + (float)(iRadius * Math.cos(halfOffsetAngle));
+//                            float iloX = lastX + (float) (iRadius * Math.sin(halfOffsetAngle));
+//                            float iloY = lastY + (float)(iRadius * Math.cos(halfOffsetAngle));
+                            float iloX = lastX + (float) (iRadius * Math.cos(angle + Math.PI / 2.0 + halfOffsetAngle));
+                            float iloY = lastY + (float)(iRadius * Math.sin(angle + Math.PI / 2.0 + halfOffsetAngle));
                             result.quadTo(iloX, iloY, lastX+offsetX, lastY + offsetY);
                         }  else {
                             // in this case, we insert a linesegment that ends at the intersection between the two offset lines
