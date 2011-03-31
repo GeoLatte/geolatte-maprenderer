@@ -68,9 +68,9 @@ public class TestOffsetRendering {
         this.extent = new SpatialExtent(-100, -100, 100, 100, spatialReference);
         this.stroke = new BasicScalableStroke(LINE_WIDTH); //e, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
         this.offsetStroke = new BasicScalableStroke(OFFSET_LINE_WIDTH); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.offsetStroke.setPerpendicularOffset(-OFFSET);
+        this.offsetStroke.setPerpendicularOffset(OFFSET);
         this.negOffsetStroke = new BasicScalableStroke(OFFSET_LINE_WIDTH); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.negOffsetStroke.setPerpendicularOffset(OFFSET);
+        this.negOffsetStroke.setPerpendicularOffset(-OFFSET);
 
 
         geomFactory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4236);

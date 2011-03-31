@@ -102,12 +102,11 @@ public class BasicScalableStroke implements ScalableStroke {
         // vector (offsetX, offsetY) is the current offset vector (orthogonal to the vector
         // determined by last and current point)
         double offsetX= 0, offsetY = 0;
-        // the point (loX, loY) is the current point + the offset-vector
+        // the point (loX, loY) is the current point + the previous offset-vector
         float loX = 0, loY = 0;
         int type = 0;
         boolean first = true;
         float offset = this.perpendicularOffset / getScale();
-        //TODO -- optimize when the offset is 0
         while (!it.isDone()) {
             type = it.currentSegment(points);
             switch (type) {
@@ -131,6 +130,7 @@ public class BasicScalableStroke implements ScalableStroke {
                     float dy = thisY - lastY;
                     // segmentAngle is the angle of the linesegment between last and current points
                     float segmentAngle = (float) Math.atan2(dy, dx);
+                    LOGGER.debug("segment-angle = " + segmentAngle);
                     offsetX = offset * Math.cos(segmentAngle + Math.PI / 2.0);
                     offsetY = offset * Math.sin(segmentAngle + Math.PI / 2.0);
                     // point (nloX, nloY) is last point + current offset vector
@@ -142,34 +142,33 @@ public class BasicScalableStroke implements ScalableStroke {
                         result.moveTo(moveX, moveY);
                         first = false;
                     } else if (nloX != loX || nloY != loY) {
-                        // halfOffsetAngle is (angle between two consecutive offset vectors)/2
-                        // we use the cross product to determine whether the segmentAngle is positive (clockwise)
-                        // or negative (counter-clockwise)
-                        double crossproduct = offsetX * lastOffsetY - offsetY*lastOffsetX;
-                        double sign = Math.signum(crossproduct);
-                        double halfOffsetAngle = sign*Math.acos((offsetX * lastOffsetX + offsetY * lastOffsetY)/(offset*offset))/2.0;
+                        // the formula for the signed angle between two vectors: ang = atan2(x1*y2-y1*x2,x1*x2+y1*y2
+                        double angleBetweenOffsetVectors = Math.atan2( lastOffsetX*offsetY - lastOffsetY*offsetX, lastOffsetX*offsetX + lastOffsetY*offsetY);
+                        double halfOffsetAngle = angleBetweenOffsetVectors / 2;
                         //iRadius is the length of the vector along the bisector of the two consecutive offset vectors that starts
                         // at the last point, and ends in the intersection of the two offset lines.
-                        double iRadius =offset * ( Math.cos(halfOffsetAngle) + Math.sin(halfOffsetAngle)*Math.tan(halfOffsetAngle));
-//                        LOGGER.debug("offsetAngle = " + 2.0*halfOffsetAngle);
-//                        LOGGER.debug("iRadius = " + iRadius);
+                        double iRadius = offset / Math.cos(halfOffsetAngle);
 
-                        if ( Math.abs(halfOffsetAngle) > Math.PI/4.0  && Math.signum(halfOffsetAngle) == Math.signum(offset) ){
-                            // in this case, we create a quadratic segment determined by last vertex + offset-vector,
-                            // this vertex + offset-vector and a point along the bisector                            
-                            result.lineTo((float)(lastX + lastOffsetX), (float)(lastY + lastOffsetY));
-                            iRadius = Math.signum(iRadius)*Math.min(Math.abs(iRadius), Math.abs(offset));
-//                            float iloX = lastX + (float) (iRadius * Math.sin(halfOffsetAngle));
-//                            float iloY = lastY + (float)(iRadius * Math.cos(halfOffsetAngle));
-                            float iloX = lastX + (float) (iRadius * Math.cos(segmentAngle + Math.PI / 2.0 + halfOffsetAngle));
-                            float iloY = lastY + (float)(iRadius * Math.sin(segmentAngle + Math.PI / 2.0 + halfOffsetAngle));
-                            result.quadTo(iloX, iloY, lastX+offsetX, lastY + offsetY);
-                        }  else {
-                            // in this case, we insert a linesegment that ends at the intersection between the two offset lines
-                            float iloX = lastX + (float) (iRadius * Math.cos(segmentAngle + Math.PI / 2.0 + halfOffsetAngle));
-                            float iloY = lastY + (float)(iRadius * Math.sin(segmentAngle + Math.PI / 2.0 + halfOffsetAngle));
+                        LOGGER.debug("offsetAngle = " + 2.0*halfOffsetAngle);
+                        LOGGER.debug("halfOffsetAngle = " + halfOffsetAngle);
+                        LOGGER.debug("iRadius = " + iRadius);
+                        if (offset > 0 && halfOffsetAngle < -Math.PI /4 ||
+                                offset < 0 && halfOffsetAngle > Math.PI/4) {
+                            //In these cases the offset-lines intersect too far beyond the last point
+                            //corect iRadius
+                            iRadius = offset/ Math.cos(Math.PI/4);
+                            float iloX = lastX + (float)(iRadius * Math.cos(segmentAngle + Math.PI/2 - 2*halfOffsetAngle - Math.signum(offset) * Math.PI/4));
+                            float iloY = lastY + (float)(iRadius * Math.sin(segmentAngle + Math.PI/2 - 2*halfOffsetAngle - Math.signum(offset) * Math.PI/4));
+                            result.lineTo(iloX, iloY);
+                            iloX = lastX + (float)(iRadius * Math.cos(segmentAngle + Math.PI/2 + Math.signum(offset) *Math.PI/4));
+                            iloY = lastY + (float)(iRadius * Math.sin(segmentAngle + Math.PI/2 + Math.signum(offset) *Math.PI/4));
+                            result.lineTo(iloX, iloY);
+                        } else {
+                            float iloX = lastX + (float) (iRadius * Math.cos(segmentAngle + Math.PI/2 - halfOffsetAngle));
+                            float iloY = lastY + (float)(iRadius * Math.sin(segmentAngle + Math.PI/2 - halfOffsetAngle));
                             result.lineTo(iloX, iloY);
                         }
+
                     }
 
                     loX = nloX + dx;
