@@ -1,15 +1,20 @@
 /*
- * This file is part of the GeoLatte project. This code is licenced under
- * the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing permissions and limitations under the
- * License.
+ * Copyright (c) 2011. Geovise BVBA, QMINO BVBA
  *
- * Copyright (C) 2010 - 2010 and Ownership of code is shared by:
- * Qmino bvba - Romeinsestraat 18 - 3001 Heverlee (http://www.Qmino.com)
- * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
+ * This file is part of GeoLatte Mapserver.
+ *
+ * GeoLatte Mapserver is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * GeoLatte Mapserver is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.geolatte.maprenderer.shape;
@@ -90,12 +95,20 @@ public class BasicScalableStroke implements ScalableStroke {
         GeneralPath result = new GeneralPath();
         PathIterator it = new FlatteningPathIterator(shape.getPathIterator(null), FLATNESS);
         float points[] = new float[6];
+
         float moveX = 0, moveY = 0;
+        // point (lasX, lasty) is the point that the PathIterator pointed to in the previous iteration
         float lastX = 0, lastY = 0;
+        // point (thisX, thisY) is the point that the pathIterator currently points to
         float thisX = 0, thisY = 0;
-        float loX = 0, loY = 0;
+        // vector (lastOffsetX, lastOffsetY) is the previous offset vector (orthogonal to the vector
+        // determined by last and before last point)
         double lastOffsetX = 0, lastOffsetY = 0;
+        // vector (offsetX, offsetY) is the current offset vector (orthogonal to the vector
+        // determined by last and current point)
         double offsetX= 0, offsetY = 0;
+        // the point (loX, loY) is the current point + the previous offset-vector
+        float loX = 0, loY = 0;
         int type = 0;
         boolean first = true;
         float offset = this.perpendicularOffset / getScale();
@@ -114,13 +127,18 @@ public class BasicScalableStroke implements ScalableStroke {
                     // Fall into....
 
                 case PathIterator.SEG_LINETO:
+
                     thisX = points[0];
                     thisY = points[1];
+                    //(dx,dy) is the vector from last point to the current point
                     float dx = thisX - lastX;
                     float dy = thisY - lastY;
-                    float angle = (float) Math.atan2(dy, dx);
-                    offsetX = offset * Math.cos(angle + Math.PI / 2.0);
-                    offsetY = offset * Math.sin(angle + Math.PI / 2.0);
+                    // segmentAngle is the angle of the linesegment between last and current points
+                    float segmentAngle = (float) Math.atan2(dy, dx);
+                    LOGGER.debug("segment-angle = " + segmentAngle);
+                    offsetX = offset * Math.cos(segmentAngle + Math.PI / 2.0);
+                    offsetY = offset * Math.sin(segmentAngle + Math.PI / 2.0);
+                    // point (nloX, nloY) is last point + current offset vector
                     float nloX = (float) (lastX + offsetX);
                     float nloY = (float) (lastY + offsetY);
                     if (first) {
@@ -129,32 +147,33 @@ public class BasicScalableStroke implements ScalableStroke {
                         result.moveTo(moveX, moveY);
                         first = false;
                     } else if (nloX != loX || nloY != loY) {
-                        // halfOffsetAngle is (angle between two consecutive offset vectors)/2
-                        // we use the cross product to determine whether the angle is positive (clockwise)
-                        // or negative (counter-clockwise)
-                        double dotProduct = offsetX * lastOffsetY - offsetY*lastOffsetX;
-                        double sign = Math.signum(dotProduct);
-                        double halfOffsetAngle = sign*Math.acos((offsetX * lastOffsetX + offsetY * lastOffsetY)/(offset*offset))/2.0;
+                        // the formula for the signed angle between two vectors: ang = atan2(x1*y2-y1*x2,x1*x2+y1*y2
+                        double angleBetweenOffsetVectors = Math.atan2( lastOffsetX*offsetY - lastOffsetY*offsetX, lastOffsetX*offsetX + lastOffsetY*offsetY);
+                        double halfOffsetAngle = angleBetweenOffsetVectors / 2;
                         //iRadius is the length of the vector along the bisector of the two consecutive offset vectors that starts
                         // at the last point, and ends in the intersection of the two offset lines.
-                        double iRadius =offset * ( Math.cos(halfOffsetAngle) + Math.sin(halfOffsetAngle)*Math.tan(halfOffsetAngle));
-//                        LOGGER.debug("offsetAngle = " + 2.0*halfOffsetAngle);
-//                        LOGGER.debug("iRadius = " + iRadius);
+                        double iRadius = offset / Math.cos(halfOffsetAngle);
 
-                        if ( Math.abs(halfOffsetAngle) > Math.PI/4.0  && Math.signum(halfOffsetAngle) == Math.signum(offset) ){
-                            // in this case, we create a quadratic segment determined by last vertex + offset-vector,
-                            // this vertex + offset-vector and a point along the bisector                            
-                            result.lineTo((float)(lastX + lastOffsetX), (float)(lastY + lastOffsetY));
-                            iRadius = Math.signum(iRadius)*Math.min(Math.abs(iRadius), Math.abs(offset));
-                            float iloX = lastX + (float) (iRadius * Math.sin(halfOffsetAngle));
-                            float iloY = lastY + (float)(iRadius * Math.cos(halfOffsetAngle));
-                            result.quadTo(iloX, iloY, lastX+offsetX, lastY + offsetY);
-                        }  else {
-                            // in this case, we insert a linesegment that ends at the intersection between the two offset lines
-                            float iloX = lastX + (float) (iRadius * Math.cos(angle + Math.PI / 2.0 + halfOffsetAngle));
-                            float iloY = lastY + (float)(iRadius * Math.sin(angle + Math.PI / 2.0 + halfOffsetAngle));
+                        LOGGER.debug("offsetAngle = " + 2.0*halfOffsetAngle);
+                        LOGGER.debug("halfOffsetAngle = " + halfOffsetAngle);
+                        LOGGER.debug("iRadius = " + iRadius);
+                        if (offset > 0 && halfOffsetAngle < -Math.PI /4 ||
+                                offset < 0 && halfOffsetAngle > Math.PI/4) {
+                            //In these cases the offset-lines intersect too far beyond the last point
+                            //corect iRadius
+                            iRadius = offset/ Math.cos(Math.PI/4);
+                            float iloX = lastX + (float)(iRadius * Math.cos(segmentAngle + Math.PI/2 - 2*halfOffsetAngle - Math.signum(offset) * Math.PI/4));
+                            float iloY = lastY + (float)(iRadius * Math.sin(segmentAngle + Math.PI/2 - 2*halfOffsetAngle - Math.signum(offset) * Math.PI/4));
+                            result.lineTo(iloX, iloY);
+                            iloX = lastX + (float)(iRadius * Math.cos(segmentAngle + Math.PI/2 + Math.signum(offset) *Math.PI/4));
+                            iloY = lastY + (float)(iRadius * Math.sin(segmentAngle + Math.PI/2 + Math.signum(offset) *Math.PI/4));
+                            result.lineTo(iloX, iloY);
+                        } else {
+                            float iloX = lastX + (float) (iRadius * Math.cos(segmentAngle + Math.PI/2 - halfOffsetAngle));
+                            float iloY = lastY + (float)(iRadius * Math.sin(segmentAngle + Math.PI/2 - halfOffsetAngle));
                             result.lineTo(iloX, iloY);
                         }
+
                     }
 
                     loX = nloX + dx;
