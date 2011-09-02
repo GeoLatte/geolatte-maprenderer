@@ -61,7 +61,7 @@ public class TestLineSymbolizer extends BaseFeatureTypeStyleTest {
 
     @Test
     public void test_get_Stroke(){
-        lineSymbolizer.getStroke();
+        //TODO -- complete
     }
 
 

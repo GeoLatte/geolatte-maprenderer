@@ -33,18 +33,22 @@ public class LineSymbolizer extends AbstractSymbolizer {
 
     final private Value<Float> perpendicularOffset;
     final private String geometryProperty;
+    final private Stroke stroke;
 
     public LineSymbolizer(LineSymbolizerType type) {
         super(type);
         perpendicularOffset = readPerpendicularOffset(type);
         geometryProperty = readGeometryProperty(type);
+        stroke = createStroke(type);
+    }
+
+    private Stroke createStroke(LineSymbolizerType type) {
+        return StrokeFactory.create(type.getStroke());
     }
 
     public String getGeometryProperty() {
         return geometryProperty;
     }
-
-
 
     public Value<Float> getPerpendicularOffset() {
         return perpendicularOffset;
