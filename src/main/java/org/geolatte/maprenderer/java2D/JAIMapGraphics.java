@@ -42,7 +42,7 @@ public class JAIMapGraphics extends MapGraphics {
 
     private final static Color DEFAULT_BACKGROUND_COLOR = new Color(1.0f, 1.0f, 1.0f, 0.0f);
 
-    private float scale;
+    private double scale;
     private final int width;
     private final int height;
     private Graphics2D g2;
@@ -134,8 +134,8 @@ public class JAIMapGraphics extends MapGraphics {
         AffineTransform atf = new AffineTransform();
         double sx = width / extent.getWidth();
         double sy = height / extent.getHeight();
-        this.scale = (float) Math.min(sx, sy);
-        //TODO -- shouldn't I maintain aspect-ratio?
+        this.scale = Math.min(sx, sy);
+        //TODO -- shouldn't we maintain aspect-ratio?
         atf.scale(sx, -sy);
         atf.translate(-extent.getMinX(), -extent.getMaxY());
         setTransform(atf);
@@ -152,7 +152,7 @@ public class JAIMapGraphics extends MapGraphics {
     }
 
     @Override
-    public float getScale() {
+    public double getScale() {
         return this.scale;
     }
 

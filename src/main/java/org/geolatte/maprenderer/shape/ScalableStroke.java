@@ -33,6 +33,6 @@ public interface ScalableStroke extends Stroke {
 
     public float getPerpendicularOffset();
 
-    public void setScale(float scale);
+    public void setScale(double scale);
 
 }

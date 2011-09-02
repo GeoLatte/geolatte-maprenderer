@@ -33,7 +33,6 @@ import org.geolatte.maprenderer.sld.filter.SLDRuleFilter;
 
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -62,7 +61,9 @@ public class FeatureTypeStyle {
     }
 
     public List<Rule> getRules() {
-        return Collections.unmodifiableList(this.rules);
+        List<Rule> copy = new ArrayList<Rule>();
+        copy.addAll(rules);
+        return copy;
     }
 
     private List<Rule> createRules(FeatureTypeStyleType type) {

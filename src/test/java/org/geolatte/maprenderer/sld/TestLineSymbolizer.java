@@ -28,9 +28,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class TestLineSymbolizer extends SLDPainterTest {
+public class TestLineSymbolizer extends BaseFeatureTypeStyleTest {
 
-    LineSymbolizer painter;
+    LineSymbolizer lineSymbolizer;
     LineSymbolizerType type;
 
     public LineSymbolizerType createSymbolizerType() {
@@ -56,42 +56,47 @@ public class TestLineSymbolizer extends SLDPainterTest {
     public void before(){
         super.before();
         type = createSymbolizerType();
-        painter = new LineSymbolizer(type);
+        lineSymbolizer = new LineSymbolizer(type);
+    }
+
+    @Test
+    public void test_get_Stroke(){
+        lineSymbolizer.getStroke();
     }
 
 
 
     @Test
     public void test_get_geometry_property(){
-        assertEquals("centerline", painter.getGeometryProperty());
+        assertEquals("centerline", lineSymbolizer.getGeometryProperty());
     }
 
     @Test
     public void test_default_uom_is_pixel() {
-        assertEquals(UOM.PIXEL, painter.getUOM());
+        assertEquals(UOM.PIXEL, lineSymbolizer.getUOM());
     }
 
     @Test
     public void test_uom_is_foot_or_metre() {
         type.setUom("http://www.opengeospatial.org/se/units/foot");
-        painter = new LineSymbolizer(type);
-        assertEquals(UOM.FOOT, painter.getUOM());
+        lineSymbolizer = new LineSymbolizer(type);
+        assertEquals(UOM.FOOT, lineSymbolizer.getUOM());
         type.setUom("http://www.opengeospatial.org/se/units/metre");
-        painter = new LineSymbolizer(type);
-        assertEquals(UOM.METRE, painter.getUOM());
+        lineSymbolizer = new LineSymbolizer(type);
+        assertEquals(UOM.METRE, lineSymbolizer.getUOM());
         
     }
 
     @Test
     public void test_perpendicularOffset(){
-        Value<Float> perOffset = painter.getPerpendicularOffset();
+        Value<Float> perOffset = lineSymbolizer.getPerpendicularOffset();
         assertEquals(UOM.PIXEL, perOffset.uom());
         assertEquals(Float.valueOf(-10f), perOffset.value());
     }
 
     @Test
     public void test_no_geometry() {
-        assertEquals("centerline", painter.getGeometryProperty());
+        assertEquals("centerline", lineSymbolizer.getGeometryProperty());
         String xmlFragment =
                 "<LineSymbolizer version=\"1.1.0\"" +
                         "                  xmlns=\"http://www.opengis.net/se\"" +

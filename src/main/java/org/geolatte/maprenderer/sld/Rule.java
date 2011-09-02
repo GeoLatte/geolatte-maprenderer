@@ -26,9 +26,13 @@ import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.sld.filter.SLDRuleFilter;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Rule  {
+
+    final private static double STND_PIXEL_SIZE_IN_M = 0.00028d; //see standard 05-077r4, p. 9
+    final private static double EPSILON = 10e-6d; //See standard 05-077r4, p.10
 
     private final String name;
     private final List<AbstractSymbolizer> symbolizers;
@@ -40,6 +44,8 @@ public class Rule  {
         this.name = name;
         this.filter = filter;
         this.symbolizers = symbolizers;
+        if (minScale == null) minScale = 0d;
+        if (maxScale == null) maxScale = Double.POSITIVE_INFINITY;
         this.minScaleDenominator = minScale;
         this.maxScaleDenominator = maxScale;
     }
@@ -65,7 +71,14 @@ public class Rule  {
     }
 
     public boolean withinScaleBounds(MapGraphics graphics) {
-        return true;
+        //TODO -take account of real pixelsizes.
+        double actualPixelSize = getActualPixelSizeInMeters(graphics);
+        double metersPerPixel = getMetersPerPixel(graphics);
+        double actualScaleDenominator = metersPerPixel / actualPixelSize;
+        double multiplier = STND_PIXEL_SIZE_IN_M / actualPixelSize;
+        double standardScaleDenominator = multiplier * actualScaleDenominator;
+        return standardScaleDenominator >= getMinScaleDenominator() - EPSILON
+                && standardScaleDenominator < getMaxScaleDenominator() + EPSILON;
     }
 
     public void symbolize(MapGraphics graphics, Shape[] shapes) {
@@ -75,6 +88,22 @@ public class Rule  {
     }
 
     public List<AbstractSymbolizer> getSymbolizers() {
-        return symbolizers;
+        List<AbstractSymbolizer> result = new ArrayList<AbstractSymbolizer>();
+        result.addAll(symbolizers);
+        return result;
     }
+
+
+    private double getActualPixelSizeInMeters(MapGraphics graphics) {
+        //TODO - retrieve real pixelsizes (when available in MapGraphics).
+        return STND_PIXEL_SIZE_IN_M;
+    }
+
+    private double getMetersPerPixel(MapGraphics graphics) {
+        //TODO - determine map units from SRID (when available)
+        return 1/graphics.getScale();
+    }
+
+
+
 }

@@ -40,7 +40,7 @@ public class BasicScalableStroke implements ScalableStroke {
 
     private float width = 1.0f;
 
-    private float scale = 1.0f;
+    private double scale = 1.0d;
 
 
     public BasicScalableStroke(float width, int join, int cap) {
@@ -72,7 +72,7 @@ public class BasicScalableStroke implements ScalableStroke {
 
     }
 
-    protected float getScale() {
+    protected double getScale() {
         return this.scale;
     }
 
@@ -89,7 +89,7 @@ public class BasicScalableStroke implements ScalableStroke {
 
     public Shape createStrokedShape(Shape shape) {
 
-        BasicStroke stroke = new BasicStroke(getWidth() / scale, this.cap, this.join);
+        BasicStroke stroke = new BasicStroke((float)(getWidth() / scale), this.cap, this.join);
         if (this.perpendicularOffset == 0.f) {
             return stroke.createStrokedShape(shape);
         }
@@ -113,7 +113,7 @@ public class BasicScalableStroke implements ScalableStroke {
         float loX = 0, loY = 0;
         int type = 0;
         boolean first = true;
-        float offset = this.perpendicularOffset / getScale();
+        double offset = this.perpendicularOffset / getScale();
         while (!it.isDone()) {
             type = it.currentSegment(points);
             switch (type) {
@@ -192,7 +192,7 @@ public class BasicScalableStroke implements ScalableStroke {
         return stroke.createStrokedShape(result);
     }
 
-    public void setScale(float scale) {
+    public void setScale(double scale) {
         this.scale = scale;
     }
 

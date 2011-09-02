@@ -21,13 +21,17 @@
 
 package org.geolatte.maprenderer.sld;
 
+import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class TestFeatureTypeStyle extends SLDPainterTest {
+public class TestFeatureTypeStyle extends BaseFeatureTypeStyleTest {
 
 
     @Before
@@ -36,11 +40,30 @@ public class TestFeatureTypeStyle extends SLDPainterTest {
     }
 
     @Test
-    public void test_constructor(){
-        FeatureTypeStyle style = new FeatureTypeStyle(sldRoot);
-        assertNotNull(style);
-        assertEquals("TEST FEATURETYPESTYLE", style.getName());
-
+    public void testName(){
+        assertEquals("TEST FEATURETYPESTYLE", getFeatureTypeStyle().getName());
     }
+
+    @Test
+    public void test_createPainter() throws SpatialReferenceCreationException {
+        assertNotNull(getFeatureTypeStyle().createPainter(createMapGraphics()));
+    }
+
+    @Test
+    public void testAllRulesInList() {
+        List<Rule> rules = getFeatureTypeStyle().getRules();
+        Assert.assertEquals(3, rules.size());
+        Assert.assertEquals("top", rules.get(0).getName());
+        Assert.assertEquals("bottom", rules.get(1).getName());
+        Assert.assertEquals("bottom", rules.get(2).getName());
+    }
+
+    @Test
+    public void testRulesListIsCopy() {
+        List<Rule> rules = getFeatureTypeStyle().getRules();
+        rules.remove(0);
+        Assert.assertEquals(3, getFeatureTypeStyle().getRules().size());
+    }
+
 
 }

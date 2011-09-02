@@ -28,6 +28,7 @@ import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 
 import java.awt.*;
+import java.util.Collections;
 import java.util.List;
 
 public class FeatureTypeStylePainter implements Painter {
@@ -46,7 +47,10 @@ public class FeatureTypeStylePainter implements Painter {
 
     @Override
     public void paint(Iterable<Feature> features) {
-        for (Rule rule : getRules()){
+        List<Rule> rules = getRules();
+        //reverse order for painting (last in list, gets painted first).
+        Collections.reverse(rules);
+        for (Rule rule : rules){
             paint(graphics, features, rule);
         }
 

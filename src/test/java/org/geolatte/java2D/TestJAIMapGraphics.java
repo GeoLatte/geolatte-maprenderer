@@ -34,10 +34,5 @@ import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
  */
 public class TestJAIMapGraphics {
 
-    public static MapGraphics create() throws SpatialReferenceCreationException {
-        SpatialReference spatialReference = new GTSpatialReference("4236", true);
-        SpatialExtent extent = new SpatialExtent(5,5,40,40, spatialReference);
-        java.awt.Dimension dim = new java.awt.Dimension(512, 512);
-        return new JAIMapGraphics(dim, spatialReference);
-    }
+
 }

@@ -22,30 +22,52 @@
 package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.FeatureTypeStyleType;
+import org.geolatte.maprenderer.geotools.GTSpatialReference;
+import org.geolatte.maprenderer.java2D.JAIMapGraphics;
+import org.geolatte.maprenderer.map.MapGraphics;
+import org.geolatte.maprenderer.map.SpatialExtent;
+import org.geolatte.maprenderer.reference.SpatialReference;
+import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.junit.BeforeClass;
 
 import java.io.InputStream;
 
-public class SLDPainterTest {
+public class BaseFeatureTypeStyleTest {
 
     static FeatureTypeStyleType sldRoot;
     FeatureTypeStyle featureTypeStyle;
 
+    public MapGraphics createMapGraphics() throws SpatialReferenceCreationException {
+        return createMapGraphics(100, 10000);
+    }
+
+    public MapGraphics createMapGraphics(int pixelSize, double extentSize) throws SpatialReferenceCreationException {
+        SpatialReference spatialReference = new GTSpatialReference("31370", true);
+        SpatialExtent extent = new SpatialExtent(0, 0, extentSize, extentSize, spatialReference);
+        java.awt.Dimension dim = new java.awt.Dimension(pixelSize, pixelSize);
+        MapGraphics mapGraphics =  new JAIMapGraphics(dim, spatialReference);
+        mapGraphics.setToExtent(extent);
+        return mapGraphics;
+    }
+
+
+
     @BeforeClass
-    public static void beforeClass(){
+    public static void beforeClass() {
         InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("test-sld.xml");
         sldRoot = SLD.instance().unmarshal(in);
     }
 
-    public void before(){
+    public void before() {
         featureTypeStyle = new FeatureTypeStyle(sldRoot);
     }
 
     /**
      * Returns the FeatureTypeStyle created form test-sld.xml
      */
-    public FeatureTypeStyle getFeatureTypeStyle(){
-        return featureTypeStyle;        
+    public FeatureTypeStyle getFeatureTypeStyle() {
+        return featureTypeStyle;
     }
+
 
 }
