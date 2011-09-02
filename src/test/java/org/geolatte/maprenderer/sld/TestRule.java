@@ -1,0 +1,74 @@
+/*
+ * Copyright (c) 2011. Geovise BVBA, QMINO BVBA
+ *
+ * This file is part of GeoLatte Mapserver.
+ *
+ * GeoLatte Mapserver is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * GeoLatte Mapserver is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.geolatte.maprenderer.sld;
+
+import org.geolatte.maprenderer.sld.filter.AlwaysTrueFilter;
+import org.geolatte.maprenderer.sld.filter.ElseFilter;
+import org.geolatte.maprenderer.sld.filter.Filter;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class TestRule extends SLDPainterTest {
+
+
+    List<Rule> rules;
+
+    @Before
+    public void before(){
+        super.before();
+        rules = painter.getRules();
+    }
+
+    @Test
+    public void test_rule_name(){
+        Rule rpainter = rules.get(0);
+        assertEquals("top", rpainter.getName());
+    }
+
+    @Test
+    public void test_rule_always_has_filter(){
+        for (Rule rule : rules){
+            Filter filter = rule.getFilter();
+            assertNotNull(filter);
+        }
+        assertTrue( rules.get(1).getFilter() instanceof AlwaysTrueFilter);
+        assertTrue( rules.get(2).getFilter() instanceof ElseFilter);
+    }
+
+
+
+    @Test
+    public void test_rule_hasScaleDenominator(){
+        Rule rule = rules.get(0);
+        assertEquals(Double.valueOf(100d), rule.getMinScaleDenominator());
+        assertEquals(Double.valueOf(1000d), rule.getMaxScaleDenominator());
+
+    }
+
+    
+    
+
+}
