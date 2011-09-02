@@ -27,13 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.geom.AffineTransform;
 
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Jan 18, 2010
- * Time: 10:45:39 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class PolygonPathIterator extends GeometryPathIterator {
 
     private static Logger LOGGER = LoggerFactory.getLogger(PolygonPathIterator.class);

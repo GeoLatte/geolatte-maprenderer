@@ -22,13 +22,6 @@ package org.geolatte.maprenderer.map;
 import java.awt.image.RenderedImage;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Feb 15, 2010
- * Time: 3:21:21 PM
- * To change this template use File | Settings | File Templates.
- */
 public interface MapCompositor {
 
     RenderedImage overlay(List<RenderedImage> images);

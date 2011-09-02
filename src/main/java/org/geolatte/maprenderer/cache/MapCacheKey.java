@@ -21,13 +21,7 @@ package org.geolatte.maprenderer.cache;
 
 import org.geolatte.maprenderer.map.SpatialExtent;
 
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Feb 15, 2010
- * Time: 5:47:54 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class MapCacheKey {
 
     private final String layerName;

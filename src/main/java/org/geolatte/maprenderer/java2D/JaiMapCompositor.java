@@ -28,13 +28,6 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Feb 15, 2010
- * Time: 3:22:40 PM
- * To change this template use File | Settings | File Templates.
- */
 public class JaiMapCompositor implements MapCompositor {
 
     public RenderedImage overlay(List<RenderedImage> images) {

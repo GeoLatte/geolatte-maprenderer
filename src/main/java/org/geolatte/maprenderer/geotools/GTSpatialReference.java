@@ -26,13 +26,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Dec 21, 2009
- * Time: 3:04:48 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class GTSpatialReference implements SpatialReference {
 
     private final CoordinateReferenceSystem crs;

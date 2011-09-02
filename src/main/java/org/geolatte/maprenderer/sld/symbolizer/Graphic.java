@@ -21,13 +21,7 @@ package org.geolatte.maprenderer.sld.symbolizer;
 
 import java.awt.*;
 
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Jan 25, 2010
- * Time: 7:20:29 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public interface Graphic {
 
     Shape generateMarkShape(double x, double y, double size);

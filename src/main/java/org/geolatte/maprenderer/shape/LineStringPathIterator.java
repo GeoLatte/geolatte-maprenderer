@@ -24,13 +24,7 @@ import com.vividsolutions.jts.geom.LineString;
 
 import java.awt.geom.AffineTransform;
 
-/**
- * Created by IntelliJ IDEA.
- * User: adnsgis
- * Date: Jan 29, 2010
- * Time: 11:43:56 AM
- * To change this template use File | Settings | File Templates.
- */
+
 public class LineStringPathIterator extends GeometryPathIterator {
 
     final private LineString lineString;

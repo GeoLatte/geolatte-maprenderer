@@ -26,13 +26,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Jan 18, 2010
- * Time: 10:14:54 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class PolygonWrapper extends GeometryWrapper implements Shape {
 
     private final Polygon polygon;

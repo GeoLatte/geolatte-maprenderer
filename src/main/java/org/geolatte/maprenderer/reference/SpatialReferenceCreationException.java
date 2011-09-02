@@ -19,13 +19,7 @@
 
 package org.geolatte.maprenderer.reference;
 
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Dec 21, 2009
- * Time: 3:07:57 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class SpatialReferenceCreationException extends SpatialReferenceException {
 
     public SpatialReferenceCreationException(Throwable t) {

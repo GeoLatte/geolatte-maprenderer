@@ -19,11 +19,7 @@
 
 package org.geolatte.maprenderer.reference;
 
-/**
- * Created by Karel Maesen
- * User: maesenka
- * Date: Dec 21, 2009
- */
+
 public interface SpatialReference {
 
     public int getEPSGCode();

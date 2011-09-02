@@ -25,14 +25,6 @@ import com.vividsolutions.jts.geom.Polygon;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 
-
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Jan 18, 2010
- * Time: 10:14:15 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ShapeAdapter {
 
     final private AffineTransform worldToImageTransform;

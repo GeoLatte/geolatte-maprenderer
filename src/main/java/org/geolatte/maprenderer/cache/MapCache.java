@@ -29,13 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.image.RenderedImage;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * Created by IntelliJ IDEA.
- * User: adnsgis
- * Date: Feb 8, 2010
- * Time: 5:32:45 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class MapCache {
 
     final private static Logger LOGGER = LoggerFactory.getLogger(MapCache.class);

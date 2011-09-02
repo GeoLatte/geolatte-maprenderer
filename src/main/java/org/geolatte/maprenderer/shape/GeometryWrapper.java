@@ -26,13 +26,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-/**
- * Created by IntelliJ IDEA.
- * User: adnsgis
- * Date: Jan 29, 2010
- * Time: 11:37:29 AM
- * To change this template use File | Settings | File Templates.
- */
+
 public abstract class GeometryWrapper {
 
     public abstract Geometry getGeometry();

@@ -22,13 +22,7 @@ package org.geolatte.maprenderer.sld.symbolizer;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Jan 25, 2010
- * Time: 9:52:18 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class CircleMarkGraphic implements Graphic {
 
     public Shape generateMarkShape(double x, double y, double size) {

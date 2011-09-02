@@ -22,13 +22,6 @@ package org.geolatte.maprenderer.sld.symbolizer;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Jan 25, 2010
- * Time: 9:49:41 PM
- * To change this template use File | Settings | File Templates.
- */
 public class SquareMarkGraphic implements Graphic {
 
     public Shape generateMarkShape(double x, double y, double size) {

@@ -25,13 +25,6 @@ import org.geolatte.maprenderer.shape.ShapeAdapter;
 
 import java.awt.*;
 
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Jan 25, 2010
- * Time: 10:07:46 PM
- * To change this template use File | Settings | File Templates.
- */
 public abstract class ShapeSymbolizer extends AbstractSymbolizer {
 
     private Color strokeColor;

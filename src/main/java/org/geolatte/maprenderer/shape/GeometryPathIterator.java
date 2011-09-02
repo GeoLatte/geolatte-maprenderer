@@ -24,13 +24,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Feb 15, 2010
- * Time: 10:46:43 PM
- * To change this template use File | Settings | File Templates.
- */
+
 abstract public class GeometryPathIterator implements PathIterator {
 
     protected final AffineTransform transform;

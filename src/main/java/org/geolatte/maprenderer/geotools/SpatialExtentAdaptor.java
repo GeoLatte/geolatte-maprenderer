@@ -31,13 +31,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.awt.geom.Rectangle2D;
 
-/**
- * Created by IntelliJ IDEA.
- * User: maesenka
- * Date: Dec 21, 2009
- * Time: 3:54:29 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class SpatialExtentAdaptor {
 
     static private GeometryFactory geometryFactory = new GeometryFactory();

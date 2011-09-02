@@ -26,13 +26,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 
-/**
- * Created by IntelliJ IDEA.
- * User: adnsgis
- * Date: Jan 29, 2010
- * Time: 11:33:32 AM
- * To change this template use File | Settings | File Templates.
- */
+
 public class LineStringWrapper extends GeometryWrapper implements Shape {
 
     private final LineString lineString;
