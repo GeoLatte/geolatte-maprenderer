@@ -39,8 +39,13 @@ public class SimpleOffsetPainter implements Painter {
     private final static float WIDTH_IN_PIXELS = 10.0f;
     private final static float OFFSET_IN_PIXELS = 5.0f;
 
+    private final MapGraphics graphics;
 
-    public void paint(MapGraphics graphics, Iterable<Feature> features) {
+    public SimpleOffsetPainter(MapGraphics graphics){
+        this.graphics = graphics;
+    }
+
+    public void paint(Iterable<Feature> features) {
         ShapeAdapter shapeAdapter = new ShapeAdapter(graphics.getTransform());
 
         BasicScalableStroke baseStroke = new BasicScalableStroke(WIDTH_IN_PIXELS);

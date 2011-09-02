@@ -23,13 +23,21 @@ package org.geolatte.maprenderer.sld.filter;
 
 import org.geolatte.core.Feature;
 
-/**
- * @author Karel Maesen, Geovise BVBA, 2010
- */
-public class AlwaysTrueFilter extends Filter {
 
-    @Override
-    public Boolean evaluate(Feature feature) {
-        return true;
+public class SLDRuleFilter {
+
+    private Expression<Boolean, ?> expression = null;
+
+    public void setFilterExpr(Expression<Boolean, ?> expression) {
+        this.expression = expression;
     }
+
+    public Boolean evaluate(Feature feature) {
+        return this.expression.evaluate(feature);
+    }
+
+    public String toString() {
+        return this.expression == null ? "NULL FILTER" : this.expression.toString();
+    }
+
 }

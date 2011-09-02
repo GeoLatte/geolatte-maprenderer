@@ -60,7 +60,7 @@ public class JAIMapRenderer implements MapRenderer {
             Painter painter = layer.getPainter();
             if (painter == null) continue;
             Iterable<Feature> reader = layer.getFeatures(extent);
-            painter.paint(graphics, reader);
+            painter.paint(reader);
         }
         long t2 = System.currentTimeMillis();
         RenderedImage image = graphics.createRendering();

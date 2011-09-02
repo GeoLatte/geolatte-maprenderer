@@ -24,14 +24,16 @@ package org.geolatte.maprenderer.map;
 import org.geolatte.core.Feature;
 
 /**
- * Paints the feature in the reader onto the graphics.
+ * Paints features  onto a <code>MapGraphics</code>.
+ *
+ *<p><code>Painter</code>s are not thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *
  */
 public interface Painter {
 
-    public void paint(MapGraphics graphics, Iterable<Feature> features);
+    public void paint(Iterable<Feature> features);
 
 
 }

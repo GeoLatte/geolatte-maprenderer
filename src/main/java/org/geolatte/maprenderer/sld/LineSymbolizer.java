@@ -21,25 +21,60 @@
 
 package org.geolatte.maprenderer.sld;
 
-import org.geolatte.core.Feature;
+import net.opengis.se.v_1_1_0.LineSymbolizerType;
+import net.opengis.se.v_1_1_0.ParameterValueType;
 import org.geolatte.maprenderer.map.MapGraphics;
+import org.geolatte.maprenderer.util.JAXBHelper;
 
 import java.awt.*;
+import java.io.Serializable;
 
 public class LineSymbolizer extends AbstractSymbolizer {
 
-    private Value<Float> perpendicularOffset = Value.of(0f, UOM.PIXEL);
+    final private Value<Float> perpendicularOffset;
+    final private String geometryProperty;
 
-    @Override
-    public void paint(MapGraphics graphics, Shape[] shapes) {
-        throw new UnsupportedOperationException();
+    public LineSymbolizer(LineSymbolizerType type) {
+        super(type);
+        perpendicularOffset = readPerpendicularOffset(type);
+        geometryProperty = readGeometryProperty(type);
     }
 
-    void setPerpendicularOffset(Value<Float> perpendicularOffset) {
-        this.perpendicularOffset = perpendicularOffset;
+    public String getGeometryProperty() {
+        return geometryProperty;
     }
+
+
 
     public Value<Float> getPerpendicularOffset() {
         return perpendicularOffset;
+    }
+
+    private Value<Float> readPerpendicularOffset(LineSymbolizerType type) {
+        ParameterValueType pv = type.getPerpendicularOffset();
+        Value<Float> defaultOffset = Value.of(0f, UOM.PIXEL);
+        if (pv == null){
+            return defaultOffset;
+        }
+        java.util.List<Serializable> content = pv.getContent();
+        if (content == null || content.isEmpty()) {
+            return defaultOffset;
+        }
+        String valueStr = JAXBHelper.extractValueToString(content);
+        return Value.of(valueStr.toString(), this.getUOM());
+    }
+
+
+    //XPath expressions or more complex operations are not supported.
+    private String readGeometryProperty(LineSymbolizerType type) {
+        if (type.getGeometry() == null) return null;
+        if (type.getGeometry().getPropertyName() == null) return null;
+        java.util.List<Object> list = type.getGeometry().getPropertyName().getContent();
+        return JAXBHelper.extractValueToString(list);
+    }
+
+    @Override
+    public void symbolize(MapGraphics graphics, Shape[] shapes) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

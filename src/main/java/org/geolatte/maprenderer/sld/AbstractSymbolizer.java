@@ -21,8 +21,8 @@
 
 package org.geolatte.maprenderer.sld;
 
+import net.opengis.se.v_1_1_0.SymbolizerType;
 import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.map.Painter;
 
 import java.awt.*;
 
@@ -32,27 +32,20 @@ import java.awt.*;
  */
 public abstract class AbstractSymbolizer {
 
-    private UOM uom = UOM.PIXEL;
-    private String geometryProperty;
+    final private UOM uom;
 
-    public void paint(MapGraphics graphics, Shape[] shapes) {
-        throw new UnsupportedOperationException();
-    }
-
-    void setGeometryProperty(String geometryProperty) {
-        this.geometryProperty = geometryProperty;
-    }
-
-
-    public String getGeometryProperty() {
-        return geometryProperty;
+    public AbstractSymbolizer(SymbolizerType type){
+        if (type.getUom() != null) {
+            UOM uom = UOM.fromURI(type.getUom());
+            this.uom = uom;
+        } else {
+            uom = UOM.PIXEL;
+        }
     }
 
     public UOM getUOM() {
         return uom;
     }
 
-    public void setUnitsOfMeasure(UOM uom) {
-        this.uom = uom;
-    }
+    public abstract void symbolize(MapGraphics graphics, Shape[] shapes);
 }

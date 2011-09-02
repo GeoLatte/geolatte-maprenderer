@@ -25,22 +25,40 @@ package org.geolatte.maprenderer.sld;
 import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
+import org.geolatte.maprenderer.shape.ShapeAdapter;
 
-import java.util.Collections;
+import java.awt.*;
 import java.util.List;
 
 public class FeatureTypeStylePainter implements Painter {
 
 
-    private final List<Rule> rules;
+    final private List<Rule> rules;
+    final private MapGraphics graphics;
+    final private ShapeAdapter shapeAdapter;
 
-    FeatureTypeStylePainter(List<Rule> rules){
+
+    FeatureTypeStylePainter(MapGraphics graphics, List<Rule> rules){
         this.rules = rules;
+        this.graphics = graphics;
+        this.shapeAdapter = new ShapeAdapter(graphics.getTransform());
     }
 
     @Override
-    public void paint(MapGraphics graphics, Iterable<Feature> features) {
+    public void paint(Iterable<Feature> features) {
+        for (Rule rule : getRules()){
+            paint(graphics, features, rule);
+        }
 
+    }
+
+    private void paint(MapGraphics graphics, Iterable<Feature> features, Rule rule) {
+        if (!rule.withinScaleBounds(graphics)) return;
+        for (Feature feature : features) {
+            if (!rule.accepts(feature)) continue;
+            Shape[] shapes = shapeAdapter.toShape(feature.getGeometry());
+            rule.symbolize(graphics,shapes);
+        }
     }
 
     /**

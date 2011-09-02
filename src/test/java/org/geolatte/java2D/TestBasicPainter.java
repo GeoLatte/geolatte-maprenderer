@@ -68,9 +68,9 @@ public class TestBasicPainter {
 
     @Test
     public void test_paint_lines_with_offset() throws IOException {
-        Painter painter = new SimpleOffsetPainter();
         this.mapGraphics.setToExtent(extent);
-        painter.paint(this.mapGraphics, features);
+        Painter painter = new SimpleOffsetPainter(this.mapGraphics);
+        painter.paint(features);
         RenderedImage img = this.mapGraphics.createRendering();
         File file = new File("/tmp/img/test-simple-offset-painter.png");
         ImageIO.write(img, "PNG", file);

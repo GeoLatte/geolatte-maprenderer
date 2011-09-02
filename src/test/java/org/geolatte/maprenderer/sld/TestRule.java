@@ -21,9 +21,9 @@
 
 package org.geolatte.maprenderer.sld;
 
-import org.geolatte.maprenderer.sld.filter.AlwaysTrueFilter;
-import org.geolatte.maprenderer.sld.filter.ElseFilter;
-import org.geolatte.maprenderer.sld.filter.Filter;
+import org.geolatte.maprenderer.sld.filter.AlwaysTrueSLDRuleFilter;
+import org.geolatte.maprenderer.sld.filter.ElseSLDRuleFilter;
+import org.geolatte.maprenderer.sld.filter.SLDRuleFilter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,7 +41,7 @@ public class TestRule extends SLDPainterTest {
     @Before
     public void before(){
         super.before();
-        rules = painter.getRules();
+        this.rules = getFeatureTypeStyle().getRules();
     }
 
     @Test
@@ -53,11 +53,11 @@ public class TestRule extends SLDPainterTest {
     @Test
     public void test_rule_always_has_filter(){
         for (Rule rule : rules){
-            Filter filter = rule.getFilter();
+            SLDRuleFilter filter = rule.getFilter();
             assertNotNull(filter);
         }
-        assertTrue( rules.get(1).getFilter() instanceof AlwaysTrueFilter);
-        assertTrue( rules.get(2).getFilter() instanceof ElseFilter);
+        assertTrue( rules.get(1).getFilter() instanceof AlwaysTrueSLDRuleFilter);
+        assertTrue( rules.get(2).getFilter() instanceof ElseSLDRuleFilter);
     }
 
 

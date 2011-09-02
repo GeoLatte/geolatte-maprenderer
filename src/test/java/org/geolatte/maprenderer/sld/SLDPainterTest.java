@@ -29,11 +29,7 @@ import java.io.InputStream;
 public class SLDPainterTest {
 
     static FeatureTypeStyleType sldRoot;
-
     FeatureTypeStyle featureTypeStyle;
-    FeatureTypeStylePainter painter;
-
-
 
     @BeforeClass
     public static void beforeClass(){
@@ -43,16 +39,6 @@ public class SLDPainterTest {
 
     public void before(){
         featureTypeStyle = new FeatureTypeStyle(sldRoot);
-        painter = featureTypeStyle.createPainter();
-    }
-
-
-    /**
-     * Returns the {@FeatureTypeStylePainter} associated with test-sld.xml
-     * @return
-     */
-    FeatureTypeStylePainter getFeatureTypeStylePainter(){
-        return painter;
     }
 
     /**

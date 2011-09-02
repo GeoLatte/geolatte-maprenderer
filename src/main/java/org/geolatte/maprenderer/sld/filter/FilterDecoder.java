@@ -38,10 +38,10 @@ public class FilterDecoder {
         throw new UnsupportedOperationException();
     }
 
-    public Filter decode() {
+    public SLDRuleFilter decode() {
         Expression<Boolean, ?> expression = (Expression<Boolean, ?>) parse(expressionRoot);
 
-        Filter filter = new Filter();
+        SLDRuleFilter filter = new SLDRuleFilter();
         filter.setFilterExpr(expression);
         return filter;
     }

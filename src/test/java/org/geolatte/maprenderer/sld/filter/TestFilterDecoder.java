@@ -46,7 +46,7 @@ public class TestFilterDecoder {
     public void test_decoder_property_is_equal() {
         FilterType type = getFragment(TestXML.propertyExpression(Comparison.PropertyIsEqualTo, "100"));
         decoder = new FilterDecoder(type);
-        Filter filter = decoder.decode();
+        SLDRuleFilter filter = decoder.decode();
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
@@ -62,7 +62,7 @@ public class TestFilterDecoder {
     public void test_decoder_property_is_equal_Boolean() {
         FilterType type = getFragment(TestXML.propertyExpression(Comparison.PropertyIsEqualTo, "true"));
         decoder = new FilterDecoder(type);
-        Filter filter = decoder.decode();
+        SLDRuleFilter filter = decoder.decode();
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
@@ -87,7 +87,7 @@ public class TestFilterDecoder {
     public void test_decoder_property_is_equal_Double() {
         FilterType type = getFragment(TestXML.propertyExpression(Comparison.PropertyIsEqualTo, "10.254"));
         decoder = new FilterDecoder(type);
-        Filter filter = decoder.decode();
+        SLDRuleFilter filter = decoder.decode();
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
@@ -103,7 +103,7 @@ public class TestFilterDecoder {
     public void test_decoder_property_is_equal_Date() throws ParseException {
         FilterType type = getFragment(TestXML.propertyExpression(Comparison.PropertyIsEqualTo, "2011-10-21"));
         decoder = new FilterDecoder(type);
-        Filter filter = decoder.decode();
+        SLDRuleFilter filter = decoder.decode();
         assertNotNull(filter);
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -121,7 +121,7 @@ public class TestFilterDecoder {
     public void test_decoder_property_is_equal_no_matchcase() {
         FilterType type = getFragment(TestXML.PROPERTY_IS_EQUAL_NO_MATCHCASE);
         decoder = new FilterDecoder(type);
-        Filter filter = decoder.decode();
+        SLDRuleFilter filter = decoder.decode();
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
@@ -137,7 +137,7 @@ public class TestFilterDecoder {
     public void test_decoder_property_is_not_equal() {
         FilterType type = getFragment(TestXML.propertyExpression(Comparison.PropertyIsNotEqualTo, "100"));
         decoder = new FilterDecoder(type);
-        Filter filter = decoder.decode();
+        SLDRuleFilter filter = decoder.decode();
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
@@ -153,7 +153,7 @@ public class TestFilterDecoder {
     public void test_decoder_property_is_less_than() {
         FilterType type = getFragment(TestXML.propertyExpression(Comparison.PropertyIsLessThan, "100"));
         decoder = new FilterDecoder(type);
-        Filter filter = decoder.decode();
+        SLDRuleFilter filter = decoder.decode();
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
@@ -174,7 +174,7 @@ public class TestFilterDecoder {
     public void test_decoder_property_is_greater_than() {
         FilterType type = getFragment(TestXML.propertyExpression(Comparison.PropertyIsGreaterThan, "100"));
         decoder = new FilterDecoder(type);
-        Filter filter = decoder.decode();
+        SLDRuleFilter filter = decoder.decode();
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
@@ -195,7 +195,7 @@ public class TestFilterDecoder {
     public void test_decoder_property_is_less_than_or_equal() {
         FilterType type = getFragment(TestXML.propertyExpression(Comparison.PropertyIsLessThanOrEqualTo, "100"));
         decoder = new FilterDecoder(type);
-        Filter filter = decoder.decode();
+        SLDRuleFilter filter = decoder.decode();
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
@@ -216,7 +216,7 @@ public class TestFilterDecoder {
     public void test_decoder_property_is_greater_than_or_equal() {
         FilterType type = getFragment(TestXML.propertyExpression(Comparison.PropertyIsGreaterThanOrEqualTo, "100"));
         decoder = new FilterDecoder(type);
-        Filter filter = decoder.decode();
+        SLDRuleFilter filter = decoder.decode();
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
@@ -236,7 +236,7 @@ public class TestFilterDecoder {
     public void test_property_is_like() {
         FilterType type = getFragment(TestXML.propertyIsLikeExpression("*sub?\\?", "*", "?", "\\"));
         decoder = new FilterDecoder(type);
-        Filter filter = decoder.decode();
+        SLDRuleFilter filter = decoder.decode();
 
         Feature mockFeature = mock(Feature.class);
         when(mockFeature.getProperty("size")).thenReturn("matching suba?");

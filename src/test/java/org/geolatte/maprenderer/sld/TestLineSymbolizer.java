@@ -27,7 +27,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 public class TestLineSymbolizer extends SLDPainterTest {
 
@@ -57,7 +56,7 @@ public class TestLineSymbolizer extends SLDPainterTest {
     public void before(){
         super.before();
         type = createSymbolizerType();
-        painter = getFeatureTypeStyle().createSymbolizer(type);
+        painter = new LineSymbolizer(type);
     }
 
 
@@ -75,10 +74,10 @@ public class TestLineSymbolizer extends SLDPainterTest {
     @Test
     public void test_uom_is_foot_or_metre() {
         type.setUom("http://www.opengeospatial.org/se/units/foot");
-        painter = getFeatureTypeStyle().createSymbolizer(type);
+        painter = new LineSymbolizer(type);
         assertEquals(UOM.FOOT, painter.getUOM());
         type.setUom("http://www.opengeospatial.org/se/units/metre");
-        painter = getFeatureTypeStyle().createSymbolizer(type);
+        painter = new LineSymbolizer(type);
         assertEquals(UOM.METRE, painter.getUOM());
         
     }
@@ -103,7 +102,7 @@ public class TestLineSymbolizer extends SLDPainterTest {
                         "</Stroke>" +
                         "</LineSymbolizer>";
         LineSymbolizerType type = SLD.instance().read(xmlFragment, LineSymbolizerType.class);
-        LineSymbolizer painter = getFeatureTypeStyle().createSymbolizer(type);
+        LineSymbolizer painter = new LineSymbolizer(type);
         assertNull(painter.getGeometryProperty());
     }
 

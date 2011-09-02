@@ -21,7 +21,7 @@
 
 package org.geolatte.maprenderer.sld.symbolizer;
 
-import org.geolatte.maprenderer.sld.filter.Filter;
+import org.geolatte.maprenderer.sld.filter.SLDRuleFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class Rule {
     private String name;
     private String title;
     private String abstractText;
-    private Filter filter;
+    private SLDRuleFilter filter;
     private Double minScaleDenominator;
     private Double maxScaleDenominator;
     private final List<Symbolizer> symbolizers = new ArrayList<Symbolizer>();
@@ -52,11 +52,11 @@ public class Rule {
         this.title = title;
     }
 
-    public Filter getFilter() {
+    public SLDRuleFilter getFilter() {
         return filter;
     }
 
-    public void setFilter(Filter filter) {
+    public void setFilter(SLDRuleFilter filter) {
         this.filter = filter;
     }
 

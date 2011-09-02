@@ -21,9 +21,23 @@
 
 package org.geolatte.java2D;
 
+import org.geolatte.maprenderer.geotools.GTSpatialReference;
+import org.geolatte.maprenderer.java2D.JAIMapGraphics;
+import org.geolatte.maprenderer.map.MapGraphics;
+import org.geolatte.maprenderer.map.SpatialExtent;
+import org.geolatte.maprenderer.reference.SpatialReference;
+import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: May 23, 2010
  */
 public class TestJAIMapGraphics {
+
+    public static MapGraphics create() throws SpatialReferenceCreationException {
+        SpatialReference spatialReference = new GTSpatialReference("4236", true);
+        SpatialExtent extent = new SpatialExtent(5,5,40,40, spatialReference);
+        java.awt.Dimension dim = new java.awt.Dimension(512, 512);
+        return new JAIMapGraphics(dim, spatialReference);
+    }
 }

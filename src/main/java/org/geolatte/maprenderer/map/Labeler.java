@@ -21,9 +21,9 @@
 
 package org.geolatte.maprenderer.map;
 
-import org.hibernatespatial.readers.FeatureReader;
+import org.geolatte.core.Feature;
 
 public interface Labeler {
 
-	public void label(MapGraphics context, FeatureReader reader);
+	public void label(MapGraphics context, Iterable<Feature> reader);
 }

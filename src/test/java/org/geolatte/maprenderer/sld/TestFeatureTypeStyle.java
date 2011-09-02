@@ -43,14 +43,4 @@ public class TestFeatureTypeStyle extends SLDPainterTest {
 
     }
 
-    @Test
-    public void test_create_painter(){
-        FeatureTypeStylePainter painter = featureTypeStyle.createPainter();
-        assertNotNull(painter);
-        assertNotNull(painter.getRules());
-        assertEquals(3, painter.getRules().size());
-    }
-
-    
-
 }

@@ -21,18 +21,27 @@
 
 package org.geolatte.maprenderer.sld;
 
-import net.opengis.se.v_1_1_0.*;
-import org.geolatte.maprenderer.sld.filter.AlwaysTrueFilter;
-import org.geolatte.maprenderer.sld.filter.ElseFilter;
-import org.geolatte.maprenderer.sld.filter.Filter;
+import net.opengis.se.v_1_1_0.FeatureTypeStyleType;
+import net.opengis.se.v_1_1_0.LineSymbolizerType;
+import net.opengis.se.v_1_1_0.RuleType;
+import net.opengis.se.v_1_1_0.SymbolizerType;
+import org.geolatte.maprenderer.map.MapGraphics;
+import org.geolatte.maprenderer.sld.filter.AlwaysTrueSLDRuleFilter;
+import org.geolatte.maprenderer.sld.filter.ElseSLDRuleFilter;
 import org.geolatte.maprenderer.sld.filter.FilterDecoder;
-import org.geolatte.maprenderer.util.JAXBHelper;
+import org.geolatte.maprenderer.sld.filter.SLDRuleFilter;
 
 import javax.xml.bind.JAXBElement;
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+
+/**
+ * Represents a feature type style, as specified in the Symbology Encoding spec.
+ *
+ * <p><code>FeatureTypeStyle</code>s are thread-safe.</p>
+ */
 public class FeatureTypeStyle {
 
     private final List<Rule> rules;
@@ -44,12 +53,16 @@ public class FeatureTypeStyle {
         this.rules = createRules(type);
     }
 
-    public FeatureTypeStylePainter createPainter() {
-        return new FeatureTypeStylePainter(rules);
+    public FeatureTypeStylePainter createPainter(MapGraphics graphics) {
+        return new FeatureTypeStylePainter(graphics, rules);
     }
 
     public String getName() {
         return this.name;
+    }
+
+    public List<Rule> getRules() {
+        return Collections.unmodifiableList(this.rules);
     }
 
     private List<Rule> createRules(FeatureTypeStyleType type) {
@@ -70,15 +83,15 @@ public class FeatureTypeStyle {
 
     private Rule createRule(RuleType ruleType, List<Rule> rules) {
         List<AbstractSymbolizer> symbolizers = createSymbolizers(ruleType);
-        Filter filter = createFilter(ruleType);
+        SLDRuleFilter filter = createFilter(ruleType);
         Double minScale = ruleType.getMinScaleDenominator();
         Double maxScale = ruleType.getMaxScaleDenominator();
         return new Rule(ruleType.getName(), filter, minScale, maxScale, symbolizers);
     }
 
-    private Filter createFilter(RuleType ruleType) {
-        if (ruleType.getElseFilter() != null) return new ElseFilter();
-        if (ruleType.getFilter() == null) return new AlwaysTrueFilter();
+    private SLDRuleFilter createFilter(RuleType ruleType) {
+        if (ruleType.getElseFilter() != null) return new ElseSLDRuleFilter();
+        if (ruleType.getFilter() == null) return new AlwaysTrueSLDRuleFilter();
         FilterDecoder decoder = new FilterDecoder(ruleType.getFilter());
         return decoder.decode();
     }
@@ -100,42 +113,8 @@ public class FeatureTypeStyle {
         symbolizers.add(symbolizer);
     }
 
-    public LineSymbolizer createSymbolizer(LineSymbolizerType type) {
-        LineSymbolizer painter = new LineSymbolizer();
-        setUOM(type, painter);
-        copyGeometryProperty(type, painter);
-        copyPerpendicularOffset(type, painter);
-        return painter;
+    private LineSymbolizer createSymbolizer(LineSymbolizerType type) {
+        return new LineSymbolizer(type);
     }
 
-    private void copyPerpendicularOffset(LineSymbolizerType type, LineSymbolizer painter) {
-        ParameterValueType pv = type.getPerpendicularOffset();
-        if (pv == null) return;
-        List<Serializable> content = pv.getContent();
-        if (content == null || content.isEmpty()) return;
-        String valueStr = JAXBHelper.extractValueToString(content);
-        Value<Float> value = Value.of(valueStr.toString(), painter.getUOM());
-        painter.setPerpendicularOffset(value);
-    }
-
-    private void setUOM(SymbolizerType type, AbstractSymbolizer symbolizer) {
-        if (type.getUom() != null) {
-            UOM uom = UOM.fromURI(type.getUom());
-            symbolizer.setUnitsOfMeasure(uom);
-        }
-    }
-
-    private void copyGeometryProperty(LineSymbolizerType type, LineSymbolizer painter) {
-        String geomProp = extractGeometryProperty(type);
-        painter.setGeometryProperty(geomProp);
-    }
-
-    //XPath expressions or more complex operations are not supported.
-
-    private String extractGeometryProperty(LineSymbolizerType type) {
-        if (type.getGeometry() == null) return null;
-        if (type.getGeometry().getPropertyName() == null) return null;
-        List<Object> list = type.getGeometry().getPropertyName().getContent();
-        return JAXBHelper.extractValueToString(list);
-    }
 }

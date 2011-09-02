@@ -23,21 +23,20 @@ package org.geolatte.maprenderer.sld;
 
 import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.map.Painter;
-import org.geolatte.maprenderer.sld.filter.Filter;
+import org.geolatte.maprenderer.sld.filter.SLDRuleFilter;
 
-import java.util.Collections;
+import java.awt.*;
 import java.util.List;
 
 public class Rule  {
 
     private final String name;
     private final List<AbstractSymbolizer> symbolizers;
-    private final Filter filter;
+    private final SLDRuleFilter filter;
     private final Double minScaleDenominator;
     private final Double maxScaleDenominator;
 
-    Rule(String name, Filter filter, Double minScale, Double maxScale, List<AbstractSymbolizer> symbolizers){
+    Rule(String name, SLDRuleFilter filter, Double minScale, Double maxScale, List<AbstractSymbolizer> symbolizers){
         this.name = name;
         this.filter = filter;
         this.symbolizers = symbolizers;
@@ -49,7 +48,7 @@ public class Rule  {
         return name;
     }
 
-    protected Filter getFilter() {
+    protected SLDRuleFilter getFilter() {
         return filter;
     }
 
@@ -59,5 +58,23 @@ public class Rule  {
 
     public Double getMaxScaleDenominator() {
         return maxScaleDenominator;
+    }
+
+    public boolean accepts(Feature feature) {
+        return getFilter().evaluate(feature);
+    }
+
+    public boolean withinScaleBounds(MapGraphics graphics) {
+        return true;
+    }
+
+    public void symbolize(MapGraphics graphics, Shape[] shapes) {
+        for (AbstractSymbolizer symbolizer : symbolizers) {
+            symbolizer.symbolize(graphics, shapes);
+        }
+    }
+
+    public List<AbstractSymbolizer> getSymbolizers() {
+        return symbolizers;
     }
 }
