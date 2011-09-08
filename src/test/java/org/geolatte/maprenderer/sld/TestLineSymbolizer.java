@@ -43,7 +43,7 @@ public class TestLineSymbolizer extends BaseFeatureTypeStyleTest {
                         "</Geometry>" +
                         "<Stroke>" +
                         "    <SvgParameter name=\"stroke\">\n#0000F\n</SvgParameter>\n" +
-                        "    <SvgParameter name=\"width\">2</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-width\">2</SvgParameter>" +
                         "</Stroke>" +
                         "<PerpendicularOffset>\n" +
                             " <ogc:Literal>\n-10\n</ogc:Literal>\n" +

@@ -34,6 +34,9 @@ public class LineSymbolizer extends AbstractSymbolizer {
     final private Value<Float> perpendicularOffset;
     final private String geometryProperty;
     final private Stroke stroke;
+    final private StrokeFactory strokeFactory = new StrokeFactory();
+
+    //TODO -- strokeFactory should be injected in constructor.
 
     public LineSymbolizer(LineSymbolizerType type) {
         super(type);
@@ -43,7 +46,7 @@ public class LineSymbolizer extends AbstractSymbolizer {
     }
 
     private Stroke createStroke(LineSymbolizerType type) {
-        return StrokeFactory.create(type.getStroke());
+        return strokeFactory.create(type.getStroke());
     }
 
     public String getGeometryProperty() {

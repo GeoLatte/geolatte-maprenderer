@@ -22,41 +22,42 @@
 package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.StrokeType;
-import org.geolatte.maprenderer.shape.BasicScalableStroke;
 import org.geolatte.maprenderer.shape.ScalableStroke;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- * A factory that creates <code>ScalableStroke</code>s from an SLD stroke specification (the <Stroke>-element).
- * <p>
- * This implementation is currently limited to SLD stroke specifications with:
- * </p>
- * <ul>
- * <li>SVG parameters with only literal values</li>
- * <li>with no GraphicFill or GraphicStroke elements</li>
- * </ul>
- *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 9/2/11
+ *         creation-date: 9/8/11
  */
-public class StrokeFactory {
+public class TestStrokeFactory {
 
-    public ScalableStroke create(StrokeType stroke) {
-        verify(stroke);
+    final private static String strokeFragment =
+                        "<Stroke  version=\"1.1.0\"" +
+                        "                  xmlns=\"http://www.opengis.net/se\"" +
+                        "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
+                        "    <SvgParameter name=\"stroke\">\n#0000F\n</SvgParameter>\n" +
+                        "    <SvgParameter name=\"stroke-width\">2</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-opacity\">0.5</SvgParameter>" +
+                        "</Stroke>";
 
-        SvgParameters svgParameters = SvgParameters.create(stroke.getSvgParameter());
+    private StrokeType strokeType;
+    private ScalableStroke stroke;
+    private StrokeFactory strokeFactory;
 
-
-        float width = 2f;
-        int join = 1;
-        int cap = 1;
-        return new BasicScalableStroke(width, join, cap);
+    @Before
+    public void setUp() {
+        strokeFactory  = new StrokeFactory();
+        strokeType = SLD.instance().read(strokeFragment, StrokeType.class);
+        stroke = strokeFactory.create(strokeType);
     }
 
 
-    private void verify(StrokeType stroke) {
-        if (stroke.getGraphicFill() != null
-                || stroke.getGraphicStroke() != null) {
-            throw new UnsupportedOperationException("Can create only solid-color strokes.");
-        }
+    @Test
+    public void testStrokeWidth(){
+        assertEquals(2,stroke.getWidth(), 0.00000001);
     }
+
 }
