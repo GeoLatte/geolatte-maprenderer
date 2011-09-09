@@ -42,8 +42,13 @@ public class TestLineSymbolizer extends BaseFeatureTypeStyleTest {
                         "    <ogc:PropertyName>\ncenterline\n</ogc:PropertyName>\n" +
                         "</Geometry>" +
                         "<Stroke>" +
-                        "    <SvgParameter name=\"stroke\">\n#0000F\n</SvgParameter>\n" +
+                        "    <SvgParameter name=\"stroke\">\n#FF0000\n</SvgParameter>\n" +
                         "    <SvgParameter name=\"stroke-width\">2</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-opacity\">0.5</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-linejoin\">round</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-linecap\">butt</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-dasharray\">1.0 2.0 3.0</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-dashoffset\">2.0</SvgParameter>" +
                         "</Stroke>" +
                         "<PerpendicularOffset>\n" +
                             " <ogc:Literal>\n-10\n</ogc:Literal>\n" +
@@ -58,13 +63,6 @@ public class TestLineSymbolizer extends BaseFeatureTypeStyleTest {
         type = createSymbolizerType();
         lineSymbolizer = new LineSymbolizer(type);
     }
-
-    @Test
-    public void test_get_Stroke(){
-        //TODO -- complete
-    }
-
-
 
     @Test
     public void test_get_geometry_property(){

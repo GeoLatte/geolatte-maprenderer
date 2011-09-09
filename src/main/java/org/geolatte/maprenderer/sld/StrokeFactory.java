@@ -40,23 +40,18 @@ import org.geolatte.maprenderer.shape.ScalableStroke;
  */
 public class StrokeFactory {
 
-    public ScalableStroke create(StrokeType stroke) {
-        verify(stroke);
-
-        SvgParameters svgParameters = SvgParameters.create(stroke.getSvgParameter());
-
-
-        float width = 2f;
-        int join = 1;
-        int cap = 1;
-        return new BasicScalableStroke(width, join, cap);
-    }
-
-
-    private void verify(StrokeType stroke) {
-        if (stroke.getGraphicFill() != null
-                || stroke.getGraphicStroke() != null) {
-            throw new UnsupportedOperationException("Can create only solid-color strokes.");
+    public ScalableStroke create(SvgParameters svgParameters) {
+        float width = svgParameters.getStrokeWidth();
+        int join = svgParameters.getStrokeLinejoin();
+        int cap = svgParameters.getStrokeLinecap();
+        float[] dashArray = svgParameters.getStrokeDasharray();
+        float dashOffset = svgParameters.getStrokeDashoffset();
+        if (dashArray.length == 0) {
+            return new BasicScalableStroke(width, join, cap);
         }
+        return new BasicScalableStroke(width, join, cap, dashArray, dashOffset);
     }
+
+
+
 }

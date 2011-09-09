@@ -37,6 +37,8 @@ public class BasicScalableStroke implements ScalableStroke {
     private int cap = BasicStroke.CAP_BUTT;
     private static float FLATNESS = .01f;
     private float perpendicularOffset = 0.f;
+    private float[] dashArray = new float[0];
+    private float dashOffset = 0f;
 
     private float width = 1.0f;
 
@@ -51,6 +53,12 @@ public class BasicScalableStroke implements ScalableStroke {
 
     public BasicScalableStroke(float width) {
         this.width = width;
+    }
+
+    public BasicScalableStroke(float width, int join, int cap, float[] dashArray, float dashOffset) {
+        this(width, join, cap);
+        this.dashArray = dashArray;
+        this.dashOffset = dashOffset;
     }
 
 
@@ -77,19 +85,37 @@ public class BasicScalableStroke implements ScalableStroke {
     }
 
 
-    protected int getJoin() {
+    @Override
+    public int getLinejoin() {
         return this.join;
     }
 
 
-    protected int getCap() {
+    @Override
+    public int getLinecap() {
         return this.cap;
+    }
+
+    @Override
+    public float[] getDashArray() {
+        return dashArray;
+    }
+
+    @Override
+    public float getDashOffset() {
+        return dashOffset;
     }
 
 
     public Shape createStrokedShape(Shape shape) {
 
-        BasicStroke stroke = new BasicStroke((float)(getWidth() / scale), this.cap, this.join);
+        BasicStroke stroke = null;
+        if (this.dashArray.length == 0) {
+            stroke = new BasicStroke((float)(getWidth() / scale), this.cap, this.join);
+        } else {
+            //miter limit 10f is default for BasicStroke.
+            stroke = new BasicStroke((float)(getWidth() / scale), this.cap, this.join, 10.f, this.dashArray, this.dashOffset);
+        }
         if (this.perpendicularOffset == 0.f) {
             return stroke.createStrokedShape(shape);
         }

@@ -23,6 +23,7 @@ package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.LineSymbolizerType;
 import net.opengis.se.v_1_1_0.ParameterValueType;
+import net.opengis.se.v_1_1_0.StrokeType;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.util.JAXBHelper;
 
@@ -46,7 +47,10 @@ public class LineSymbolizer extends AbstractSymbolizer {
     }
 
     private Stroke createStroke(LineSymbolizerType type) {
-        return strokeFactory.create(type.getStroke());
+        StrokeType strokeType = type.getStroke();
+        verify(strokeType);
+        SvgParameters svgParameters = SvgParameters.create(strokeType.getSvgParameter());
+        return strokeFactory.create(svgParameters);
     }
 
     public String getGeometryProperty() {
@@ -83,5 +87,18 @@ public class LineSymbolizer extends AbstractSymbolizer {
     @Override
     public void symbolize(MapGraphics graphics, Shape[] shapes) {
         //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    /**
+     * Verifies that the stroketype is supported.
+     * @param stroke
+     */
+    private void verify(StrokeType stroke) {
+        if (stroke == null)
+            throw new IllegalArgumentException("No stroke type specified.");
+        if (stroke.getGraphicFill() != null
+                || stroke.getGraphicStroke() != null) {
+            throw new UnsupportedOperationException("Can create only solid-color strokes.");
+        }
     }
 }

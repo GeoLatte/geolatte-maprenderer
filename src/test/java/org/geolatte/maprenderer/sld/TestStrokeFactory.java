@@ -26,6 +26,8 @@ import org.geolatte.maprenderer.shape.ScalableStroke;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.awt.*;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -38,20 +40,38 @@ public class TestStrokeFactory {
                         "<Stroke  version=\"1.1.0\"" +
                         "                  xmlns=\"http://www.opengis.net/se\"" +
                         "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
-                        "    <SvgParameter name=\"stroke\">\n#0000F\n</SvgParameter>\n" +
+                        "    <SvgParameter name=\"stroke\">\n#FF0000\n</SvgParameter>\n" +
                         "    <SvgParameter name=\"stroke-width\">2</SvgParameter>" +
                         "    <SvgParameter name=\"stroke-opacity\">0.5</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-linejoin\">round</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-linecap\">butt</SvgParameter>" +
                         "</Stroke>";
 
-    private StrokeType strokeType;
+     final private static String dashedStrokeFragment =
+                        "<Stroke  version=\"1.1.0\"" +
+                        "                  xmlns=\"http://www.opengis.net/se\"" +
+                        "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
+                        "    <SvgParameter name=\"stroke\">\n#FF0000\n</SvgParameter>\n" +
+                        "    <SvgParameter name=\"stroke-width\">2</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-opacity\">0.5</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-linejoin\">round</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-linecap\">butt</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-dasharray\">1.0 2.0 3.0</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-dashoffset\">2.0</SvgParameter>" +
+                        "</Stroke>";
+
+
     private ScalableStroke stroke;
+    private ScalableStroke dashedStroke;
     private StrokeFactory strokeFactory;
 
     @Before
     public void setUp() {
         strokeFactory  = new StrokeFactory();
-        strokeType = SLD.instance().read(strokeFragment, StrokeType.class);
-        stroke = strokeFactory.create(strokeType);
+        StrokeType strokeType = SLD.instance().read(strokeFragment, StrokeType.class);
+        stroke = strokeFactory.create(SvgParameters.create(strokeType.getSvgParameter()));
+        strokeType = SLD.instance().read(dashedStrokeFragment, StrokeType.class);
+        dashedStroke = strokeFactory.create(SvgParameters.create(strokeType.getSvgParameter()));
     }
 
 
@@ -59,5 +79,36 @@ public class TestStrokeFactory {
     public void testStrokeWidth(){
         assertEquals(2,stroke.getWidth(), 0.00000001);
     }
+
+    @Test
+    public void testLinejoin(){
+        assertEquals(BasicStroke.JOIN_ROUND, stroke.getLinejoin());
+    }
+
+    @Test
+    public void testLinecap(){
+        assertEquals(BasicStroke.CAP_BUTT, stroke.getLinecap());
+    }
+
+    @Test
+    public void testStrokeDashArray() {
+        assertEquals(0, stroke.getDashArray().length);
+    }
+
+    @Test
+    public void testStrokeDashOffset() {
+        assertEquals(0.0f, stroke.getDashOffset(), 0.00001f);
+    }
+
+    @Test
+    public void testDashedStrokeDashArray() {
+        assertEquals(6, dashedStroke.getDashArray().length);
+    }
+
+    @Test
+    public void testDashedStrokeDashOffset() {
+        assertEquals(2.0f, dashedStroke.getDashOffset(), 0.00001f);
+    }
+
 
 }

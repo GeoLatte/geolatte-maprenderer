@@ -35,4 +35,11 @@ public interface ScalableStroke extends Stroke {
 
     public void setScale(double scale);
 
+    public int getLinejoin();
+
+    public int getLinecap();
+
+    public float[] getDashArray();
+
+    public float getDashOffset();
 }
