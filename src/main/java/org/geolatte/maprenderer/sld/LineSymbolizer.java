@@ -33,7 +33,7 @@ import java.io.Serializable;
 
 public class LineSymbolizer extends AbstractSymbolizer {
 
-    final private Value<Float> perpendicularOffset;
+
     final private String geometryProperty;
     final private ScalableStroke stroke;
     final private StrokeFactory strokeFactory = new StrokeFactory();
@@ -42,7 +42,7 @@ public class LineSymbolizer extends AbstractSymbolizer {
 
     public LineSymbolizer(LineSymbolizerType type) {
         super(type);
-        perpendicularOffset = readPerpendicularOffset(type);
+        Value<Float> perpendicularOffset = readPerpendicularOffset(type);
         geometryProperty = readGeometryProperty(type);
         stroke = createStroke(type, perpendicularOffset);
     }
@@ -59,7 +59,7 @@ public class LineSymbolizer extends AbstractSymbolizer {
     }
 
     public Value<Float> getPerpendicularOffset() {
-        return perpendicularOffset;
+        return this.stroke.getPerpendicularOffset();
     }
 
     private Value<Float> readPerpendicularOffset(LineSymbolizerType type) {
@@ -77,7 +77,7 @@ public class LineSymbolizer extends AbstractSymbolizer {
     }
 
 
-    //XPath expressions or more complex operations are not supported.
+    //XPath expressions or more complex expressions are not supported.
     private String readGeometryProperty(LineSymbolizerType type) {
         if (type.getGeometry() == null) return null;
         if (type.getGeometry().getPropertyName() == null) return null;

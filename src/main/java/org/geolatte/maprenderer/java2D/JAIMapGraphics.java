@@ -42,6 +42,7 @@ public class JAIMapGraphics extends MapGraphics {
 
     private final static Color DEFAULT_BACKGROUND_COLOR = new Color(1.0f, 1.0f, 1.0f, 0.0f);
 
+    //TODO -- replace by scale by it's inverse (metersPerPixel).
     private double scale;
     private final int width;
     private final int height;
