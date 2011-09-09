@@ -28,7 +28,6 @@ import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
-import org.junit.BeforeClass;
 
 import java.io.InputStream;
 

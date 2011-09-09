@@ -48,7 +48,8 @@ public class PointSymbolizer extends ShapeSymbolizer {
 
     public void symbolize(Feature feature) {
         Point pnt = getAnchor(feature);
-        Shape markShape = this.graphic.generateMarkShape(pnt.getX(), pnt.getY(), this.size / getGraphics().getScale());
+        //TODO -- assumes Map Units in meters
+        Shape markShape = this.graphic.generateMarkShape(pnt.getX(), pnt.getY(), this.size * getGraphics().getMetersPerPixel());
         getGraphics().setColor(getFillColor());
         getGraphics().fill(markShape);
         getGraphics().setColor(getStrokeColor());

@@ -44,7 +44,7 @@ public class BasicScalableStroke implements ScalableStroke {
 
     private float width = 1.0f;
 
-    private double scale = 1.0d;
+    private double metersPerPixel = 1.0d;
 
 
     public BasicScalableStroke(float width, Value<Float> offset, int join, int cap) {
@@ -77,21 +77,6 @@ public class BasicScalableStroke implements ScalableStroke {
     public float getWidth() {
         return this.width;
     }
-//
-//    public void setPerpendicularOffset(Value<Float> pixelDistance) {
-//        this.perpendicularOffset = pixelDistance;
-//
-//    }
-
-//    public void setWidth(float pixelWidth) {
-//        this.width = pixelWidth;
-//
-//    }
-
-    protected double getScale() {
-        return this.scale;
-    }
-
 
     @Override
     public int getLinejoin() {
@@ -119,10 +104,10 @@ public class BasicScalableStroke implements ScalableStroke {
 
         BasicStroke stroke = null;
         if (this.dashArray.length == 0) {
-            stroke = new BasicStroke((float)(getWidth() / scale), this.cap, this.join);
+            stroke = new BasicStroke((float)(getWidth() * metersPerPixel), this.cap, this.join);
         } else {
             //miter limit 10f is default for BasicStroke.
-            stroke = new BasicStroke((float)(getWidth() / scale), this.cap, this.join, 10.f, this.dashArray, this.dashOffset);
+            stroke = new BasicStroke((float)(getWidth() * metersPerPixel), this.cap, this.join, 10.f, this.dashArray, this.dashOffset);
         }
         if (this.perpendicularOffset.value() == 0.f) {
             return stroke.createStrokedShape(shape);
@@ -231,14 +216,14 @@ public class BasicScalableStroke implements ScalableStroke {
         if (UOM.PIXEL == this.perpendicularOffset.uom()){
             return value;
         } else {
-            //TODO -- what about meter vs. foot?
-            return value / getScale();
+            return value * this.metersPerPixel;
         }
     }
 
-    public void setScale(double scale) {
-        this.scale = scale;
+    public void setMetersPerPixel(double metersPerPixel) {
+        this.metersPerPixel = metersPerPixel;
     }
+
 
 
 }

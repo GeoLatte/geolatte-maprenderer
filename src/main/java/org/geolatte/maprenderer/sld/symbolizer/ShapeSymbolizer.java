@@ -126,7 +126,7 @@ public abstract class ShapeSymbolizer extends AbstractSymbolizer {
     private void setScalableStroke() {
         ScalableStroke stroke = getStroke();
         if (stroke == null) return;
-        stroke.setScale(getGraphics().getScale());
+        stroke.setMetersPerPixel(getGraphics().getMetersPerPixel());
         getGraphics().setStroke(stroke);
 
     }

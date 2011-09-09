@@ -51,10 +51,10 @@ public class SimpleOffsetPainter implements Painter {
         ShapeAdapter shapeAdapter = new ShapeAdapter(graphics.getTransform());
 
         BasicScalableStroke baseStroke = new BasicScalableStroke(WIDTH_IN_PIXELS);
-        baseStroke.setScale(graphics.getScale());
+        baseStroke.setMetersPerPixel(graphics.getMetersPerPixel());
 
         BasicScalableStroke offsetStroke = new BasicScalableStroke(2.0f, OFFSET_IN_PIXELS);
-        offsetStroke.setScale(graphics.getScale());
+        offsetStroke.setMetersPerPixel(graphics.getMetersPerPixel());
 
         for(Feature feature : features){
             Shape[] shapes = shapeAdapter.toShape(feature.getGeometry());

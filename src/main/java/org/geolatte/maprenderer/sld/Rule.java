@@ -73,7 +73,7 @@ public class Rule  {
     public boolean withinScaleBounds(MapGraphics graphics) {
         //TODO -take account of real pixelsizes.
         double actualPixelSize = getActualPixelSizeInMeters(graphics);
-        double metersPerPixel = getMetersPerPixel(graphics);
+        double metersPerPixel = graphics.getMetersPerPixel();
         double actualScaleDenominator = metersPerPixel / actualPixelSize;
         double multiplier = STND_PIXEL_SIZE_IN_M / actualPixelSize;
         double standardScaleDenominator = multiplier * actualScaleDenominator;
@@ -98,12 +98,5 @@ public class Rule  {
         //TODO - retrieve real pixelsizes (when available in MapGraphics).
         return STND_PIXEL_SIZE_IN_M;
     }
-
-    private double getMetersPerPixel(MapGraphics graphics) {
-        //TODO - determine map units from SRID (when available)
-        return 1/graphics.getScale();
-    }
-
-
 
 }

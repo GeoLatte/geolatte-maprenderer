@@ -31,9 +31,7 @@ public interface ScalableStroke extends Stroke {
 
     public Value<Float> getPerpendicularOffset();
 
-    //TODO should be renamed to setMetersPerPixel
-    @Deprecated
-    public void setScale(double scale);
+    public void setMetersPerPixel(double metersPerPixel);
 
     public int getLinejoin();
 
