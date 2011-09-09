@@ -48,6 +48,9 @@ public class SvgParameters  {
     Map<String, String> parameterMap;
     public static final float DEFAULT_STROKE_WIDTH = 1.0f;
     public static final float DEFAULT_STROKE_OPACITY = 1.0f;
+    public static final int DEFAULT_STROKE_LINEJOIN = BasicStroke.JOIN_MITER;
+    public static final int DEFAULT_STROKE_LINECAP = BasicStroke.CAP_SQUARE;
+    public static final float DEFAULT_STROKE_DASHOFFSET = 0.0f;
 
 
     public static SvgParameters create(List<SvgParameterType> types) {
@@ -87,6 +90,59 @@ public class SvgParameters  {
     public float getStrokeOpacity() {
         String str = parameterMap.get("stroke-opacity");
         if (str == null) return DEFAULT_STROKE_OPACITY;
+        return Float.parseFloat(str);
+    }
+
+    /**
+     * Returns the line join style.
+     *
+     * @return the line join style as one of the static int members of <code>BasicStroke</code>
+     */
+    public int getStrokeLinejoin() {
+        String str = parameterMap.get("stroke-linejoin");
+        if (str == null) return DEFAULT_STROKE_LINEJOIN;
+        if (str.equalsIgnoreCase("mitre")) return BasicStroke.JOIN_MITER;
+        if (str.equalsIgnoreCase("round")) return BasicStroke.JOIN_ROUND;
+        if (str.equalsIgnoreCase("bevel")) return BasicStroke.JOIN_BEVEL;
+
+        throw new IllegalArgumentException(String.format("Can't map %s to a line join.", str));
+    }
+
+    /**
+     * Returns the line cap style.
+     *
+     * @return the line cap style as one of the static int members of <code>BasicStroke</code>
+     */
+    public int getStrokeLinecap() {
+        String str = parameterMap.get("stroke-linecap");
+        if (str == null) return DEFAULT_STROKE_LINECAP;
+        if (str.equalsIgnoreCase("butt")) return BasicStroke.CAP_BUTT;
+        if (str.equalsIgnoreCase("round")) return BasicStroke.CAP_ROUND;
+        if (str.equalsIgnoreCase("square")) return BasicStroke.CAP_SQUARE;
+
+        throw new IllegalArgumentException(String.format("Can't map %s to a line cap.", str));
+    }
+
+    public float[] getStrokeDasharray() {
+        String str = parameterMap.get("stroke-dasharray");
+        if (str == null) return new float[0];
+        //If an odd number of values is given, then the
+        //pattern is repeated twice to create the dasharray.
+        String[] dashStr = str.trim().split("\\s");
+        int dashArLength = (dashStr.length % 2 == 0) ? dashStr.length : 2*dashStr.length;
+        float[] dash = new float[dashArLength];
+        for (int i = 0; i < dashArLength; i++) {
+            dash[i] = Float.parseFloat(dashStr[i % dashStr.length]);
+        }
+
+        return dash;
+
+    }
+
+    public float getStrokeDashoffset() {
+        String str = parameterMap.get("stroke-dashoffset");
+        if (str == null) return DEFAULT_STROKE_DASHOFFSET;
+
         return Float.parseFloat(str);
     }
 }

@@ -42,6 +42,10 @@ public class TestSvgParameters {
                         "    <SvgParameter name=\"stroke\">\n#FF0000\n</SvgParameter>\n" +
                         "    <SvgParameter name=\"stroke-width\">2</SvgParameter>" +
                         "    <SvgParameter name=\"stroke-opacity\">0.5</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-linejoin\">round</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-linecap\">butt</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-dasharray\">1.0 2.0 3.0</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-dashoffset\">2.0</SvgParameter>" +
                         "</Stroke>";
 
     final private static String emptyStroke =
@@ -64,7 +68,7 @@ public class TestSvgParameters {
     }
 
     @Test
-    public void test_read_stroke_color() {
+    public void testStrokeColor() {
         assertEquals(Color.RED, parameters.getStrokeColor());
     }
 
@@ -93,5 +97,52 @@ public class TestSvgParameters {
         assertEquals(SvgParameters.DEFAULT_STROKE_OPACITY, defaultParameters.getStrokeOpacity(), 0.0001f);
     }
 
+    @Test
+    public void testStrokeLinejoin() {
+        assertEquals(BasicStroke.JOIN_ROUND, parameters.getStrokeLinejoin());
+    }
+
+    @Test
+    public void testDefaultStrokeLinejoin() {
+        assertEquals(SvgParameters.DEFAULT_STROKE_LINEJOIN, defaultParameters.getStrokeLinejoin());
+    }
+
+    @Test
+    public void testStrokeLinecap() {
+        assertEquals(BasicStroke.CAP_BUTT, parameters.getStrokeLinecap());
+    }
+
+    @Test
+    public void testDefaultStrokeLinecap() {
+        assertEquals(SvgParameters.DEFAULT_STROKE_LINECAP, defaultParameters.getStrokeLinecap());
+    }
+
+    @Test
+    public void testStrokeDasharray(){
+        float[] dashArray = parameters.getStrokeDasharray();
+        assertEquals(6, dashArray.length);
+        assertEquals(1f, dashArray[0], 0.00001f);
+        assertEquals(2f, dashArray[1], 0.00001f);
+        assertEquals(3f, dashArray[2], 0.00001f);
+        assertEquals(1f, dashArray[3], 0.00001f);
+        assertEquals(2f, dashArray[4], 0.00001f);
+        assertEquals(3f, dashArray[5], 0.00001f);
+    }
+
+    @Test
+    public void testDefaultStrokeDasharray(){
+        float[] dashArray = defaultParameters.getStrokeDasharray();
+        assertEquals(0, dashArray.length);
+    }
+
+    @Test
+    public void testStrokeDashoffset() {
+        assertEquals(2f, parameters.getStrokeDashoffset(), 0.00001f);
+    }
+
+    @Test
+    public void testDefaultStrokeDashoffset() {
+        assertEquals(SvgParameters.DEFAULT_STROKE_DASHOFFSET, defaultParameters.getStrokeDashoffset(), 0.0000f);
+    }
 
 }
