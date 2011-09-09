@@ -25,6 +25,7 @@ import net.opengis.se.v_1_1_0.LineSymbolizerType;
 import net.opengis.se.v_1_1_0.ParameterValueType;
 import net.opengis.se.v_1_1_0.StrokeType;
 import org.geolatte.maprenderer.map.MapGraphics;
+import org.geolatte.maprenderer.shape.ScalableStroke;
 import org.geolatte.maprenderer.util.JAXBHelper;
 
 import java.awt.*;
@@ -34,7 +35,7 @@ public class LineSymbolizer extends AbstractSymbolizer {
 
     final private Value<Float> perpendicularOffset;
     final private String geometryProperty;
-    final private Stroke stroke;
+    final private ScalableStroke stroke;
     final private StrokeFactory strokeFactory = new StrokeFactory();
 
     //TODO -- strokeFactory should be injected in constructor.
@@ -44,9 +45,11 @@ public class LineSymbolizer extends AbstractSymbolizer {
         perpendicularOffset = readPerpendicularOffset(type);
         geometryProperty = readGeometryProperty(type);
         stroke = createStroke(type);
+        stroke.setPerpendicularOffset(perpendicularOffset);
+
     }
 
-    private Stroke createStroke(LineSymbolizerType type) {
+    private ScalableStroke createStroke(LineSymbolizerType type) {
         StrokeType strokeType = type.getStroke();
         verify(strokeType);
         SvgParameters svgParameters = SvgParameters.create(strokeType.getSvgParameter());

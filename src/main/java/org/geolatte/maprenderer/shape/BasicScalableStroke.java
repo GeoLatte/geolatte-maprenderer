@@ -21,6 +21,8 @@
 
 package org.geolatte.maprenderer.shape;
 
+import org.geolatte.maprenderer.sld.UOM;
+import org.geolatte.maprenderer.sld.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +38,7 @@ public class BasicScalableStroke implements ScalableStroke {
     private int join = BasicStroke.JOIN_BEVEL;
     private int cap = BasicStroke.CAP_BUTT;
     private static float FLATNESS = .01f;
-    private float perpendicularOffset = 0.f;
+    private Value<Float> perpendicularOffset = Value.of(0.f, UOM.PIXEL);
     private float[] dashArray = new float[0];
     private float dashOffset = 0f;
 
@@ -62,7 +64,7 @@ public class BasicScalableStroke implements ScalableStroke {
     }
 
 
-    public float getPerpendicularOffset() {
+    public Value<Float> getPerpendicularOffset() {
         return this.perpendicularOffset;
     }
 
@@ -70,7 +72,7 @@ public class BasicScalableStroke implements ScalableStroke {
         return this.width;
     }
 
-    public void setPerpendicularOffset(float pixelDistance) {
+    public void setPerpendicularOffset(Value<Float> pixelDistance) {
         this.perpendicularOffset = pixelDistance;
 
     }
@@ -116,7 +118,7 @@ public class BasicScalableStroke implements ScalableStroke {
             //miter limit 10f is default for BasicStroke.
             stroke = new BasicStroke((float)(getWidth() / scale), this.cap, this.join, 10.f, this.dashArray, this.dashOffset);
         }
-        if (this.perpendicularOffset == 0.f) {
+        if (this.perpendicularOffset.value() == 0.f) {
             return stroke.createStrokedShape(shape);
         }
 
@@ -139,7 +141,7 @@ public class BasicScalableStroke implements ScalableStroke {
         float loX = 0, loY = 0;
         int type = 0;
         boolean first = true;
-        double offset = this.perpendicularOffset / getScale();
+        double offset = determinePixelOffset();
         while (!it.isDone()) {
             type = it.currentSegment(points);
             switch (type) {
@@ -216,6 +218,16 @@ public class BasicScalableStroke implements ScalableStroke {
         }
         result.lineTo(loX, loY);        
         return stroke.createStrokedShape(result);
+    }
+
+    private double determinePixelOffset() {
+        float value = this.perpendicularOffset.value();
+        if (UOM.PIXEL == this.perpendicularOffset.uom()){
+            return value;
+        } else {
+            //TODO -- what about meter vs. foot?
+            return value / getScale();
+        }
     }
 
     public void setScale(double scale) {

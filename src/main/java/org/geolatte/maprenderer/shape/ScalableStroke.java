@@ -21,6 +21,8 @@
 
 package org.geolatte.maprenderer.shape;
 
+import org.geolatte.maprenderer.sld.Value;
+
 import java.awt.*;
 
 public interface ScalableStroke extends Stroke {
@@ -29,9 +31,9 @@ public interface ScalableStroke extends Stroke {
 
     public float getWidth();
 
-    public void setPerpendicularOffset(float pixelDistance);
+    public void setPerpendicularOffset(Value<Float> pixelDistance);
 
-    public float getPerpendicularOffset();
+    public Value<Float> getPerpendicularOffset();
 
     public void setScale(double scale);
 

@@ -34,6 +34,8 @@ import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.maprenderer.shape.BasicScalableStroke;
 import org.geolatte.maprenderer.shape.ScalableStroke;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
+import org.geolatte.maprenderer.sld.UOM;
+import org.geolatte.maprenderer.sld.Value;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,7 +59,8 @@ public class TestOffsetRendering {
 
 
     private static final float LINE_WIDTH = 5.0f;
-    private static final float OFFSET  = 8.0f;
+    private static final Value<Float> OFFSET  = Value.of(8.0f, UOM.PIXEL);
+    private static final Value<Float> NEG_OFFSET = Value.of(-8.0f, UOM.PIXEL);
     private static final float OFFSET_LINE_WIDTH = 1.0f;
     private static final int NUM_IMG = 90;
 
@@ -77,7 +80,7 @@ public class TestOffsetRendering {
         this.offsetStroke = new BasicScalableStroke(OFFSET_LINE_WIDTH); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
         this.offsetStroke.setPerpendicularOffset(OFFSET);
         this.negOffsetStroke = new BasicScalableStroke(OFFSET_LINE_WIDTH); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.negOffsetStroke.setPerpendicularOffset(-OFFSET);
+        this.negOffsetStroke.setPerpendicularOffset(NEG_OFFSET);
 
 
         geomFactory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4236);
