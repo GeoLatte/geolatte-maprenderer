@@ -157,6 +157,12 @@ public class JAIMapGraphics extends MapGraphics {
     }
 
     @Override
+    public double getMetersPerPixel(){
+        //TODO - determine map units from SRID (when available) and convert to meters when necessary
+        return 1/getScale();
+    }
+
+    @Override
     public RenderedImage createRendering() {
         return this.image;
     }

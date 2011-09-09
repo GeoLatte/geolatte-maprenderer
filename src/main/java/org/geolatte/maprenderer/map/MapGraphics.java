@@ -34,7 +34,7 @@ public abstract class MapGraphics extends Graphics2D {
 //    TODO : change SpatialReference to geolatte-geom's CRS
 //    TODO : remove setToExtent() and have extent set in constructor
 //    TODO : add method to set a DPI "hint" == intended resolution
-//    TODO : getScale() should provide reasonable value in case of geodetic CRS's. (see symbology encoding standard 05-077r4, p. 10)
+//    TODO : getScale()/getMetersPerPixel should provide reasonable value in case of geodetic CRS's. (see symbology encoding standard 05-077r4, p. 10)
 
     abstract public Dimension getDimension();
 
@@ -44,6 +44,9 @@ public abstract class MapGraphics extends Graphics2D {
 
     abstract public void setToExtent(SpatialExtent extent);
 
+    @Deprecated
     abstract public double getScale();
+
+    abstract public double getMetersPerPixel();
 
 }

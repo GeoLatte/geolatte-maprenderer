@@ -21,7 +21,6 @@
 
 package org.geolatte.maprenderer.sld;
 
-import net.opengis.se.v_1_1_0.StrokeType;
 import org.geolatte.maprenderer.shape.BasicScalableStroke;
 import org.geolatte.maprenderer.shape.ScalableStroke;
 
@@ -40,18 +39,21 @@ import org.geolatte.maprenderer.shape.ScalableStroke;
  */
 public class StrokeFactory {
 
-    public ScalableStroke create(SvgParameters svgParameters) {
+    public ScalableStroke create(SvgParameters svgParameters, Value<Float> perpendicularOffset) {
         float width = svgParameters.getStrokeWidth();
         int join = svgParameters.getStrokeLinejoin();
         int cap = svgParameters.getStrokeLinecap();
         float[] dashArray = svgParameters.getStrokeDasharray();
         float dashOffset = svgParameters.getStrokeDashoffset();
         if (dashArray.length == 0) {
-            return new BasicScalableStroke(width, join, cap);
+            return new BasicScalableStroke(width, perpendicularOffset, join, cap);
         }
-        return new BasicScalableStroke(width, join, cap, dashArray, dashOffset);
+        return new BasicScalableStroke(width, perpendicularOffset, join, cap, dashArray, dashOffset);
     }
 
+    public ScalableStroke create(SvgParameters svgParameters) {
+        return create(svgParameters, Value.of(0f, UOM.PIXEL));
+    }
 
 
 }

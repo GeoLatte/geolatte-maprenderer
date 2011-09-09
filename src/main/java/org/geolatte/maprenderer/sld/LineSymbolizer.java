@@ -44,16 +44,14 @@ public class LineSymbolizer extends AbstractSymbolizer {
         super(type);
         perpendicularOffset = readPerpendicularOffset(type);
         geometryProperty = readGeometryProperty(type);
-        stroke = createStroke(type);
-        stroke.setPerpendicularOffset(perpendicularOffset);
-
+        stroke = createStroke(type, perpendicularOffset);
     }
 
-    private ScalableStroke createStroke(LineSymbolizerType type) {
+    private ScalableStroke createStroke(LineSymbolizerType type, Value<Float> perpendicularOffset) {
         StrokeType strokeType = type.getStroke();
         verify(strokeType);
         SvgParameters svgParameters = SvgParameters.create(strokeType.getSvgParameter());
-        return strokeFactory.create(svgParameters);
+        return strokeFactory.create(svgParameters, perpendicularOffset);
     }
 
     public String getGeometryProperty() {

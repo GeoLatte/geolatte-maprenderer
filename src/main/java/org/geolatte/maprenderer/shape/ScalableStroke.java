@@ -27,14 +27,12 @@ import java.awt.*;
 
 public interface ScalableStroke extends Stroke {
 
-    public void setWidth(float pixelWidth);
-
     public float getWidth();
-
-    public void setPerpendicularOffset(Value<Float> pixelDistance);
 
     public Value<Float> getPerpendicularOffset();
 
+    //TODO should be renamed to setMetersPerPixel
+    @Deprecated
     public void setScale(double scale);
 
     public int getLinejoin();

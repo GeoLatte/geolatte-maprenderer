@@ -53,8 +53,7 @@ public class SimpleOffsetPainter implements Painter {
         BasicScalableStroke baseStroke = new BasicScalableStroke(WIDTH_IN_PIXELS);
         baseStroke.setScale(graphics.getScale());
 
-        BasicScalableStroke offsetStroke = new BasicScalableStroke(2.0f);
-        offsetStroke.setPerpendicularOffset(OFFSET_IN_PIXELS);
+        BasicScalableStroke offsetStroke = new BasicScalableStroke(2.0f, OFFSET_IN_PIXELS);
         offsetStroke.setScale(graphics.getScale());
 
         for(Feature feature : features){

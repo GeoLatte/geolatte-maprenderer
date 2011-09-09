@@ -47,18 +47,24 @@ public class BasicScalableStroke implements ScalableStroke {
     private double scale = 1.0d;
 
 
-    public BasicScalableStroke(float width, int join, int cap) {
+    public BasicScalableStroke(float width, Value<Float> offset, int join, int cap) {
+        this.perpendicularOffset = offset;
         this.cap = cap;
         this.join = join;
         this.width = width;
+    }
+
+    public BasicScalableStroke(float width, Value<Float> offset) {
+        this.width = width;
+        this.perpendicularOffset = offset;
     }
 
     public BasicScalableStroke(float width) {
         this.width = width;
     }
 
-    public BasicScalableStroke(float width, int join, int cap, float[] dashArray, float dashOffset) {
-        this(width, join, cap);
+    public BasicScalableStroke(float width, Value<Float> offset, int join, int cap, float[] dashArray, float dashOffset) {
+        this(width, offset, join, cap);
         this.dashArray = dashArray;
         this.dashOffset = dashOffset;
     }
@@ -71,16 +77,16 @@ public class BasicScalableStroke implements ScalableStroke {
     public float getWidth() {
         return this.width;
     }
+//
+//    public void setPerpendicularOffset(Value<Float> pixelDistance) {
+//        this.perpendicularOffset = pixelDistance;
+//
+//    }
 
-    public void setPerpendicularOffset(Value<Float> pixelDistance) {
-        this.perpendicularOffset = pixelDistance;
-
-    }
-
-    public void setWidth(float pixelWidth) {
-        this.width = pixelWidth;
-
-    }
+//    public void setWidth(float pixelWidth) {
+//        this.width = pixelWidth;
+//
+//    }
 
     protected double getScale() {
         return this.scale;
