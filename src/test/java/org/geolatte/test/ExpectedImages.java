@@ -19,20 +19,35 @@
  *  Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.java2D;
+package org.geolatte.test;
 
-import org.geolatte.maprenderer.geotools.GTSpatialReference;
-import org.geolatte.maprenderer.java2D.JAIMapGraphics;
-import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.map.SpatialExtent;
-import org.geolatte.maprenderer.reference.SpatialReference;
-import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
+import javax.imageio.ImageIO;
+import java.awt.image.RenderedImage;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
+ * A support class that retrieves the test images from the file system.
+ *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: May 23, 2010
+ *         creation-date: 9/10/11
  */
-public class TestJAIMapGraphics {
+public class ExpectedImages {
 
+    final public static String PACKAGE = "img/expected/";
+
+    public static RenderedImage get(String str) throws IOException {
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(PACKAGE + str);
+        if (in == null) throw new IOException("File not found: " + str);
+        try {
+            return ImageIO.read(in);
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                //nothing to do.
+            }
+        }
+    }
 
 }
