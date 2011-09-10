@@ -47,20 +47,24 @@ public class BasicScalableStroke implements ScalableStroke {
     private double metersPerPixel = 1.0d;
 
 
-    public BasicScalableStroke(float width, Value<Float> offset, int join, int cap) {
-        this.perpendicularOffset = offset;
-        this.cap = cap;
-        this.join = join;
+    public BasicScalableStroke(float width) {
         this.width = width;
+    }
+
+    public BasicScalableStroke(float width, int join, int cap) {
+        this(width);
+        this.join = join;
+        this.cap = cap;
+    }
+
+    public BasicScalableStroke(float width, Value<Float> offset, int join, int cap) {
+        this(width, join, cap);
+        this.perpendicularOffset = offset;
     }
 
     public BasicScalableStroke(float width, Value<Float> offset) {
         this.width = width;
         this.perpendicularOffset = offset;
-    }
-
-    public BasicScalableStroke(float width) {
-        this.width = width;
     }
 
     public BasicScalableStroke(float width, Value<Float> offset, int join, int cap, float[] dashArray, float dashOffset) {
@@ -99,7 +103,13 @@ public class BasicScalableStroke implements ScalableStroke {
         return dashOffset;
     }
 
-
+    /**
+     * Creates the stroked shape.
+     *
+     * <p>If the perpendicalar offset != 0, then the offset linesegments are joined much like the strategy JOIN_MITER.</p>
+     * @param shape
+     * @return
+     */
     public Shape createStrokedShape(Shape shape) {
 
         BasicStroke stroke = null;

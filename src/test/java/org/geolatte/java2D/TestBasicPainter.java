@@ -73,8 +73,8 @@ public class TestBasicPainter {
         Painter painter = new SimpleOffsetPainter(this.mapGraphics);
         painter.paint(features);
         RenderedImage img = this.mapGraphics.createRendering();
-        TestSupport.writeImageToDisk(img, "test-simple-offset-painter.png", "PNG");
-        assertImageEquals("expected-test-simple-offset-painter.png", img);
+        TestSupport.writeImageToDisk(img, "simple-offset-painter.png", "PNG");
+        assertImageEquals("expected-simple-offset-painter.png", img);
 
     }
 

@@ -38,8 +38,8 @@ import java.awt.*;
 public class SimpleOffsetPainter implements Painter {
 
 
-    private final static float WIDTH_IN_PIXELS = 10.0f;
-    private final static Value<Float> OFFSET_IN_PIXELS = Value.of(5.0f, UOM.PIXEL);
+    private final static float WIDTH_IN_PIXELS = 6.0f;
+    private final static Value<Float> OFFSET_IN_PIXELS = Value.of(4.0f, UOM.PIXEL);
 
     private final MapGraphics graphics;
 
@@ -50,7 +50,7 @@ public class SimpleOffsetPainter implements Painter {
     public void paint(Iterable<Feature> features) {
         ShapeAdapter shapeAdapter = new ShapeAdapter(graphics.getTransform());
 
-        BasicScalableStroke baseStroke = new BasicScalableStroke(WIDTH_IN_PIXELS);
+        BasicScalableStroke baseStroke = new BasicScalableStroke(WIDTH_IN_PIXELS,BasicStroke.JOIN_MITER, BasicStroke.CAP_SQUARE);
 
         BasicScalableStroke offsetStroke = new BasicScalableStroke(2.0f, OFFSET_IN_PIXELS);
 
