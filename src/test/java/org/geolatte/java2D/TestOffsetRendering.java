@@ -36,13 +36,12 @@ import org.geolatte.maprenderer.shape.ScalableStroke;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.maprenderer.sld.UOM;
 import org.geolatte.maprenderer.sld.Value;
+import org.geolatte.test.TestSupport;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.RenderedImage;
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -86,23 +85,23 @@ public class TestOffsetRendering {
 
     @Test
     public void test_paint_lines_left_to_right_with_offset() throws IOException {
-        renderImage(offsetStroke, "/tmp/img/offset-left-to-right-painter-", true);
+        renderImage(offsetStroke, "offset-left-to-right-painter-", true);
     }
 
     @Test
     public void test_paint_lines_right_to_left_with_offset() throws IOException {
-        renderImage(offsetStroke, "/tmp/img/offset-right-to-left-painter-", false);
+        renderImage(offsetStroke, "offset-right-to-left-painter-", false);
     }
 
 
     @Test
     public void test_paint_lines_left_to_right_with_negative_offset() throws IOException {
-        renderImage(negOffsetStroke, "/tmp/img/negative-offset-left-to-right-", true);
+        renderImage(negOffsetStroke, "negative-offset-left-to-right-", true);
     }
 
     @Test
     public void test_paint_lines_right_to_left_with_negative_offset() throws IOException {
-        renderImage(negOffsetStroke, "/tmp/img/negative-offset-right-to-left-", false);
+        renderImage(negOffsetStroke, "negative-offset-right-to-left-", false);
     }
 
     private void renderImage(ScalableStroke offsetStroke, String path, boolean leftToRight) throws IOException {
@@ -125,9 +124,7 @@ public class TestOffsetRendering {
             drawLineString(line, mapGraphics);
 
             RenderedImage img = mapGraphics.createRendering();
-            File file = new File(path + i + ".png");
-            ImageIO.write(img, "PNG", file);
-
+            TestSupport.writeImageToDisk(img,path + i + ".png", "PNG");
         }
 
     }

@@ -30,15 +30,16 @@ import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.test.MockLineStringFeature;
+import org.geolatte.test.TestSupport;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.imageio.ImageIO;
 import java.awt.image.RenderedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.geolatte.test.TestSupport.assertImageEquals;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -72,10 +73,12 @@ public class TestBasicPainter {
         Painter painter = new SimpleOffsetPainter(this.mapGraphics);
         painter.paint(features);
         RenderedImage img = this.mapGraphics.createRendering();
-        File file = new File("/tmp/img/test-simple-offset-painter.png");
-        ImageIO.write(img, "PNG", file);
+        TestSupport.writeImageToDisk(img, "test-simple-offset-painter.png", "PNG");
+        assertImageEquals("expected-test-simple-offset-painter.png", img);
 
     }
+
+
 
 
 }

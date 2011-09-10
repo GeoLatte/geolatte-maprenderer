@@ -24,7 +24,6 @@ package org.geolatte.maprenderer.java2D;
 import java.awt.*;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
-import java.awt.image.SampleModel;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -36,29 +35,30 @@ public class ImageComparator {
     public boolean equals(RenderedImage img1, RenderedImage img2) {
         if (img1 == img2) return true;
         if (img1 == null || img2 == null) return false;
-        if (!sameColorModel(img1,img2)) return false;
         Raster r1 = img1.getData();
         Raster r2 = img2.getData();
 
         if (!sameBounds(r1, r2)) return false;
         if (!sameBands(r1, r2)) return false;
-        if (!sameSampleModel(r1, r2)) return false;
 
         if (!sameRasterData(r1, r2)) return false;
 
         return true;
     }
 
-    private boolean sameSampleModel(Raster r1, Raster r2) {
-        SampleModel model1 = r1.getSampleModel();
-        SampleModel model2 = r2.getSampleModel();
-        if (model1.getDataType() != model2.getDataType()) return false;
-        return true;
-    }
+//Turns out testing on equality of samplemodel and colormodel is too strict.
+//This is often modified by ImageIO.
 
-    private boolean sameColorModel(RenderedImage img1, RenderedImage img2) {
-        return img1.getColorModel().equals(img2.getColorModel());
-    }
+//    private boolean sameSampleModel(Raster r1, Raster r2) {
+//        SampleModel model1 = r1.getSampleModel();
+//        SampleModel model2 = r2.getSampleModel();
+//        if (model1.getDataType() != model2.getDataType()) return false;
+//        return true;
+//    }
+//
+//    private boolean sameColorModel(RenderedImage img1, RenderedImage img2) {
+//        return img1.getColorModel().equals(img2.getColorModel());
+//    }
 
     private boolean sameBands(Raster r1, Raster r2) {
         return r1.getNumBands() == r2.getNumBands();
