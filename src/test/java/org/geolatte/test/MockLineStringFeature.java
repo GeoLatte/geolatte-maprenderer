@@ -30,6 +30,14 @@ import com.vividsolutions.jts.geom.*;
 public class MockLineStringFeature extends AbstractMockFeature{
 
 
+    public MockLineStringFeature(Geometry geom) {
+        super(geom);
+    }
+
+    public MockLineStringFeature(){
+        super();
+    }
+
     protected Geometry generateGeom() {
         double startx = 10;
         double starty = 10;
@@ -41,6 +49,15 @@ public class MockLineStringFeature extends AbstractMockFeature{
                 new Coordinate(startx + 30, starty+10.0)
         };
         return geomFactory.createLineString(coordinates);
+    }
+
+    public static MockLineStringFeature createLine(double startX, double startY, double endX, double endY){
+        Coordinate[] coordinates = new Coordinate[]{
+                new Coordinate(startX, startY),
+                new Coordinate(endX, endY)
+        };
+        Geometry geom =  geomFactory.createLineString(coordinates);
+        return new MockLineStringFeature(geom);
     }
 
 

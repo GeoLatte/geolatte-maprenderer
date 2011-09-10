@@ -25,17 +25,16 @@ import org.geolatte.maprenderer.geotools.GTSpatialReferenceFactory;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.java2D.JaiMapCompositor;
 import org.geolatte.maprenderer.map.MapCompositor;
+import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.SpatialExtent;
+import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceException;
 import org.geolatte.maprenderer.reference.SpatialReferenceFactory;
-import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.reference.SpatialReference;
+import org.geolatte.test.TestSupport;
 import org.junit.Test;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.RenderedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +61,7 @@ public class TestJaiMapCompositor {
     }
 
     @Test
-    public void testOverlay() {
+    public void testOverlay() throws IOException {
 
 
         List<RenderedImage> images = new ArrayList<RenderedImage>();
@@ -108,13 +107,8 @@ public class TestJaiMapCompositor {
 
     }
 
-    private void writeToFile(RenderedImage img, String fn) {
-        File f1 = new File("/tmp/img/" + fn + ".png");
-        try {
-            ImageIO.write(img, "PNG", f1);
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+    private void writeToFile(RenderedImage img, String fn) throws IOException {
+        TestSupport.writeImageToDisk(img, fn, "PNG");
     }
 
 }

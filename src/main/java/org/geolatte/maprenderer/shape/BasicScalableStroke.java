@@ -107,7 +107,9 @@ public class BasicScalableStroke implements ScalableStroke {
             stroke = new BasicStroke((float)(getWidth() * metersPerPixel), this.cap, this.join);
         } else {
             //miter limit 10f is default for BasicStroke.
-            stroke = new BasicStroke((float)(getWidth() * metersPerPixel), this.cap, this.join, 10.f, this.dashArray, this.dashOffset);
+            float[] scaledDashArray = scaleArray(this.dashArray);
+            float scaledDashOffset = (float)(dashOffset * metersPerPixel);
+            stroke = new BasicStroke((float)(getWidth() * metersPerPixel), this.cap, this.join, 10.f, scaledDashArray, scaledDashOffset);
         }
         if (this.perpendicularOffset.value() == 0.f) {
             return stroke.createStrokedShape(shape);
@@ -211,12 +213,20 @@ public class BasicScalableStroke implements ScalableStroke {
         return stroke.createStrokedShape(result);
     }
 
+    private float[] scaleArray(float[] dashArray) {
+        float[] result = new float[dashArray.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (float)(dashArray[i]*metersPerPixel);
+        }
+        return result;
+    }
+
     private double determinePixelOffset() {
         float value = this.perpendicularOffset.value();
         if (UOM.PIXEL == this.perpendicularOffset.uom()){
-            return value;
-        } else {
             return value * this.metersPerPixel;
+        } else {
+            throw new UnsupportedOperationException("Only perpendicular offsets in pixel supported.");
         }
     }
 

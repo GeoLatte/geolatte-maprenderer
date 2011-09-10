@@ -40,6 +40,11 @@ public abstract class AbstractMockFeature implements Feature {
     protected Integer id;
     protected static AtomicInteger counter = new AtomicInteger(0);
 
+    public AbstractMockFeature(Geometry geom){
+        this.geom = geom;
+        this.id = counter.incrementAndGet();
+    }
+
     public AbstractMockFeature() {
         this.geom = generateGeom();
         this.id = counter.incrementAndGet();

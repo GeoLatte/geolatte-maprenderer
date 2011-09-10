@@ -65,7 +65,6 @@ public class LineSymbolizer extends AbstractSymbolizer {
         ScalableStroke stroke = createStroke();
         graphics.setStroke(stroke);
         Color c = svgParameters.getStrokeColor();
-        //TODO -- set opacity!!
         Color sRGB = new Color(ColorSpace.getInstance(ColorSpace.CS_sRGB), c.getRGBColorComponents(null), svgParameters.getStrokeOpacity());
         graphics.setColor(sRGB);
         for(Shape s : shapes){

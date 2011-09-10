@@ -22,9 +22,16 @@
 package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.LineSymbolizerType;
+import org.geolatte.maprenderer.map.MapGraphics;
+import org.geolatte.maprenderer.shape.ShapeAdapter;
+import org.geolatte.test.MockLineStringFeature;
+import org.geolatte.test.TestSupport;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.awt.image.RenderedImage;
+
+import static org.geolatte.test.TestSupport.assertImageEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -44,14 +51,14 @@ public class TestLineSymbolizer extends BaseFeatureTypeStyleTest {
                         "<Stroke>" +
                         "    <SvgParameter name=\"stroke\">\n#FF0000\n</SvgParameter>\n" +
                         "    <SvgParameter name=\"stroke-width\">2</SvgParameter>" +
-                        "    <SvgParameter name=\"stroke-opacity\">0.5</SvgParameter>" +
+                        "    <SvgParameter name=\"stroke-opacity\">.9</SvgParameter>" +
                         "    <SvgParameter name=\"stroke-linejoin\">round</SvgParameter>" +
                         "    <SvgParameter name=\"stroke-linecap\">butt</SvgParameter>" +
                         "    <SvgParameter name=\"stroke-dasharray\">1.0 2.0 3.0</SvgParameter>" +
                         "    <SvgParameter name=\"stroke-dashoffset\">2.0</SvgParameter>" +
                         "</Stroke>" +
                         "<PerpendicularOffset>\n" +
-                            " <ogc:Literal>\n-10\n</ogc:Literal>\n" +
+                            " <ogc:Literal>\n20\n</ogc:Literal>\n" +
                         "</PerpendicularOffset>"+
                         "</LineSymbolizer>";
         return SLD.instance().read(xmlFragment, LineSymbolizerType.class);
@@ -89,7 +96,7 @@ public class TestLineSymbolizer extends BaseFeatureTypeStyleTest {
     public void test_perpendicularOffset(){
         Value<Float> perOffset = lineSymbolizer.getPerpendicularOffset();
         assertEquals(UOM.PIXEL, perOffset.uom());
-        assertEquals(Float.valueOf(-10f), perOffset.value());
+        assertEquals(Float.valueOf(20f), perOffset.value());
     }
 
     @Test
@@ -107,6 +114,19 @@ public class TestLineSymbolizer extends BaseFeatureTypeStyleTest {
         LineSymbolizerType type = SLD.instance().read(xmlFragment, LineSymbolizerType.class);
         LineSymbolizer painter = new LineSymbolizer(type);
         assertNull(painter.getGeometryProperty());
+    }
+
+    @Test
+    public void testSymbolize() throws Exception {
+        MapGraphics g = createMapGraphics(100, 100000);
+
+        //a horizontal line in the middle of the image.
+        MockLineStringFeature feature = MockLineStringFeature.createLine(10000d, 50000d, 90000d, 50000d);
+        ShapeAdapter adapter = new ShapeAdapter(g.getTransform());
+        lineSymbolizer.symbolize(g, adapter.toShape(feature.getGeometry()));
+        RenderedImage img = g.createRendering();
+        TestSupport.writeImageToDisk(img, "lineSymbolizer-1.png", "PNG");
+        assertImageEquals("expected-lineSymbolizer-1.png", img);
     }
 
 }
