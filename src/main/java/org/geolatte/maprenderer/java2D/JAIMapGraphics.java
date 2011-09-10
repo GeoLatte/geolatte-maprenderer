@@ -24,6 +24,7 @@ package org.geolatte.maprenderer.java2D;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.maprenderer.reference.SpatialReference;
+import org.geolatte.maprenderer.shape.ScalableStroke;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -369,6 +370,9 @@ public class JAIMapGraphics extends MapGraphics {
     }
 
     public void setStroke(Stroke s) {
+        if (s instanceof ScalableStroke) {
+            ((ScalableStroke)s).setMetersPerPixel(getMetersPerPixel());
+        }
         g2.setStroke(s);
     }
 

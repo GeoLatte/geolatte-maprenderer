@@ -61,7 +61,7 @@ public class TestOffsetRendering {
     private static final float LINE_WIDTH = 5.0f;
     private static final Value<Float> OFFSET  = Value.of(8.0f, UOM.PIXEL);
     private static final Value<Float> NEG_OFFSET = Value.of(-8.0f, UOM.PIXEL);
-    private static final float OFFSET_LINE_WIDTH = 1.0f;
+    private static final float OFFSET_LINE_WIDTH = 2.0f;
     private static final int NUM_IMG = 90;
 
     private SpatialReference spatialReference;

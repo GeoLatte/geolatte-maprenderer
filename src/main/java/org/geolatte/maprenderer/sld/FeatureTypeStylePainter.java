@@ -28,9 +28,18 @@ import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 
 import java.awt.*;
-import java.util.Collections;
 import java.util.List;
 
+/**
+ * A {@link Painter} that paints <code>Feature</code>s according to the
+ * instructions in a FeatureTypeStyle.
+ *
+ * <p>FeatureTypeStyles are specified in the OGC Symbology Encoding Implementation Specification v1.1.0 (05-77r4). </p>
+ *
+ * <p>In this implementation all rules are applied to each feature in sequence (see 05-77r4, p. 11). This approach is
+ * consistent with GeoTools and GeoServer.</p>
+ *
+ */
 public class FeatureTypeStylePainter implements Painter {
 
 
@@ -45,24 +54,20 @@ public class FeatureTypeStylePainter implements Painter {
         this.shapeAdapter = new ShapeAdapter(graphics.getTransform());
     }
 
+
+    //TODO -- this does not take into account the ElseFilters in Rules!!
     @Override
     public void paint(Iterable<Feature> features) {
-        List<Rule> rules = getRules();
-        //reverse order for painting (last in list, gets painted first).
-        Collections.reverse(rules);
-        for (Rule rule : rules){
-            paint(graphics, features, rule);
-        }
-
-    }
-
-    private void paint(MapGraphics graphics, Iterable<Feature> features, Rule rule) {
-        if (!rule.withinScaleBounds(graphics)) return;
-        for (Feature feature : features) {
-            if (!rule.accepts(feature)) continue;
+        //Note: this order (iterate over feature, then iterate over rules is
+        // consistent with GeoTools/GeoServer renderers.
+        for (Feature feature : features){
             Shape[] shapes = shapeAdapter.toShape(feature.getGeometry());
-            rule.symbolize(graphics,shapes);
+            for (Rule rule : rules){
+                if (!rule.accepts(feature)) continue;
+                rule.symbolize(graphics, shapes);
+            }
         }
+
     }
 
     /**
