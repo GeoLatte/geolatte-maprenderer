@@ -33,6 +33,8 @@ import java.util.Map;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 27, 2010
  */
+//TODO move this into geolatte-common
+// something like this also exists in geolatte-mapserver !
 public class TypeConverter {
 
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";

@@ -27,6 +27,8 @@ import org.geolatte.maprenderer.reference.SpatialReference;
 import java.awt.*;
 import java.io.Serializable;
 
+//TODO -- replace by corresponding class in Geolatte-geom or Geolatte-common
+@Deprecated
 public class SpatialExtent implements Serializable {
 
     private final double minX;

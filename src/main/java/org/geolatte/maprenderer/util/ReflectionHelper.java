@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+//TODO -- move this into geolatte-common
 public class ReflectionHelper {
 	
 	
