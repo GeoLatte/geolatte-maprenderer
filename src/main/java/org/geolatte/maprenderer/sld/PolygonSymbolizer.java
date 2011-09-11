@@ -21,6 +21,7 @@
 
 package org.geolatte.maprenderer.sld;
 
+import com.vividsolutions.jts.geom.Geometry;
 import net.opengis.se.v_1_1_0.*;
 import org.geolatte.maprenderer.map.MapGraphics;
 
@@ -78,7 +79,8 @@ public class PolygonSymbolizer extends AbstractSymbolizer {
     }
 
     @Override
-    public void symbolize(MapGraphics graphics, Shape[] shapes) {
+    public void symbolize(MapGraphics graphics, Geometry geometry) {
+        Shape[] shapes = toShapes(graphics, geometry);
         fill(graphics, shapes);
         stroke(graphics, shapes);
     }

@@ -45,13 +45,10 @@ public class FeatureTypeStylePainter implements Painter {
 
     final private List<Rule> rules;
     final private MapGraphics graphics;
-    final private ShapeAdapter shapeAdapter;
-
 
     FeatureTypeStylePainter(MapGraphics graphics, List<Rule> rules){
         this.rules = rules;
         this.graphics = graphics;
-        this.shapeAdapter = new ShapeAdapter(graphics.getTransform());
     }
 
 
@@ -61,10 +58,9 @@ public class FeatureTypeStylePainter implements Painter {
         //Note: this order (iterate over feature, then iterate over rules is
         // consistent with GeoTools/GeoServer renderers.
         for (Feature feature : features){
-            Shape[] shapes = shapeAdapter.toShape(feature.getGeometry());
             for (Rule rule : rules){
                 if (!rule.accepts(feature)) continue;
-                rule.symbolize(graphics, shapes);
+                rule.symbolize(graphics, feature.getGeometry());
             }
         }
 

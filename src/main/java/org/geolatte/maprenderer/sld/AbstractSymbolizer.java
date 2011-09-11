@@ -21,10 +21,12 @@
 
 package org.geolatte.maprenderer.sld;
 
+import com.vividsolutions.jts.geom.Geometry;
 import net.opengis.se.v_1_1_0.GeometryType;
 import net.opengis.se.v_1_1_0.ParameterValueType;
 import net.opengis.se.v_1_1_0.SymbolizerType;
 import org.geolatte.maprenderer.map.MapGraphics;
+import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.maprenderer.util.JAXBHelper;
 
 import java.awt.*;
@@ -57,7 +59,7 @@ public abstract class AbstractSymbolizer {
         return uom;
     }
 
-    public abstract void symbolize(MapGraphics graphics, Shape[] shapes);
+    public abstract void symbolize(MapGraphics graphics, Geometry geometry);
 
     protected Value<Float> readPerpendicularOffset(ParameterValueType parameterValueType){
         Value<Float> defaultOffset = Value.of(0f, UOM.PIXEL);
@@ -93,5 +95,9 @@ public abstract class AbstractSymbolizer {
 
     protected PaintFactory getPaintFactory(){
         return this.paintFactory;
+    }
+
+    protected Shape[] toShapes(MapGraphics graphics, Geometry geometry) {
+        return new ShapeAdapter(graphics.getTransform()).toShape(geometry);
     }
 }

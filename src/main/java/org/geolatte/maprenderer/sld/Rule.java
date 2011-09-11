@@ -21,11 +21,11 @@
 
 package org.geolatte.maprenderer.sld;
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.sld.filter.SLDRuleFilter;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,9 +81,9 @@ public class Rule  {
                 && standardScaleDenominator < getMaxScaleDenominator() + EPSILON;
     }
 
-    public void symbolize(MapGraphics graphics, Shape[] shapes) {
+    public void symbolize(MapGraphics graphics, Geometry geometry) {
         for (AbstractSymbolizer symbolizer : symbolizers) {
-            symbolizer.symbolize(graphics, shapes);
+            symbolizer.symbolize(graphics, geometry);
         }
     }
 

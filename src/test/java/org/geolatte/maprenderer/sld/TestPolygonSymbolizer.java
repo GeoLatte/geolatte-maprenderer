@@ -111,7 +111,7 @@ public class TestPolygonSymbolizer extends BaseFeatureTypeStyleTest {
         //a horizontal line in the middle of the image.
         MockPolygonFeature feature = MockPolygonFeature.createRect(3000, 3000, 6000, 6000);
         ShapeAdapter adapter = new ShapeAdapter(g.getTransform());
-        symbolizer.symbolize(g, adapter.toShape(feature.getGeometry()));
+        symbolizer.symbolize(g, feature.getGeometry());
         RenderedImage img = g.createRendering();
         TestSupport.writeImageToDisk(img, testCaseName, "PNG");
         assertImageEquals("expected-" + testCaseName, img);

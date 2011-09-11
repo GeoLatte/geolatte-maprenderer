@@ -21,6 +21,7 @@
 
 package org.geolatte.maprenderer.sld;
 
+import com.vividsolutions.jts.geom.Geometry;
 import net.opengis.se.v_1_1_0.GeometryType;
 import net.opengis.se.v_1_1_0.LineSymbolizerType;
 import net.opengis.se.v_1_1_0.ParameterValueType;
@@ -55,7 +56,8 @@ public class LineSymbolizer extends AbstractSymbolizer {
     }
 
     @Override
-    public void symbolize(MapGraphics graphics, Shape[] shapes) {
+    public void symbolize(MapGraphics graphics, Geometry geometry) {
+        Shape[] shapes = toShapes(graphics, geometry);
         Stroke stroke = createStroke();
         graphics.setStroke(stroke);
         Paint paint = createPaint();

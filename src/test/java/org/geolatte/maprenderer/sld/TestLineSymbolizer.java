@@ -123,7 +123,7 @@ public class TestLineSymbolizer extends BaseFeatureTypeStyleTest {
         //a horizontal line in the middle of the image.
         MockLineStringFeature feature = MockLineStringFeature.createLine(10000d, 50000d, 90000d, 50000d);
         ShapeAdapter adapter = new ShapeAdapter(g.getTransform());
-        lineSymbolizer.symbolize(g, adapter.toShape(feature.getGeometry()));
+        lineSymbolizer.symbolize(g, feature.getGeometry());
         RenderedImage img = g.createRendering();
         TestSupport.writeImageToDisk(img, "lineSymbolizer-1.png", "PNG");
         assertImageEquals("expected-lineSymbolizer-1.png", img);
