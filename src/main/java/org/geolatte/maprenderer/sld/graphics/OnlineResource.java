@@ -19,18 +19,44 @@
  *  Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.maprenderer.sld.symbolizer;
+package org.geolatte.maprenderer.sld.graphics;
 
-import java.awt.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 
+public class OnlineResource {
+	
+	private String url = null;
+	
+	private String type = null;
 
-public abstract class AbstractMarkGraphic implements Graphic {
+	public String getType() {
+		return type;
+	}
 
+	public void setType(String type) {
+		this.type = type;
+	}
 
-    private float size;
+	public String getUrl() {
+		return url;
+	}
 
-
-    public abstract Shape generateMarkShape(double x, double y, double size);
-
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	
+	public URL asURL() throws MalformedURLException{
+		if (url == null){
+			return null;
+		}
+		
+		if (this.type == null || this.type.equalsIgnoreCase("simple")){
+			return new URL(this.url);
+		} else {
+			throw new UnsupportedOperationException("Only simple links are currently supported.");
+		}
+		
+	}
 
 }

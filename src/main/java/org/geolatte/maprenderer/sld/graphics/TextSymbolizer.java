@@ -19,14 +19,15 @@
  *  Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.maprenderer.sld.symbolizer;
+package org.geolatte.maprenderer.sld.graphics;
 
 import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
 
 import java.awt.*;
 
-public class TextSymbolizer extends AbstractSymbolizer {
+@Deprecated
+public class TextSymbolizer {
 
     private String labelProperty = null;
     private String fontFamily = "SERIF";

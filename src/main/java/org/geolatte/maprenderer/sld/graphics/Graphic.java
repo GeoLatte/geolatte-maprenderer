@@ -19,11 +19,13 @@
  *  Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.maprenderer.sld.symbolizer;
+package org.geolatte.maprenderer.sld.graphics;
+
+import java.awt.*;
 
 
-public abstract class AbstractSymbolizer {
+public interface Graphic {
 
-
+    Shape generateMarkShape(double x, double y, double size);
 
 }

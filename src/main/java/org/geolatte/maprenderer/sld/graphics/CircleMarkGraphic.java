@@ -19,13 +19,16 @@
  *  Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.maprenderer.sld.symbolizer;
+package org.geolatte.maprenderer.sld.graphics;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
 
-public interface Graphic {
+public class CircleMarkGraphic implements Graphic {
 
-    Shape generateMarkShape(double x, double y, double size);
+    public Shape generateMarkShape(double x, double y, double size) {
+        return new Ellipse2D.Double(x, y, size, size);
 
+    }
 }
