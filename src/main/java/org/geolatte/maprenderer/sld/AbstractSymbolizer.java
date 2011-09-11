@@ -21,10 +21,14 @@
 
 package org.geolatte.maprenderer.sld;
 
+import net.opengis.se.v_1_1_0.GeometryType;
+import net.opengis.se.v_1_1_0.ParameterValueType;
 import net.opengis.se.v_1_1_0.SymbolizerType;
 import org.geolatte.maprenderer.map.MapGraphics;
+import org.geolatte.maprenderer.util.JAXBHelper;
 
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2010.
@@ -33,6 +37,12 @@ import java.awt.*;
 public abstract class AbstractSymbolizer {
 
     final private UOM uom;
+
+    //TODO -- stroke and paint factories should be injected in constructor.
+    final private StrokeFactory strokeFactory = new StrokeFactory();
+    final private PaintFactory paintFactory = new PaintFactory();
+
+
 
     public AbstractSymbolizer(SymbolizerType type){
         if (type.getUom() != null) {
@@ -48,4 +58,40 @@ public abstract class AbstractSymbolizer {
     }
 
     public abstract void symbolize(MapGraphics graphics, Shape[] shapes);
+
+    protected Value<Float> readPerpendicularOffset(ParameterValueType parameterValueType){
+        Value<Float> defaultOffset = Value.of(0f, UOM.PIXEL);
+        String valueStr = extractParameterValue(parameterValueType);
+        if (valueStr == null) {
+            return defaultOffset;
+        }
+        return Value.of(valueStr.toString(), this.getUOM());
+    }
+
+    //TODO -- XPath expressions are not supported.
+    protected String readGeometry(GeometryType geometryType){
+        if (geometryType == null) return null;
+        if (geometryType.getPropertyName() == null) return null;
+        java.util.List<Object> list = geometryType.getPropertyName().getContent();
+        return JAXBHelper.extractValueToString(list);
+    }
+
+    protected String extractParameterValue(ParameterValueType parameterValueType){
+         if (parameterValueType == null){
+            return null;
+        }
+        java.util.List<Serializable> content = parameterValueType.getContent();
+        if (content == null || content.isEmpty()) {
+            return null;
+        }
+        return JAXBHelper.extractValueToString(content);
+    }
+
+    protected StrokeFactory getStrokeFactory(){
+        return this.strokeFactory;
+    }
+
+    protected PaintFactory getPaintFactory(){
+        return this.paintFactory;
+    }
 }

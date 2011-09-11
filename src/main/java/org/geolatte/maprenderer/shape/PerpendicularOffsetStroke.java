@@ -31,9 +31,12 @@ import java.awt.geom.FlatteningPathIterator;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 
-public class BasicScalableStroke implements ScalableStroke {
+//TODO -- refactor by splitting perpendicular offset from stroke
+//TODO -- this class gives different results from BasicStroke when offset = 0!!
 
-    private static Logger LOGGER = LoggerFactory.getLogger(BasicScalableStroke.class);
+public class PerpendicularOffsetStroke implements Stroke {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(PerpendicularOffsetStroke.class);
 
     private int join = BasicStroke.JOIN_BEVEL;
     private int cap = BasicStroke.CAP_BUTT;
@@ -47,27 +50,27 @@ public class BasicScalableStroke implements ScalableStroke {
     private double metersPerPixel = 1.0d;
 
 
-    public BasicScalableStroke(float width) {
+    public PerpendicularOffsetStroke(float width) {
         this.width = width;
     }
 
-    public BasicScalableStroke(float width, int join, int cap) {
+    public PerpendicularOffsetStroke(float width, int join, int cap) {
         this(width);
         this.join = join;
         this.cap = cap;
     }
 
-    public BasicScalableStroke(float width, Value<Float> offset, int join, int cap) {
+    public PerpendicularOffsetStroke(float width, Value<Float> offset, int join, int cap) {
         this(width, join, cap);
         this.perpendicularOffset = offset;
     }
 
-    public BasicScalableStroke(float width, Value<Float> offset) {
+    public PerpendicularOffsetStroke(float width, Value<Float> offset) {
         this.width = width;
         this.perpendicularOffset = offset;
     }
 
-    public BasicScalableStroke(float width, Value<Float> offset, int join, int cap, float[] dashArray, float dashOffset) {
+    public PerpendicularOffsetStroke(float width, Value<Float> offset, int join, int cap, float[] dashArray, float dashOffset) {
         this(width, offset, join, cap);
         this.dashArray = dashArray;
         this.dashOffset = dashOffset;
@@ -82,23 +85,19 @@ public class BasicScalableStroke implements ScalableStroke {
         return this.width;
     }
 
-    @Override
     public int getLinejoin() {
         return this.join;
     }
 
 
-    @Override
     public int getLinecap() {
         return this.cap;
     }
 
-    @Override
     public float[] getDashArray() {
         return dashArray;
     }
 
-    @Override
     public float getDashOffset() {
         return dashOffset;
     }
@@ -113,7 +112,7 @@ public class BasicScalableStroke implements ScalableStroke {
     public Shape createStrokedShape(Shape shape) {
 
         BasicStroke stroke = null;
-        if (this.dashArray.length == 0) {
+        if (this.dashArray == null || this.dashArray.length == 0) {
             stroke = new BasicStroke((float)(getWidth() * metersPerPixel), this.cap, this.join);
         } else {
             //miter limit 10f is default for BasicStroke.

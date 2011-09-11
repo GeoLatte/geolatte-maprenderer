@@ -48,12 +48,13 @@ public class FeatureTypeStyle {
 
 
     FeatureTypeStyle(FeatureTypeStyleType type) {
+        //TODO -- add try/catch here and throw a Checked Exception
         this.name = type.getName();
         this.rules = createRules(type);
     }
 
     public FeatureTypeStylePainter createPainter(MapGraphics graphics) {
-        return new FeatureTypeStylePainter(graphics, rules);
+        return new FeatureTypeStylePainter(graphics, getRules());
     }
 
     public String getName() {

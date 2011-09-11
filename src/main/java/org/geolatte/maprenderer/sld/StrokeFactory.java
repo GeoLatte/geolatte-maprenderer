@@ -21,8 +21,9 @@
 
 package org.geolatte.maprenderer.sld;
 
-import org.geolatte.maprenderer.shape.BasicScalableStroke;
-import org.geolatte.maprenderer.shape.ScalableStroke;
+import org.geolatte.maprenderer.shape.PerpendicularOffsetStroke;
+
+import java.awt.*;
 
 /**
  * A factory that creates <code>ScalableStroke</code>s from an SLD stroke specification (the <Stroke>-element).
@@ -39,20 +40,25 @@ import org.geolatte.maprenderer.shape.ScalableStroke;
  */
 public class StrokeFactory {
 
-    public ScalableStroke create(SvgParameters svgParameters, Value<Float> perpendicularOffset) {
+    public Stroke create(SvgParameters svgParameters, Value<Float> perpendicularOffset) {
+        if (perpendicularOffset == null || Math.abs(perpendicularOffset.value()) < Math.ulp(1f)) {
+            return create(svgParameters);
+        }
         float width = svgParameters.getStrokeWidth();
         int join = svgParameters.getStrokeLinejoin();
         int cap = svgParameters.getStrokeLinecap();
         float[] dashArray = svgParameters.getStrokeDasharray();
         float dashOffset = svgParameters.getStrokeDashoffset();
-        if (dashArray.length == 0) {
-            return new BasicScalableStroke(width, perpendicularOffset, join, cap);
-        }
-        return new BasicScalableStroke(width, perpendicularOffset, join, cap, dashArray, dashOffset);
+        return new PerpendicularOffsetStroke(width, perpendicularOffset, join, cap, dashArray, dashOffset);
     }
 
-    public ScalableStroke create(SvgParameters svgParameters) {
-        return create(svgParameters, Value.of(0f, UOM.PIXEL));
+    public Stroke create(SvgParameters svgParameters) {
+        return new BasicStroke(svgParameters.getStrokeWidth(),
+                svgParameters.getStrokeLinecap(),
+                svgParameters.getStrokeLinejoin(),
+                10f,
+                svgParameters.getStrokeDasharray(),
+                svgParameters.getStrokeDashoffset());
     }
 
 

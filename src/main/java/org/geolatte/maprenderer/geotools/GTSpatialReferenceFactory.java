@@ -48,7 +48,6 @@ public class GTSpatialReferenceFactory implements SpatialReferenceFactory {
                                      SpatialReference target) {
         CoordinateReferenceSystem sourceCRS = findCRS(source);
         CoordinateReferenceSystem targetCRS = findCRS(target);
-        //TODO :: cache CRSProjector objects....
         return new CRSProjector(sourceCRS, targetCRS);
     }
 

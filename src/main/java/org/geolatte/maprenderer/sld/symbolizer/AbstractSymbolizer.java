@@ -22,7 +22,7 @@
 package org.geolatte.maprenderer.sld.symbolizer;
 
 
-public abstract class AbstractSymbolizer implements Symbolizer {
+public abstract class AbstractSymbolizer {
 
 
 

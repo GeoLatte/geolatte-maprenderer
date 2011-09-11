@@ -112,8 +112,8 @@ public class TestLineSymbolizer extends BaseFeatureTypeStyleTest {
                         "</Stroke>" +
                         "</LineSymbolizer>";
         LineSymbolizerType type = SLD.instance().read(xmlFragment, LineSymbolizerType.class);
-        LineSymbolizer painter = new LineSymbolizer(type);
-        assertNull(painter.getGeometryProperty());
+        LineSymbolizer symbolizer = new LineSymbolizer(type);
+        assertNull(symbolizer.getGeometryProperty());
     }
 
     @Test

@@ -31,8 +31,7 @@ import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
-import org.geolatte.maprenderer.shape.BasicScalableStroke;
-import org.geolatte.maprenderer.shape.ScalableStroke;
+import org.geolatte.maprenderer.shape.PerpendicularOffsetStroke;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.maprenderer.sld.UOM;
 import org.geolatte.maprenderer.sld.Value;
@@ -66,18 +65,18 @@ public class TestOffsetRendering {
     private SpatialReference spatialReference;
     private SpatialExtent extent;
     private java.awt.Dimension dim = new java.awt.Dimension(512, 512);
-    private ScalableStroke stroke;
-    private ScalableStroke offsetStroke;
-    private ScalableStroke negOffsetStroke;
+    private PerpendicularOffsetStroke stroke;
+    private PerpendicularOffsetStroke offsetStroke;
+    private PerpendicularOffsetStroke negOffsetStroke;
     private GeometryFactory geomFactory;
 
     @Before
     public void setUp() throws SpatialReferenceCreationException {
         this.spatialReference = new GTSpatialReference("4236", true);
         this.extent = new SpatialExtent(-100, -100, 100, 100, spatialReference);
-        this.stroke = new BasicScalableStroke(LINE_WIDTH); //e, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.offsetStroke = new BasicScalableStroke(OFFSET_LINE_WIDTH, OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.negOffsetStroke = new BasicScalableStroke(OFFSET_LINE_WIDTH, NEG_OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
+        this.stroke = new PerpendicularOffsetStroke(LINE_WIDTH); //e, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
+        this.offsetStroke = new PerpendicularOffsetStroke(OFFSET_LINE_WIDTH, OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
+        this.negOffsetStroke = new PerpendicularOffsetStroke(OFFSET_LINE_WIDTH, NEG_OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
         geomFactory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4236);
 
     }
@@ -104,7 +103,7 @@ public class TestOffsetRendering {
         renderImage(negOffsetStroke, "negative-offset-right-to-left-", false);
     }
 
-    private void renderImage(ScalableStroke offsetStroke, String path, boolean leftToRight) throws IOException {
+    private void renderImage(PerpendicularOffsetStroke offsetStroke, String path, boolean leftToRight) throws IOException {
 
         double theta = 2 * Math.PI / NUM_IMG;
         for (int i = 0; i < NUM_IMG; i++) {

@@ -22,13 +22,13 @@
 package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.StrokeType;
-import org.geolatte.maprenderer.shape.ScalableStroke;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -61,43 +61,43 @@ public class TestStrokeFactory {
                         "</Stroke>";
 
 
-    private ScalableStroke stroke;
-    private ScalableStroke dashedStroke;
+    private BasicStroke stroke;
+    private BasicStroke dashedStroke;
     private StrokeFactory strokeFactory;
 
     @Before
     public void setUp() {
         strokeFactory  = new StrokeFactory();
         StrokeType strokeType = SLD.instance().read(strokeFragment, StrokeType.class);
-        stroke = strokeFactory.create(SvgParameters.create(strokeType.getSvgParameter()));
+        stroke = (BasicStroke)strokeFactory.create(SvgParameters.create(strokeType.getSvgParameter()));
         strokeType = SLD.instance().read(dashedStrokeFragment, StrokeType.class);
-        dashedStroke = strokeFactory.create(SvgParameters.create(strokeType.getSvgParameter()));
+        dashedStroke = (BasicStroke)strokeFactory.create(SvgParameters.create(strokeType.getSvgParameter()));
     }
 
 
     @Test
     public void testStrokeWidth(){
-        assertEquals(2,stroke.getWidth(), 0.00000001);
+        assertEquals(2,stroke.getLineWidth(), 0.00000001);
     }
 
     @Test
     public void testLinejoin(){
-        assertEquals(BasicStroke.JOIN_ROUND, stroke.getLinejoin());
+        assertEquals(BasicStroke.JOIN_ROUND, stroke.getLineJoin());
     }
 
     @Test
     public void testLinecap(){
-        assertEquals(BasicStroke.CAP_BUTT, stroke.getLinecap());
+        assertEquals(BasicStroke.CAP_BUTT, stroke.getEndCap());
     }
 
     @Test
     public void testStrokeDashArray() {
-        assertEquals(0, stroke.getDashArray().length);
+        assertNull(stroke.getDashArray());
     }
 
     @Test
     public void testStrokeDashOffset() {
-        assertEquals(0.0f, stroke.getDashOffset(), 0.00001f);
+        assertEquals(0.0f, stroke.getDashPhase(), 0.00001f);
     }
 
     @Test
@@ -107,7 +107,7 @@ public class TestStrokeFactory {
 
     @Test
     public void testDashedStrokeDashOffset() {
-        assertEquals(2.0f, dashedStroke.getDashOffset(), 0.00001f);
+        assertEquals(2.0f, dashedStroke.getDashPhase(), 0.00001f);
     }
 
 

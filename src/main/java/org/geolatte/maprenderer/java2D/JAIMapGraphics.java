@@ -24,7 +24,7 @@ package org.geolatte.maprenderer.java2D;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.maprenderer.reference.SpatialReference;
-import org.geolatte.maprenderer.shape.ScalableStroke;
+import org.geolatte.maprenderer.shape.PerpendicularOffsetStroke;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -370,10 +370,24 @@ public class JAIMapGraphics extends MapGraphics {
     }
 
     public void setStroke(Stroke s) {
-        if (s instanceof ScalableStroke) {
-            ((ScalableStroke)s).setMetersPerPixel(getMetersPerPixel());
+        Stroke scaledStroke = scaleStroke(s);
+        g2.setStroke(scaledStroke);
+    }
+
+    private Stroke scaleStroke(Stroke s) {
+        if (s instanceof PerpendicularOffsetStroke) {
+            ((PerpendicularOffsetStroke)s).setMetersPerPixel(getMetersPerPixel());
+            return s;
         }
-        g2.setStroke(s);
+        if (s instanceof BasicStroke){
+            BasicStroke orig = (BasicStroke)s;
+            return new BasicStroke((float) (orig.getLineWidth() * getMetersPerPixel()),
+                    orig.getEndCap(), orig.getLineJoin(),
+                    orig.getMiterLimit(), orig.getDashArray(),
+                    orig.getDashPhase()
+                    );
+        }
+        throw new IllegalArgumentException("Can't scale stroke.");
     }
 
     public void setRenderingHint(RenderingHints.Key hintKey, Object hintValue) {

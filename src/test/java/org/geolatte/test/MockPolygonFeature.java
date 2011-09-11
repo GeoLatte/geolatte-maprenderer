@@ -34,7 +34,10 @@ public class MockPolygonFeature extends AbstractMockFeature {
 
     public MockPolygonFeature() {
         super();
+    }
 
+    public MockPolygonFeature(Geometry geom) {
+        super(geom);
     }
 
     protected Geometry generateGeom(){
@@ -53,5 +56,17 @@ public class MockPolygonFeature extends AbstractMockFeature {
         LinearRing shell = geomFactory.createLinearRing(coordinates);
         return new Polygon(shell, null, geomFactory);        
     };
+
+    public static MockPolygonFeature createRect(double minX, double minY, double maxX, double maxY) {
+        Coordinate[] coordinates = new Coordinate[]{
+                new Coordinate(minX, minY),
+                new Coordinate(minX, maxY),
+                new Coordinate(maxX, maxY),
+                new Coordinate(maxX, minY),
+                new Coordinate(minX, minY)
+    };
+        LinearRing shell = geomFactory.createLinearRing(coordinates);
+        return new MockPolygonFeature(geomFactory.createPolygon(shell, null));
+    }
 
 }

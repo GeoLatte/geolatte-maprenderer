@@ -46,11 +46,15 @@ public class SvgParameters  {
     public static final Color DEFAULT_STROKE_COLOR = Color.BLACK;
 
     Map<String, String> parameterMap;
+
+    //Defaults (see symboly encoding specs.)
     public static final float DEFAULT_STROKE_WIDTH = 1.0f;
     public static final float DEFAULT_STROKE_OPACITY = 1.0f;
     public static final int DEFAULT_STROKE_LINEJOIN = BasicStroke.JOIN_MITER;
     public static final int DEFAULT_STROKE_LINECAP = BasicStroke.CAP_SQUARE;
     public static final float DEFAULT_STROKE_DASHOFFSET = 0.0f;
+    public static final Color DEFAULT_FILL_COLOR = Color.decode("#808080");
+    public static final float DEFAULT_FILL_OPACITY = 1.0f;
 
 
     public static SvgParameters create(List<SvgParameterType> types) {
@@ -125,7 +129,7 @@ public class SvgParameters  {
 
     public float[] getStrokeDasharray() {
         String str = parameterMap.get("stroke-dasharray");
-        if (str == null) return new float[0];
+        if (str == null) return null;
         //If an odd number of values is given, then the
         //pattern is repeated twice to create the dasharray.
         String[] dashStr = str.trim().split("\\s");
@@ -143,6 +147,19 @@ public class SvgParameters  {
         String str = parameterMap.get("stroke-dashoffset");
         if (str == null) return DEFAULT_STROKE_DASHOFFSET;
 
+        return Float.parseFloat(str);
+    }
+
+    public Color getFillColor() {
+        String str = parameterMap.get("fill");
+        if (str == null) return DEFAULT_FILL_COLOR;
+        return Color.decode(str);
+
+    }
+
+    public float getFillOpacity() {
+        String str = parameterMap.get("fill-opacity");
+        if (str == null) return DEFAULT_FILL_OPACITY;
         return Float.parseFloat(str);
     }
 }

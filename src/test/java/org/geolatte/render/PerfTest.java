@@ -22,7 +22,7 @@
 //import org.geolatte.maprenderer.map.SpatialExtent;
 //import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 //import org.geolatte.maprenderer.reference.SpatialReference;
-//import org.geolatte.maprenderer.shape.BasicScalableStroke;
+//import org.geolatte.maprenderer.shape.PerpendicularOffsetStroke;
 //import org.geolatte.maprenderer.sld.FeatureTypeStyle;
 //import org.geolatte.maprenderer.sld.symbolizer.PolygonSymbolizer;
 //import org.geolatte.maprenderer.sld.symbolizer.Rule;
@@ -80,7 +80,7 @@
 //        FeatureTypeStyle fts = new FeatureTypeStyle();
 //        Rule rule = new Rule();
 //        PolygonSymbolizer symbolizer = new PolygonSymbolizer();
-//        symbolizer.setStroke(new BasicScalableStroke(1f));
+//        symbolizer.setStroke(new PerpendicularOffsetStroke(1f));
 //        symbolizer.setStrokeColor(Color.BLACK);
 //        symbolizer.setFillColor(Color.RED);
 //        rule.getSymbolizers().add(symbolizer);

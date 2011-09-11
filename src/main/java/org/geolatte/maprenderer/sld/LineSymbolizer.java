@@ -21,34 +21,29 @@
 
 package org.geolatte.maprenderer.sld;
 
+import net.opengis.se.v_1_1_0.GeometryType;
 import net.opengis.se.v_1_1_0.LineSymbolizerType;
 import net.opengis.se.v_1_1_0.ParameterValueType;
 import net.opengis.se.v_1_1_0.StrokeType;
 import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.shape.ScalableStroke;
-import org.geolatte.maprenderer.util.JAXBHelper;
 
 import java.awt.*;
-import java.awt.color.ColorSpace;
-import java.io.Serializable;
 
 public class LineSymbolizer extends AbstractSymbolizer {
 
 
+    final private String geometryProperty;
     final private Value<Float> perpendicularOffset;
     final private SvgParameters svgParameters;
-    final private String geometryProperty;
-    final private StrokeFactory strokeFactory = new StrokeFactory();
-
-    //TODO -- strokeFactory should be injected in constructor.
 
     public LineSymbolizer(LineSymbolizerType type) {
         super(type);
         perpendicularOffset = readPerpendicularOffset(type);
-        geometryProperty = readGeometryProperty(type);
         StrokeType strokeType = type.getStroke();
         verify(strokeType);
         svgParameters = SvgParameters.create(strokeType.getSvgParameter());
+        GeometryType geometryType = type.getGeometry();
+        geometryProperty = readGeometry(geometryType);
     }
 
     public String getGeometryProperty() {
@@ -61,12 +56,10 @@ public class LineSymbolizer extends AbstractSymbolizer {
 
     @Override
     public void symbolize(MapGraphics graphics, Shape[] shapes) {
-        //ScalableStrokes are not thread-safe,so should always be recreated when symbolizing shapes
-        ScalableStroke stroke = createStroke();
+        Stroke stroke = createStroke();
         graphics.setStroke(stroke);
-        Color c = svgParameters.getStrokeColor();
-        Color sRGB = new Color(ColorSpace.getInstance(ColorSpace.CS_sRGB), c.getRGBColorComponents(null), svgParameters.getStrokeOpacity());
-        graphics.setColor(sRGB);
+        Paint paint = createPaint();
+        graphics.setPaint(paint);
         for(Shape s : shapes){
             graphics.draw(s);
         }
@@ -76,30 +69,18 @@ public class LineSymbolizer extends AbstractSymbolizer {
 
     private Value<Float> readPerpendicularOffset(LineSymbolizerType type) {
         ParameterValueType pv = type.getPerpendicularOffset();
-        Value<Float> defaultOffset = Value.of(0f, UOM.PIXEL);
-        if (pv == null){
-            return defaultOffset;
-        }
-        java.util.List<Serializable> content = pv.getContent();
-        if (content == null || content.isEmpty()) {
-            return defaultOffset;
-        }
-        String valueStr = JAXBHelper.extractValueToString(content);
-        return Value.of(valueStr.toString(), this.getUOM());
+        return readPerpendicularOffset(pv);
     }
 
-
-    //XPath expressions or more complex expressions are not supported.
-    private String readGeometryProperty(LineSymbolizerType type) {
-        if (type.getGeometry() == null) return null;
-        if (type.getGeometry().getPropertyName() == null) return null;
-        java.util.List<Object> list = type.getGeometry().getPropertyName().getContent();
-        return JAXBHelper.extractValueToString(list);
+    private Paint createPaint() {
+        Color c = svgParameters.getStrokeColor();
+        float opacity = svgParameters.getStrokeOpacity();
+        return getPaintFactory().create(c, opacity);
     }
 
-    private ScalableStroke createStroke() {
-           return strokeFactory.create(svgParameters, perpendicularOffset);
-       }
+    private Stroke createStroke() {
+           return getStrokeFactory().create(svgParameters, perpendicularOffset);
+    }
 
     /**
      * Verifies that the stroketype is supported.

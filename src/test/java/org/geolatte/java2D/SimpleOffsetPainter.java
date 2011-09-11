@@ -24,7 +24,7 @@ package org.geolatte.java2D;
 import org.geolatte.core.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
-import org.geolatte.maprenderer.shape.BasicScalableStroke;
+import org.geolatte.maprenderer.shape.PerpendicularOffsetStroke;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.maprenderer.sld.UOM;
 import org.geolatte.maprenderer.sld.Value;
@@ -50,9 +50,9 @@ public class SimpleOffsetPainter implements Painter {
     public void paint(Iterable<Feature> features) {
         ShapeAdapter shapeAdapter = new ShapeAdapter(graphics.getTransform());
 
-        BasicScalableStroke baseStroke = new BasicScalableStroke(WIDTH_IN_PIXELS,BasicStroke.JOIN_MITER, BasicStroke.CAP_SQUARE);
+        PerpendicularOffsetStroke baseStroke = new PerpendicularOffsetStroke(WIDTH_IN_PIXELS,BasicStroke.JOIN_MITER, BasicStroke.CAP_SQUARE);
 
-        BasicScalableStroke offsetStroke = new BasicScalableStroke(2.0f, OFFSET_IN_PIXELS);
+        PerpendicularOffsetStroke offsetStroke = new PerpendicularOffsetStroke(2.0f, OFFSET_IN_PIXELS);
 
         for(Feature feature : features){
             Shape[] shapes = shapeAdapter.toShape(feature.getGeometry());

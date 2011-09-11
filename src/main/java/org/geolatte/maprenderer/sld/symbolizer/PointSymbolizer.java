@@ -25,10 +25,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import org.geolatte.core.Feature;
 
-import java.awt.*;
 
-
-public class PointSymbolizer extends ShapeSymbolizer {
+public class PointSymbolizer {
 
     private Graphic graphic;
     private double size;
@@ -49,11 +47,11 @@ public class PointSymbolizer extends ShapeSymbolizer {
     public void symbolize(Feature feature) {
         Point pnt = getAnchor(feature);
         //TODO -- assumes Map Units in meters
-        Shape markShape = this.graphic.generateMarkShape(pnt.getX(), pnt.getY(), this.size * getGraphics().getMetersPerPixel());
-        getGraphics().setColor(getFillColor());
-        getGraphics().fill(markShape);
-        getGraphics().setColor(getStrokeColor());
-        getGraphics().draw(markShape);
+//        Shape markShape = this.graphic.generateMarkShape(pnt.getX(), pnt.getY(), this.size * getGraphics().getMetersPerPixel());
+//        getGraphics().setColor(getFillColor());
+//        getGraphics().fill(markShape);
+//        getGraphics().setColor(getStrokeColor());
+//        getGraphics().draw(markShape);
     }
 
     private Point getAnchor(Feature feature) {

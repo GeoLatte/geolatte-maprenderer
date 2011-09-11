@@ -21,6 +21,7 @@
 
 package org.geolatte.maprenderer.sld;
 
+import net.opengis.se.v_1_1_0.FillType;
 import net.opengis.se.v_1_1_0.StrokeType;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +29,7 @@ import org.junit.Test;
 import java.awt.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -35,7 +37,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestSvgParameters {
 
-     final private static String strokeFragment =
+     final private static String stroke =
                         "<Stroke  version=\"1.1.0\"" +
                         "                  xmlns=\"http://www.opengis.net/se\"" +
                         "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
@@ -54,72 +56,93 @@ public class TestSvgParameters {
             "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
             "</Stroke>";
 
+    final private static String fill =
+            "<Fill  version=\"1.1.0\"" +
+                        "                  xmlns=\"http://www.opengis.net/se\"" +
+                        "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
+                        "    <SvgParameter name=\"fill\">\n#FF0000\n</SvgParameter>\n" +
+                        "    <SvgParameter name=\"fill-opacity\">0.6</SvgParameter>" +
+            "</Fill>";
+
+    final private static String emptyFill =
+            "<Fill  version=\"1.1.0\"" +
+                        "                  xmlns=\"http://www.opengis.net/se\"" +
+                        "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
+            "</Fill>";
 
 
-    private SvgParameters parameters;
-    private SvgParameters defaultParameters;
+
+
+    private SvgParameters strokeParameters;
+    private SvgParameters strokeDefaultParameters;
+    private SvgParameters fillParameters;
+    private SvgParameters fillDefaultParameters;
 
     @Before
     public void setUp() {
-        StrokeType strokeType = SLD.instance().read(strokeFragment, StrokeType.class);
-        parameters = SvgParameters.create(strokeType.getSvgParameter());
+        StrokeType strokeType = SLD.instance().read(stroke, StrokeType.class);
+        strokeParameters = SvgParameters.create(strokeType.getSvgParameter());
         strokeType = SLD.instance().read(emptyStroke, StrokeType.class);
-        defaultParameters = SvgParameters.create(strokeType.getSvgParameter());
+        strokeDefaultParameters = SvgParameters.create(strokeType.getSvgParameter());
+        FillType fillType = SLD.instance().read(fill, FillType.class);
+        fillParameters = SvgParameters.create(fillType.getSvgParameter());
+        fillType = SLD.instance().read(emptyFill, FillType.class);
+        fillDefaultParameters = SvgParameters.create(fillType.getSvgParameter());
     }
 
     @Test
     public void testStrokeColor() {
-        assertEquals(Color.RED, parameters.getStrokeColor());
+        assertEquals(Color.RED, strokeParameters.getStrokeColor());
     }
 
      @Test
     public void testDefaultStrokeColor() {
-        assertEquals(SvgParameters.DEFAULT_STROKE_COLOR, defaultParameters.getStrokeColor());
+        assertEquals(SvgParameters.DEFAULT_STROKE_COLOR, strokeDefaultParameters.getStrokeColor());
     }
 
     @Test
     public void testStrokeWidth(){
-        assertEquals(2f, parameters.getStrokeWidth(), 0.00001);
+        assertEquals(2f, strokeParameters.getStrokeWidth(), 0.00001);
     }
 
     @Test
     public void testDefaultStrokeWidth(){
-        assertEquals(SvgParameters.DEFAULT_STROKE_WIDTH, defaultParameters.getStrokeWidth(), 0.00001);
+        assertEquals(SvgParameters.DEFAULT_STROKE_WIDTH, strokeDefaultParameters.getStrokeWidth(), 0.00001);
     }
 
     @Test
     public void testStrokeOpacity(){
-        assertEquals(0.5f, parameters.getStrokeOpacity(), 0.00001f);
+        assertEquals(0.5f, strokeParameters.getStrokeOpacity(), 0.00001f);
     }
 
     @Test
     public void testDefaultStrokeOpacity() {
-        assertEquals(SvgParameters.DEFAULT_STROKE_OPACITY, defaultParameters.getStrokeOpacity(), 0.0001f);
+        assertEquals(SvgParameters.DEFAULT_STROKE_OPACITY, strokeDefaultParameters.getStrokeOpacity(), 0.0001f);
     }
 
     @Test
     public void testStrokeLinejoin() {
-        assertEquals(BasicStroke.JOIN_ROUND, parameters.getStrokeLinejoin());
+        assertEquals(BasicStroke.JOIN_ROUND, strokeParameters.getStrokeLinejoin());
     }
 
     @Test
     public void testDefaultStrokeLinejoin() {
-        assertEquals(SvgParameters.DEFAULT_STROKE_LINEJOIN, defaultParameters.getStrokeLinejoin());
+        assertEquals(SvgParameters.DEFAULT_STROKE_LINEJOIN, strokeDefaultParameters.getStrokeLinejoin());
     }
 
     @Test
     public void testStrokeLinecap() {
-        assertEquals(BasicStroke.CAP_BUTT, parameters.getStrokeLinecap());
+        assertEquals(BasicStroke.CAP_BUTT, strokeParameters.getStrokeLinecap());
     }
 
     @Test
     public void testDefaultStrokeLinecap() {
-        assertEquals(SvgParameters.DEFAULT_STROKE_LINECAP, defaultParameters.getStrokeLinecap());
+        assertEquals(SvgParameters.DEFAULT_STROKE_LINECAP, strokeDefaultParameters.getStrokeLinecap());
     }
 
     @Test
     public void testStrokeDasharray(){
-        float[] dashArray = parameters.getStrokeDasharray();
+        float[] dashArray = strokeParameters.getStrokeDasharray();
         assertEquals(6, dashArray.length);
         assertEquals(1f, dashArray[0], 0.00001f);
         assertEquals(2f, dashArray[1], 0.00001f);
@@ -131,18 +154,38 @@ public class TestSvgParameters {
 
     @Test
     public void testDefaultStrokeDasharray(){
-        float[] dashArray = defaultParameters.getStrokeDasharray();
-        assertEquals(0, dashArray.length);
+        float[] dashArray = strokeDefaultParameters.getStrokeDasharray();
+        assertNull(dashArray);
     }
 
     @Test
     public void testStrokeDashoffset() {
-        assertEquals(2f, parameters.getStrokeDashoffset(), 0.00001f);
+        assertEquals(2f, strokeParameters.getStrokeDashoffset(), 0.00001f);
     }
 
     @Test
     public void testDefaultStrokeDashoffset() {
-        assertEquals(SvgParameters.DEFAULT_STROKE_DASHOFFSET, defaultParameters.getStrokeDashoffset(), 0.0000f);
+        assertEquals(SvgParameters.DEFAULT_STROKE_DASHOFFSET, strokeDefaultParameters.getStrokeDashoffset(), 0.0000f);
+    }
+
+    @Test
+    public void testFillColor() {
+        assertEquals(Color.RED, fillParameters.getFillColor());
+    }
+
+    @Test
+    public void testDefaultFillColor() {
+        assertEquals(SvgParameters.DEFAULT_FILL_COLOR, fillDefaultParameters.getFillColor());
+    }
+
+    @Test
+    public void testFillOpacity() {
+        assertEquals(0.6f, fillParameters.getFillOpacity(), 0.00001f);
+    }
+
+    @Test
+    public void testDefaultFillOpacity() {
+        assertEquals(SvgParameters.DEFAULT_FILL_OPACITY, fillDefaultParameters.getFillOpacity(),0.00001f);
     }
 
 }

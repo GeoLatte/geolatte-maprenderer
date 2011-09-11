@@ -19,25 +19,18 @@
  *  Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.maprenderer.shape;
-
-import org.geolatte.maprenderer.sld.Value;
+package org.geolatte.maprenderer.sld;
 
 import java.awt.*;
+import java.awt.color.ColorSpace;
 
-public interface ScalableStroke extends Stroke {
+/**
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 9/11/11
+ */
+public class PaintFactory {
 
-    public float getWidth();
-
-    public Value<Float> getPerpendicularOffset();
-
-    public void setMetersPerPixel(double metersPerPixel);
-
-    public int getLinejoin();
-
-    public int getLinecap();
-
-    public float[] getDashArray();
-
-    public float getDashOffset();
+    public Paint create(Color c, float opacity) {
+        return new Color(ColorSpace.getInstance(ColorSpace.CS_sRGB), c.getRGBColorComponents(null), opacity);
+    }
 }
