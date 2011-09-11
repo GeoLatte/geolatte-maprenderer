@@ -26,8 +26,6 @@ import org.geolatte.maprenderer.java2D.PerpendicularOffsetStroke;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
-import org.geolatte.maprenderer.sld.UOM;
-import org.geolatte.maprenderer.sld.Value;
 
 import java.awt.*;
 
@@ -39,7 +37,7 @@ public class SimpleOffsetPainter implements Painter {
 
 
     private final static float WIDTH_IN_PIXELS = 6.0f;
-    private final static Value<Float> OFFSET_IN_PIXELS = Value.of(4.0f, UOM.PIXEL);
+    private final static float OFFSET_IN_PIXELS = 4.0f;
 
     private final MapGraphics graphics;
 

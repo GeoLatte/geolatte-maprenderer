@@ -33,8 +33,6 @@ import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
-import org.geolatte.maprenderer.sld.UOM;
-import org.geolatte.maprenderer.sld.Value;
 import org.geolatte.test.TestSupport;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,8 +55,8 @@ public class TestOffsetRendering {
 
 
     private static final float LINE_WIDTH = 5.0f;
-    private static final Value<Float> OFFSET  = Value.of(8.0f, UOM.PIXEL);
-    private static final Value<Float> NEG_OFFSET = Value.of(-8.0f, UOM.PIXEL);
+    private static final float OFFSET  = 8.0f;
+    private static final float NEG_OFFSET = -8.0f;
     private static final float OFFSET_LINE_WIDTH = 2.0f;
     private static final int NUM_IMG = 90;
 

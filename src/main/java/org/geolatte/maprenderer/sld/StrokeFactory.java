@@ -49,7 +49,8 @@ public class StrokeFactory {
         int cap = svgParameters.getStrokeLinecap();
         float[] dashArray = svgParameters.getStrokeDasharray();
         float dashOffset = svgParameters.getStrokeDashoffset();
-        return new PerpendicularOffsetStroke(width, perpendicularOffset, join, cap, dashArray, dashOffset);
+        //TODO add check to see if perpendicular offset is in pixels!
+        return new PerpendicularOffsetStroke(width, perpendicularOffset.value(), join, cap, dashArray, dashOffset);
     }
 
     public Stroke create(SvgParameters svgParameters) {

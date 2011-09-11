@@ -21,8 +21,6 @@
 
 package org.geolatte.maprenderer.java2D;
 
-import org.geolatte.maprenderer.sld.UOM;
-import org.geolatte.maprenderer.sld.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,97 +29,60 @@ import java.awt.geom.FlatteningPathIterator;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 
-//TODO -- refactor by splitting perpendicular offset from stroke
-//TODO -- this class gives different results from BasicStroke when offset = 0!!
+//Since the DuctusShapeRenderer in Oracle's Java2D implementation handles BasicStroke and any other strokes differently,
+// the approach here is not ideal. It produces different rendering results from BasicStroke when pOffset == 0.
+//therefore:
+//TODO -- move the calculation of the offset to a the GeometryPathIterator.
 
 public class PerpendicularOffsetStroke implements Stroke {
 
     private static Logger LOGGER = LoggerFactory.getLogger(PerpendicularOffsetStroke.class);
 
-    private int join = BasicStroke.JOIN_BEVEL;
-    private int cap = BasicStroke.CAP_BUTT;
     private static float FLATNESS = .01f;
-    private Value<Float> perpendicularOffset = Value.of(0.f, UOM.PIXEL);
-    private float[] dashArray = new float[0];
-    private float dashOffset = 0f;
-
-    private float width = 1.0f;
-
-    private double metersPerPixel = 1.0d;
-
+    private float perpendicularOffset = 0f;
+    private BasicStroke delegate;
 
     public PerpendicularOffsetStroke(float width) {
-        this.width = width;
+        delegate = new BasicStroke(width);
     }
 
     public PerpendicularOffsetStroke(float width, int join, int cap) {
-        this(width);
-        this.join = join;
-        this.cap = cap;
+        delegate = new BasicStroke(width, cap, join);
     }
 
-    public PerpendicularOffsetStroke(float width, Value<Float> offset, int join, int cap) {
-        this(width, join, cap);
+    public PerpendicularOffsetStroke(float width, float offset, int join, int cap) {
+        delegate = new BasicStroke(width, cap, join);
         this.perpendicularOffset = offset;
     }
 
-    public PerpendicularOffsetStroke(float width, Value<Float> offset) {
-        this.width = width;
+    public PerpendicularOffsetStroke(float width, float offset) {
+        delegate = new BasicStroke(width);
         this.perpendicularOffset = offset;
     }
 
-    public PerpendicularOffsetStroke(float width, Value<Float> offset, int join, int cap, float[] dashArray, float dashOffset) {
-        this(width, offset, join, cap);
-        this.dashArray = dashArray;
-        this.dashOffset = dashOffset;
+    public PerpendicularOffsetStroke(float width, float offset, int join, int cap, float[] dashArray, float dashOffset) {
+        delegate = new BasicStroke(width, cap, join, 10f, dashArray, dashOffset);
+        this.perpendicularOffset = offset;
     }
 
 
-    public Value<Float> getPerpendicularOffset() {
+    public float getPerpendicularOffset() {
         return this.perpendicularOffset;
-    }
-
-    public float getWidth() {
-        return this.width;
-    }
-
-    public int getLinejoin() {
-        return this.join;
-    }
-
-
-    public int getLinecap() {
-        return this.cap;
-    }
-
-    public float[] getDashArray() {
-        return dashArray;
-    }
-
-    public float getDashOffset() {
-        return dashOffset;
     }
 
     /**
      * Creates the stroked shape.
      *
      * <p>If the perpendicalar offset != 0, then the offset linesegments are joined much like the strategy JOIN_MITER.</p>
+     *
+     *
      * @param shape
      * @return
      */
     public Shape createStrokedShape(Shape shape) {
 
-        BasicStroke stroke = null;
-        if (this.dashArray == null || this.dashArray.length == 0) {
-            stroke = new BasicStroke((float)(getWidth() * metersPerPixel), this.cap, this.join);
-        } else {
-            //miter limit 10f is default for BasicStroke.
-            float[] scaledDashArray = scaleArray(this.dashArray);
-            float scaledDashOffset = (float)(dashOffset * metersPerPixel);
-            stroke = new BasicStroke((float)(getWidth() * metersPerPixel), this.cap, this.join, 10.f, scaledDashArray, scaledDashOffset);
-        }
-        if (this.perpendicularOffset.value() == 0.f) {
-            return stroke.createStrokedShape(shape);
+        if (Math.abs(this.perpendicularOffset) < Math.ulp(1.f)) {
+            return delegate.createStrokedShape(shape);
         }
 
         GeneralPath result = new GeneralPath();
@@ -143,7 +104,7 @@ public class PerpendicularOffsetStroke implements Stroke {
         float loX = 0, loY = 0;
         int type = 0;
         boolean first = true;
-        double offset = determinePixelOffset();
+        double offset = perpendicularOffset;
         while (!it.isDone()) {
             type = it.currentSegment(points);
             switch (type) {
@@ -219,30 +180,33 @@ public class PerpendicularOffsetStroke implements Stroke {
             it.next();
         }
         result.lineTo(loX, loY);        
-        return stroke.createStrokedShape(result);
+        return delegate.createStrokedShape(result);
     }
 
-    private float[] scaleArray(float[] dashArray) {
-        float[] result = new float[dashArray.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = (float)(dashArray[i]*metersPerPixel);
-        }
-        return result;
+    //Delegate methods
+
+
+    public float getLineWidth() {
+        return delegate.getLineWidth();
     }
 
-    private double determinePixelOffset() {
-        float value = this.perpendicularOffset.value();
-        if (UOM.PIXEL == this.perpendicularOffset.uom()){
-            return value * this.metersPerPixel;
-        } else {
-            throw new UnsupportedOperationException("Only perpendicular offsets in pixel supported.");
-        }
+    public int getEndCap() {
+        return delegate.getEndCap();
     }
 
-    public void setMetersPerPixel(double metersPerPixel) {
-        this.metersPerPixel = metersPerPixel;
+    public int getLineJoin() {
+        return delegate.getLineJoin();
     }
 
+    public float getMiterLimit() {
+        return delegate.getMiterLimit();
+    }
 
+    public float[] getDashArray() {
+        return delegate.getDashArray();
+    }
 
+    public float getDashPhase() {
+        return delegate.getDashPhase();
+    }
 }

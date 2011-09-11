@@ -45,7 +45,7 @@ import static org.geolatte.test.TestSupport.assertImageEquals;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: May 23, 2010
  */
-public class TestBasicPainter {
+public class TestSimpleOffsetPainter {
 
 
     private MapGraphics mapGraphics;

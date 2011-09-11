@@ -134,7 +134,7 @@ public class JAIMapGraphics extends MapGraphics {
         AffineTransform atf = new AffineTransform();
         double sx = width / extent.getWidth();
         double sy = height / extent.getHeight();
-        this.metersPerPixel = Math.max(1/sx, 1/sy);
+        this.metersPerPixel = Math.max(1 / sx, 1 / sy);
         //we don't maintain aspect-ratio here!
         atf.scale(sx, -sy);
         atf.translate(-extent.getMinX(), -extent.getMaxY());
@@ -153,7 +153,7 @@ public class JAIMapGraphics extends MapGraphics {
 
 
     @Override
-    public double getMetersPerPixel(){
+    public double getMetersPerPixel() {
         //TODO - determine map units from SRID (when available) and convert to meters when necessary
         return this.metersPerPixel;
     }
@@ -374,11 +374,17 @@ public class JAIMapGraphics extends MapGraphics {
 
     private Stroke scaleStroke(Stroke s) {
         if (s instanceof PerpendicularOffsetStroke) {
-            ((PerpendicularOffsetStroke)s).setMetersPerPixel(getMetersPerPixel());
-            return s;
+            PerpendicularOffsetStroke orig = (PerpendicularOffsetStroke) s;
+            float origOffset = orig.getPerpendicularOffset();
+            float scaledOffset = (float) (origOffset* getMetersPerPixel());
+            return new PerpendicularOffsetStroke((float) (orig.getLineWidth() * getMetersPerPixel()),
+                    scaledOffset,
+                    orig.getLineJoin(), orig.getEndCap(),
+                    scaleArray(orig.getDashArray()),
+                    (float) (orig.getDashPhase() * getMetersPerPixel()));
         }
-        if (s instanceof BasicStroke){
-            BasicStroke orig = (BasicStroke)s;
+        if (s instanceof BasicStroke) {
+            BasicStroke orig = (BasicStroke) s;
             return new BasicStroke((float) (orig.getLineWidth() * getMetersPerPixel()),
                     orig.getEndCap(), orig.getLineJoin(),
                     orig.getMiterLimit(), scaleArray(orig.getDashArray()),
@@ -392,7 +398,7 @@ public class JAIMapGraphics extends MapGraphics {
         if (dashArray == null) return null;
         float[] result = new float[dashArray.length];
         for (int i = 0; i < result.length; i++) {
-            result[i] = (float)(dashArray[i]*metersPerPixel);
+            result[i] = (float) (dashArray[i] * metersPerPixel);
         }
         return result;
     }
