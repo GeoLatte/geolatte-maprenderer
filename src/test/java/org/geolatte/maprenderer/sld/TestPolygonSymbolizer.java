@@ -46,9 +46,6 @@ public class TestPolygonSymbolizer extends BaseFeatureTypeStyleTest {
     PolygonSymbolizer symbolizer;
     PolygonSymbolizerType type;
 
-
-
-
     @Before
     public void before(){
         super.before();
@@ -102,6 +99,12 @@ public class TestPolygonSymbolizer extends BaseFeatureTypeStyleTest {
         type = SLD.instance().read(noStrokeSymbolizer, PolygonSymbolizerType.class);
         testCase("polygonSymbolizer-nostroke.png");
     }
+
+    //TODO -- add test case for polygon with perpendicular offset
+
+    //TODO -- add test case for polygon with displacement
+
+    //TODO -- add test case for donut polygon
 
     private void testCase(String testCaseName) throws SpatialReferenceCreationException, IOException {
         symbolizer = new PolygonSymbolizer(type);
