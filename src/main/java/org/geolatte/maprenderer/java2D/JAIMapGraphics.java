@@ -381,12 +381,22 @@ public class JAIMapGraphics extends MapGraphics {
             BasicStroke orig = (BasicStroke)s;
             return new BasicStroke((float) (orig.getLineWidth() * getMetersPerPixel()),
                     orig.getEndCap(), orig.getLineJoin(),
-                    orig.getMiterLimit(), orig.getDashArray(),
-                    orig.getDashPhase()
-                    );
+                    orig.getMiterLimit(), scaleArray(orig.getDashArray()),
+                    (float) (orig.getDashPhase() * getMetersPerPixel())
+            );
         }
         throw new IllegalArgumentException("Can't scale stroke.");
     }
+
+    private float[] scaleArray(float[] dashArray) {
+        if (dashArray == null) return null;
+        float[] result = new float[dashArray.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (float)(dashArray[i]*metersPerPixel);
+        }
+        return result;
+    }
+
 
     public void setRenderingHint(RenderingHints.Key hintKey, Object hintValue) {
         g2.setRenderingHint(hintKey, hintValue);
