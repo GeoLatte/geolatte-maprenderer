@@ -21,7 +21,7 @@
 
 package org.geolatte.maprenderer.sld;
 
-import org.geolatte.maprenderer.shape.PerpendicularOffsetStroke;
+import org.geolatte.maprenderer.java2D.PerpendicularOffsetStroke;
 
 import java.awt.*;
 

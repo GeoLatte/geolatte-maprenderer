@@ -19,7 +19,7 @@
  *  Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.maprenderer.shape;
+package org.geolatte.maprenderer.java2D;
 
 import org.geolatte.maprenderer.sld.UOM;
 import org.geolatte.maprenderer.sld.Value;

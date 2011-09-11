@@ -24,7 +24,6 @@ package org.geolatte.maprenderer.java2D;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.maprenderer.reference.SpatialReference;
-import org.geolatte.maprenderer.shape.PerpendicularOffsetStroke;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;

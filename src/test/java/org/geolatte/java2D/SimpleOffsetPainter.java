@@ -22,9 +22,9 @@
 package org.geolatte.java2D;
 
 import org.geolatte.core.Feature;
+import org.geolatte.maprenderer.java2D.PerpendicularOffsetStroke;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
-import org.geolatte.maprenderer.shape.PerpendicularOffsetStroke;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.maprenderer.sld.UOM;
 import org.geolatte.maprenderer.sld.Value;
