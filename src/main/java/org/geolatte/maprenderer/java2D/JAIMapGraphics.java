@@ -42,8 +42,7 @@ public class JAIMapGraphics extends MapGraphics {
 
     private final static Color DEFAULT_BACKGROUND_COLOR = new Color(1.0f, 1.0f, 1.0f, 0.0f);
 
-    //TODO -- replace by scale by it's inverse (metersPerPixel).
-    private double scale;
+    private double metersPerPixel;
     private final int width;
     private final int height;
     private Graphics2D g2;
@@ -135,8 +134,8 @@ public class JAIMapGraphics extends MapGraphics {
         AffineTransform atf = new AffineTransform();
         double sx = width / extent.getWidth();
         double sy = height / extent.getHeight();
-        this.scale = Math.min(sx, sy);
-        //TODO -- shouldn't we maintain aspect-ratio?
+        this.metersPerPixel = Math.max(1/sx, 1/sy);
+        //we don't maintain aspect-ratio here!
         atf.scale(sx, -sy);
         atf.translate(-extent.getMinX(), -extent.getMaxY());
         setTransform(atf);
@@ -156,7 +155,7 @@ public class JAIMapGraphics extends MapGraphics {
     @Override
     public double getMetersPerPixel(){
         //TODO - determine map units from SRID (when available) and convert to meters when necessary
-        return 1/this.scale;
+        return this.metersPerPixel;
     }
 
     @Override
