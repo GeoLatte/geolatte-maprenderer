@@ -22,13 +22,16 @@
 package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.FeatureTypeStyleType;
+import net.opengis.se.v_1_1_0.ParameterValueType;
 import net.opengis.sld.v_1_1_0.ObjectFactory;
+import org.geolatte.maprenderer.util.JAXBHelper;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.io.StringReader;
 
 public class SLD {
@@ -87,6 +90,17 @@ public class SLD {
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String extractParameterValue(ParameterValueType parameterValueType) {
+        if (parameterValueType == null) {
+            return null;
+        }
+        java.util.List<Serializable> content = parameterValueType.getContent();
+        if (content == null || content.isEmpty()) {
+            return null;
+        }
+        return JAXBHelper.extractValueToString(content);
     }
 
 }

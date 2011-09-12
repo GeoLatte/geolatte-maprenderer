@@ -21,11 +21,11 @@
 
 package org.geolatte.maprenderer.sld.graphics;
 
-import java.awt.*;
-
-
-public interface Graphic {
-
-    Shape generateMarkShape(double x, double y, double size);
-
+/**
+ * A Graphic symbol with an inherent shape, color and possibly size.
+ * <p>See SE, § 11.3.2</p>
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 9/12/11
+ */
+public class Graphic {
 }

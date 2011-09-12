@@ -25,7 +25,7 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
 
-public class CircleMarkGraphic implements Graphic {
+public class CircleMark implements Mark {
 
     public Shape generateMarkShape(double x, double y, double size) {
         return new Ellipse2D.Double(x, y, size, size);

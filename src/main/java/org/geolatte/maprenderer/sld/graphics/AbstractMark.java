@@ -21,41 +21,16 @@
 
 package org.geolatte.maprenderer.sld.graphics;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-import org.geolatte.core.Feature;
+import java.awt.*;
 
 
-public class PointSymbolizer {
-
-    private Mark graphic;
-    private double size;
+public abstract class AbstractMark implements Mark {
 
 
-    public void setSize(double size) {
-        this.size = size;
-    }
+    private float size;
 
-    public double getSize() {
-        return this.size;
-    }
 
-    public void setGraphic(Mark graphic) {
-        this.graphic = graphic;
-    }
+    public abstract Shape generateMarkShape(double x, double y, double size);
 
-    public void symbolize(Feature feature) {
-        Point pnt = getAnchor(feature);
-        //TODO -- assumes Map Units in meters
-//        Shape markShape = this.graphic.generateMarkShape(pnt.getX(), pnt.getY(), this.size * getGraphics().getMetersPerPixel());
-//        getGraphics().setColor(getFillColor());
-//        getGraphics().fill(markShape);
-//        getGraphics().setColor(getStrokeColor());
-//        getGraphics().draw(markShape);
-    }
 
-    private Point getAnchor(Feature feature) {
-        Geometry geom = feature.getGeometry();
-        return geom.getCentroid();
-    }
 }

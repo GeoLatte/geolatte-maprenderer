@@ -30,7 +30,6 @@ import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.maprenderer.util.JAXBHelper;
 
 import java.awt.*;
-import java.io.Serializable;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2010.
@@ -78,15 +77,8 @@ public abstract class AbstractSymbolizer {
         return JAXBHelper.extractValueToString(list);
     }
 
-    protected String extractParameterValue(ParameterValueType parameterValueType){
-         if (parameterValueType == null){
-            return null;
-        }
-        java.util.List<Serializable> content = parameterValueType.getContent();
-        if (content == null || content.isEmpty()) {
-            return null;
-        }
-        return JAXBHelper.extractValueToString(content);
+    protected String extractParameterValue(ParameterValueType parameterValueType) {
+        return SLD.instance().extractParameterValue(parameterValueType);
     }
 
     protected StrokeFactory getStrokeFactory(){

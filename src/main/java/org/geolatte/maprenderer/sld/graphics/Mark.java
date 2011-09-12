@@ -22,11 +22,10 @@
 package org.geolatte.maprenderer.sld.graphics;
 
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 
-public class SquareMarkGraphic implements Graphic {
 
-    public Shape generateMarkShape(double x, double y, double size) {
-        return new Rectangle2D.Double(x, y, size, size);
-    }
+public interface Mark {
+
+    Shape generateMarkShape(double x, double y, double size);
+
 }
