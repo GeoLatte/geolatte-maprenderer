@@ -31,6 +31,7 @@ import java.io.IOException;
 
 import static org.geolatte.test.TestSupport.assertImageEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -41,8 +42,10 @@ public class TestExternalGraphicsRepository {
 
     private static String LOCAL_GRAPHICS_PACKAGE = "graphics";
 
-    //TODO can we link to a more stable graphic?
-    private static String EXT_GRAPHIC_URL = "http://www.google.com/intl/en_com/images/srpr/logo3w.png";
+    //TODO can we link to a more stable graphics?
+    private static String EXT_GRAPHIC_IMAGE_URL = "http://www.google.com/intl/en_com/images/srpr/logo3w.png";
+    private static String EXT_GRAPHIC_SVG_URL = "http://www.gbwiki.net/wiki/images/3/35/Information_icon.svg";
+
 
     private ExternalGraphicsRepository repo;
 
@@ -53,30 +56,35 @@ public class TestExternalGraphicsRepository {
 
     @Test
     public void testGraphicsReadFromClassPath() throws IOException {
-        RenderedImage img = repo.get("file://local.graphics/bus.png");
-        assertNotNull(img);
+        GraphicSource source = repo.get("file://local.graphics/bus.png");
+        assertNotNull(source);
+
+        assertTrue(source instanceof RenderedImageGraphicSource);
 
         RenderedImage expectedGraphic = ExpectedImages.getExpectedGraphic("bus.png");
-        assertImageEquals(expectedGraphic, img);
+        assertImageEquals(expectedGraphic, (RenderedImage)source.getGraphic());
 
     }
 
     @Test
     public void testGraphicsFromURL() throws IOException {
-        RenderedImage img = repo.get(EXT_GRAPHIC_URL);
-        assertNotNull(img);
-        TestSupport.writeImageToDisk(img, "logo3w.png", "PNG"); // for visual check
+        GraphicSource source = repo.get(EXT_GRAPHIC_IMAGE_URL);
+        assertNotNull(source);
+        assertTrue(source instanceof RenderedImageGraphicSource);
+        RenderedImage img1 = (RenderedImage)source.getGraphic();
+        TestSupport.writeImageToDisk(img1, "logo3w.png", "PNG"); // for visual check
 
         //Test that the image is in the cache
-        RenderedImage img2 = repo.getFromCache(EXT_GRAPHIC_URL);
-        assertNotNull(img2);
-        assertImageEquals(img, img2);
+        GraphicSource source2 = repo.getFromCache(EXT_GRAPHIC_IMAGE_URL);
+        assertNotNull(source2);
+        RenderedImage img2 = (RenderedImage) source2.getGraphic();
+        assertImageEquals(img1, img2);
     }
 
     @Test
     public void test404Url() {
         try {
-            RenderedImage img = repo.get("http://localhost/blabla.png");
+            repo.get("http://localhost/blabla.png");
             fail();
         } catch (IOException e) {
             //OK
@@ -87,7 +95,7 @@ public class TestExternalGraphicsRepository {
     @Test
     public void testUrlToNonGraphic() {
         try {
-            RenderedImage img = repo.get("http://www.geolatte.org/");
+            repo.get("http://www.geolatte.org/");
             fail();
         } catch (IOException e) {
             //OK
@@ -99,7 +107,7 @@ public class TestExternalGraphicsRepository {
     public void testStoringNullValuesInRepoFails() throws IOException {
         RenderedImage expectedGraphic = ExpectedImages.getExpectedGraphic("bus.png");
         try {
-            repo.storeInCache(null, expectedGraphic);
+            repo.storeInCache(null, new RenderedImageGraphicSource(expectedGraphic));
             fail();
         } catch (IllegalArgumentException e) {
             //OK

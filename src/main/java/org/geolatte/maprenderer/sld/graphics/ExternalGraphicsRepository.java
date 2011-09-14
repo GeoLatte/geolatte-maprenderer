@@ -54,7 +54,7 @@ public class ExternalGraphicsRepository {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ExternalGraphicsRepository.class);
 
-    private final Map<String, RenderedImage> cache = new ConcurrentHashMap<String, RenderedImage>();
+    private final Map<String, GraphicSource> cache = new ConcurrentHashMap<String, GraphicSource>();
 
     //TODO -- verify the exception-handling scenario's
     //TODO -- replace the concurrentHashMap with ehcache (in order to control growth of the cache)
@@ -65,8 +65,8 @@ public class ExternalGraphicsRepository {
         }
     }
 
-    public RenderedImage get(String url) throws IOException {
-        RenderedImage img = getFromCache(url);
+    public GraphicSource get(String url) throws IOException {
+        GraphicSource img = getFromCache(url);
         if (img == null) {
             img = retrieveImageFromUrl(url);
             storeInCache(url, img);
@@ -74,36 +74,36 @@ public class ExternalGraphicsRepository {
         return img;
     }
 
-    public void storeInCache(String url, RenderedImage img) {
-        if (url == null || img == null) throw new IllegalArgumentException();
-        this.cache.put(url, img);
+    public void storeInCache(String url, GraphicSource source) {
+        if (url == null || source == null) throw new IllegalArgumentException();
+        this.cache.put(url, source);
     }
 
-    public RenderedImage getFromCache(String url) {
+    public GraphicSource getFromCache(String url) {
         return this.cache.get(url);
 
     }
 
     private void readGraphicsFromPackage(String packageName) {
-        InputStream graphicsIndexFile = getGrahicsIndex(packageName);
-        if (graphicsIndexFile == null) {
+        InputStream graphicsIndex = getGraphicsIndex(packageName);
+        if (graphicsIndex == null) {
             LOGGER.warn("Can't find package " + packageName +", or package doesn't have a graphics.index file.");
             return;
         }
         try {
-            Properties props = readGraphicsIndex(graphicsIndexFile);
-            Enumeration<String> enumeration = (Enumeration<String>)props.propertyNames();
-            readGraphicsFromPackage(packageName, props, enumeration);
+            Properties props = readGraphicsIndex(graphicsIndex);
+            readGraphicsFromPackage(packageName, props);
         } catch (IOException e){
             LOGGER.warn("Error reading from package " + packageName, e);
         }
     }
 
-    private void readGraphicsFromPackage(String packageName, Properties props, Enumeration<String> enumeration) throws IOException {
+    private void readGraphicsFromPackage(String packageName, Properties props) throws IOException {
+        Enumeration<String> enumeration = (Enumeration<String>)props.propertyNames();
         while (enumeration.hasMoreElements()) {
             String url = enumeration.nextElement();
             if (getFromCache(url) != null) continue;
-            RenderedImage img = retrieveFromClassPath(packageName + "/" + props.getProperty(url).trim());
+            GraphicSource img = retrieveFromClassPath(packageName + "/" + props.getProperty(url).trim());
             this.cache.put(url, img);
         }
     }
@@ -114,29 +114,44 @@ public class ExternalGraphicsRepository {
         return props;
     }
 
-    private RenderedImage retrieveFromClassPath(String path) throws IOException {
+    private GraphicSource retrieveFromClassPath(String path) throws IOException {
         InputStream in = getResourceAsStream(path);
         if (in == null) {
             LOGGER.warn(String.format("Graphics file %s not found on classpath.", path));
             return null;
         }
-        return ImageIO.read(in);
+        //try to read it as an image (png, jpeg,..)
+        RenderedImage img = ImageIO.read(in);
+        if (img != null) return new RenderedImageGraphicSource(img);
+        //if unsuccesfull, try to read it as an SVG
+        //TODO -- implement svg parsing
+        throw new IllegalArgumentException("File " + path + " is neither image nor svg.");
     }
 
-    private RenderedImage retrieveImageFromUrl(String url) throws IOException {
+    private GraphicSource retrieveImageFromUrl(String url) throws IOException {
         HttpGet httpGet = new HttpGet(url);
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = httpClient.execute(httpGet);
         if (response.getStatusLine().getStatusCode() != 200) {
             throw new IOException("Can't retrieve image from " + url);
         }
+
         HttpEntity entity = response.getEntity();
-        RenderedImage img = ImageIO.read(entity.getContent());
-        if (img == null) throw new IOException("Response from " + url + " is not recognized as an image.");
-        return img;
+        if (contentTypeIsSVG(entity)) {
+            //TODO --implement svg
+            return null;
+        } else {
+            RenderedImage img = ImageIO.read(entity.getContent());
+            if (img == null) throw new IOException("Response from " + url + " is not recognized as an image.");
+            return new RenderedImageGraphicSource(img);
+        }
     }
 
-    private InputStream getGrahicsIndex(String packageName) {
+    private boolean contentTypeIsSVG(HttpEntity entity) {
+        return "image/svg+xml".equalsIgnoreCase(entity.getContentType().getValue());
+    }
+
+    private InputStream getGraphicsIndex(String packageName) {
         return getResourceAsStream(packageName + "/graphics.index");
     }
 
