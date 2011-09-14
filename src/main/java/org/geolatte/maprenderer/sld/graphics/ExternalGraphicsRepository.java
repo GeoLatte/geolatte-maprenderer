@@ -25,13 +25,17 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.geolatte.maprenderer.util.SVGDocumentIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.svg.SVGDocument;
 
 import javax.imageio.ImageIO;
 import java.awt.image.RenderedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
@@ -68,7 +72,7 @@ public class ExternalGraphicsRepository {
     public GraphicSource get(String url) throws IOException {
         GraphicSource img = getFromCache(url);
         if (img == null) {
-            img = retrieveImageFromUrl(url);
+            img = retrieveGraphicSourceFromUrl(url);
             storeInCache(url, img);
         }
         return img;
@@ -103,7 +107,8 @@ public class ExternalGraphicsRepository {
         while (enumeration.hasMoreElements()) {
             String url = enumeration.nextElement();
             if (getFromCache(url) != null) continue;
-            GraphicSource img = retrieveFromClassPath(packageName + "/" + props.getProperty(url).trim());
+            String path = packageName + "/" + props.getProperty(url).trim();
+            GraphicSource img = retrieveFromClassPath(url, path);
             this.cache.put(url, img);
         }
     }
@@ -114,21 +119,21 @@ public class ExternalGraphicsRepository {
         return props;
     }
 
-    private GraphicSource retrieveFromClassPath(String path) throws IOException {
-        InputStream in = getResourceAsStream(path);
-        if (in == null) {
-            LOGGER.warn(String.format("Graphics file %s not found on classpath.", path));
-            return null;
+    private GraphicSource retrieveFromClassPath(String uri, String path) throws IOException {
+        File file = getResourceAsFile(path);
+        if (file == null) {
+            throw new IOException(String.format("Graphics file %s not found on classpath.", path));
         }
         //try to read it as an image (png, jpeg,..)
-        RenderedImage img = ImageIO.read(in);
+        RenderedImage img = ImageIO.read(file);
         if (img != null) return new RenderedImageGraphicSource(img);
         //if unsuccesfull, try to read it as an SVG
-        //TODO -- implement svg parsing
-        throw new IllegalArgumentException("File " + path + " is neither image nor svg.");
+        SVGDocument svg = SVGDocumentIO.read(uri, file);
+        if (svg != null) return new SVGDocumentGraphicSource(svg);
+        throw new IOException("File " + path + " is neither image nor svg.");
     }
 
-    private GraphicSource retrieveImageFromUrl(String url) throws IOException {
+    private GraphicSource retrieveGraphicSourceFromUrl(String url) throws IOException {
         HttpGet httpGet = new HttpGet(url);
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = httpClient.execute(httpGet);
@@ -138,8 +143,9 @@ public class ExternalGraphicsRepository {
 
         HttpEntity entity = response.getEntity();
         if (contentTypeIsSVG(entity)) {
-            //TODO --implement svg
-            return null;
+            SVGDocument svg = SVGDocumentIO.read(url, entity.getContent());
+            if (svg == null) throw new IOException("Response from " + url + " is not recognized as SVG document.");
+            return new SVGDocumentGraphicSource(svg);
         } else {
             RenderedImage img = ImageIO.read(entity.getContent());
             if (img == null) throw new IOException("Response from " + url + " is not recognized as an image.");
@@ -151,11 +157,16 @@ public class ExternalGraphicsRepository {
         return "image/svg+xml".equalsIgnoreCase(entity.getContentType().getValue());
     }
 
-    private InputStream getGraphicsIndex(String packageName) {
-        return getResourceAsStream(packageName + "/graphics.index");
+    private InputStream getGraphicsIndex(String packageName)  {
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream(packageName + "/graphics.index");
     }
 
-    private InputStream getResourceAsStream(String resource) {
-        return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
+    private File getResourceAsFile(String resource)  {
+        //TODO -- the lin commented-out doesn't seem to work with SAX parser. Why?
+        // the returned InputStream, when fed to the SAX parser, complains about content not allowed in
+        // prolog. But the file has certainly no content before prolog and has no BOM (I checked with hd).
+        //return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
+        URL url = Thread.currentThread().getContextClassLoader().getResource(resource);
+        return new File(url.getFile());
     }
 }

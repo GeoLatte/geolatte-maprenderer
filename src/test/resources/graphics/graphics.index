@@ -4,4 +4,5 @@
     <entry key="file://local.graphics/bus.png">bus.png</entry>
     <entry key="file://local.graphics/parking.png">parking.png</entry>
     <entry key="file://local.graphics/train.png">train.png</entry>
+    <entry key="file://local.graphics/information.svg">information.svg</entry>
 </properties>

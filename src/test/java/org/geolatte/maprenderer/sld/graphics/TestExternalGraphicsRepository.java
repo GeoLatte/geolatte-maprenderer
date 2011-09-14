@@ -55,7 +55,7 @@ public class TestExternalGraphicsRepository {
     }
 
     @Test
-    public void testGraphicsReadFromClassPath() throws IOException {
+    public void testImageGraphicsReadFromClassPath() throws IOException {
         GraphicSource source = repo.get("file://local.graphics/bus.png");
         assertNotNull(source);
 
@@ -64,6 +64,14 @@ public class TestExternalGraphicsRepository {
         RenderedImage expectedGraphic = ExpectedImages.getExpectedGraphic("bus.png");
         assertImageEquals(expectedGraphic, (RenderedImage)source.getGraphic());
 
+    }
+
+    @Test
+    public void testSVGGraphicsReadFromClassPath() throws IOException {
+        GraphicSource source = repo.get("file://local.graphics/information.svg");
+        assertNotNull(source);
+        assertTrue(source instanceof SVGDocumentGraphicSource);
+        //TODO -- test for image equality (based on transcoding?).
     }
 
     @Test

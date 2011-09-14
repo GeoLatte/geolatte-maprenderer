@@ -58,11 +58,27 @@
             <version>1.6.0</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- httpclient for retrieving graphics via HTTP. -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.1.2</version>
         </dependency>
+
+        <!-- Batik dependencies for handling SVG graphic content-->
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-transcoder</artifactId>
+            <version>1.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-svg-dom</artifactId>
+            <version>1.7</version>
+        </dependency>
+
+
         <!-- dependencies for the ehcache -->
         <dependency>
             <groupId>net.sf.ehcache</groupId>
