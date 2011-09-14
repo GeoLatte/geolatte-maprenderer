@@ -53,7 +53,7 @@ public class TestSupport {
      * Determines whether image files are to be written to disk.
      * @return
      */
-    public static boolean writeTestImagesToDisk(){
+    public static boolean writeTestImagesToDiskIsActive(){
         if (System.getProperty(WRITE_TEST_IMAGES_TO_DISK) == null) return false;
         return true;
     }
@@ -66,7 +66,7 @@ public class TestSupport {
      * @throws IOException
      */
     public static void writeImageToDisk(RenderedImage img, String imageName, String type) throws IOException {
-        if (TestSupport.writeTestImagesToDisk()){
+        if (TestSupport.writeTestImagesToDiskIsActive()){
             File file = new File(getTempDir(),imageName);
             ImageIO.write(img, type, file);
         }
@@ -80,7 +80,7 @@ public class TestSupport {
     }
 
     public static void assertImageEquals(String expectedImageName, RenderedImage received) throws IOException {
-        RenderedImage expected = ExpectedImages.get(expectedImageName);
+        RenderedImage expected = ExpectedImages.getExpectedRenderedImage(expectedImageName);
         assertImageEquals(expected, received);
     }
 

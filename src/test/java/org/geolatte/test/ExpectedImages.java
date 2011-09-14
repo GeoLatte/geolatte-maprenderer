@@ -34,10 +34,19 @@ import java.io.InputStream;
  */
 public class ExpectedImages {
 
-    final public static String PACKAGE = "img/expected/";
+    final public static String PACKAGE_EXPECTED = "img/expected/";
+    final public static String PACKAGE_GRAPHICS = "graphics/";
 
-    public static RenderedImage get(String str) throws IOException {
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(PACKAGE + str);
+    public static RenderedImage getExpectedRenderedImage(String str) throws IOException {
+        return readImage(PACKAGE_EXPECTED + str);
+    }
+
+    public static RenderedImage getExpectedGraphic(String str) throws IOException {
+        return readImage(PACKAGE_GRAPHICS + str);
+    }
+
+    private static RenderedImage readImage(String str) throws IOException {
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(str);
         if (in == null) throw new IOException("File not found: " + str);
         try {
             return ImageIO.read(in);

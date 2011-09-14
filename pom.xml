@@ -58,6 +58,11 @@
             <version>1.6.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.1.2</version>
+        </dependency>
         <!-- dependencies for the ehcache -->
         <dependency>
             <groupId>net.sf.ehcache</groupId>

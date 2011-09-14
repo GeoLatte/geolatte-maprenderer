@@ -40,8 +40,8 @@ public class TestImageComparator {
 
     @Test
     public void testSameImageReturnsTrue() throws IOException {
-        RenderedImage img1 = ExpectedImages.get("image-compare-base.png");
-        RenderedImage img2 = ExpectedImages.get("image-compare-base.png");
+        RenderedImage img1 = ExpectedImages.getExpectedRenderedImage("image-compare-base.png");
+        RenderedImage img2 = ExpectedImages.getExpectedRenderedImage("image-compare-base.png");
 
         ImageComparator comparator = new ImageComparator();
         assertTrue(comparator.equals(img1, img2));
@@ -51,8 +51,8 @@ public class TestImageComparator {
 
     @Test
     public void testModigiedImageReturnsFalse() throws IOException {
-        RenderedImage img1 = ExpectedImages.get("image-compare-base.png");
-        RenderedImage img2 = ExpectedImages.get("image-compare-edited.png");
+        RenderedImage img1 = ExpectedImages.getExpectedRenderedImage("image-compare-base.png");
+        RenderedImage img2 = ExpectedImages.getExpectedRenderedImage("image-compare-edited.png");
 
         ImageComparator comparator = new ImageComparator();
         assertFalse(comparator.equals(img1, img2));
