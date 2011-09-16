@@ -61,7 +61,7 @@ public class ExternalGraphicsRepository {
     private final Map<String, GraphicSource> cache = new ConcurrentHashMap<String, GraphicSource>();
 
     //TODO -- verify the exception-handling scenario's
-    //TODO -- replace the concurrentHashMap with ehcache (in order to control growth of the cache)
+    //TODO -- replace the concurrentHashMap with ehcache (in order to control growth of the cache). Note that ehcache is already a dependency
 
     public ExternalGraphicsRepository(String[] localGraphicsPackage) {
         for (String packageName :localGraphicsPackage){
@@ -162,7 +162,7 @@ public class ExternalGraphicsRepository {
     }
 
     private File getResourceAsFile(String resource)  {
-        //TODO -- the lin commented-out doesn't seem to work with SAX parser. Why?
+        //TODO -- the line below doesn't seem to work with SAX parser. Why?
         // the returned InputStream, when fed to the SAX parser, complains about content not allowed in
         // prolog. But the file has certainly no content before prolog and has no BOM (I checked with hd).
         //return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);

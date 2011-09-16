@@ -29,6 +29,7 @@ import org.junit.Test;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 
+import static junit.framework.Assert.assertEquals;
 import static org.geolatte.test.TestSupport.assertImageEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -87,6 +88,20 @@ public class TestExternalGraphicsRepository {
         assertNotNull(source2);
         RenderedImage img2 = (RenderedImage) source2.getGraphic();
         assertImageEquals(img1, img2);
+    }
+
+    @Test
+    public void testSVGGraphicsReadFromURL() throws IOException {
+        GraphicSource source1 = repo.get(EXT_GRAPHIC_SVG_URL);
+        assertNotNull(source1);
+        assertTrue(source1 instanceof SVGDocumentGraphicSource);
+        //TODO -- test for image equality (based on transcoding?).
+
+        //Test that the image is in the cache
+        GraphicSource source2 = repo.getFromCache(EXT_GRAPHIC_SVG_URL);
+        assertNotNull(source2);
+        assertEquals(source1.getGraphic(), source2.getGraphic());
+
     }
 
     @Test
