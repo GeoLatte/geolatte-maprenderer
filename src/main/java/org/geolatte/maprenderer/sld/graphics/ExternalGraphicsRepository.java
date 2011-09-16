@@ -58,7 +58,7 @@ public class ExternalGraphicsRepository {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ExternalGraphicsRepository.class);
 
-    private final Map<String, GraphicSource> cache = new ConcurrentHashMap<String, GraphicSource>();
+    private final Map<String, ExternalGraphicSource> cache = new ConcurrentHashMap<String, ExternalGraphicSource>();
 
     //TODO -- verify the exception-handling scenario's
     //TODO -- replace the concurrentHashMap with ehcache (in order to control growth of the cache). Note that ehcache is already a dependency
@@ -69,8 +69,8 @@ public class ExternalGraphicsRepository {
         }
     }
 
-    public GraphicSource get(String url) throws IOException {
-        GraphicSource img = getFromCache(url);
+    public ExternalGraphicSource get(String url) throws IOException {
+        ExternalGraphicSource img = getFromCache(url);
         if (img == null) {
             img = retrieveGraphicSourceFromUrl(url);
             storeInCache(url, img);
@@ -78,12 +78,12 @@ public class ExternalGraphicsRepository {
         return img;
     }
 
-    public void storeInCache(String url, GraphicSource source) {
+    public void storeInCache(String url, ExternalGraphicSource source) {
         if (url == null || source == null) throw new IllegalArgumentException();
         this.cache.put(url, source);
     }
 
-    public GraphicSource getFromCache(String url) {
+    public ExternalGraphicSource getFromCache(String url) {
         return this.cache.get(url);
 
     }
@@ -108,7 +108,7 @@ public class ExternalGraphicsRepository {
             String url = enumeration.nextElement();
             if (getFromCache(url) != null) continue;
             String path = packageName + "/" + props.getProperty(url).trim();
-            GraphicSource img = retrieveFromClassPath(url, path);
+            ExternalGraphicSource img = retrieveFromClassPath(url, path);
             this.cache.put(url, img);
         }
     }
@@ -119,7 +119,7 @@ public class ExternalGraphicsRepository {
         return props;
     }
 
-    private GraphicSource retrieveFromClassPath(String uri, String path) throws IOException {
+    private ExternalGraphicSource retrieveFromClassPath(String uri, String path) throws IOException {
         File file = getResourceAsFile(path);
         if (file == null) {
             throw new IOException(String.format("Graphics file %s not found on classpath.", path));
@@ -133,7 +133,7 @@ public class ExternalGraphicsRepository {
         throw new IOException("File " + path + " is neither image nor svg.");
     }
 
-    private GraphicSource retrieveGraphicSourceFromUrl(String url) throws IOException {
+    private ExternalGraphicSource retrieveGraphicSourceFromUrl(String url) throws IOException {
         HttpGet httpGet = new HttpGet(url);
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = httpClient.execute(httpGet);

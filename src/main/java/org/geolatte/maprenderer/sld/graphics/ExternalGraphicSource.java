@@ -25,7 +25,7 @@ package org.geolatte.maprenderer.sld.graphics;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 9/14/11
  */
-public abstract class GraphicSource {
+public abstract class ExternalGraphicSource {
 
     public abstract Object getGraphic();
 

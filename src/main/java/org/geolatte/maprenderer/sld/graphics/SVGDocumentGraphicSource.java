@@ -27,7 +27,7 @@ import org.w3c.dom.svg.SVGDocument;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 9/14/11
  */
-public class SVGDocumentGraphicSource extends GraphicSource{
+public class SVGDocumentGraphicSource extends ExternalGraphicSource {
 
     final private SVGDocument svg;
 

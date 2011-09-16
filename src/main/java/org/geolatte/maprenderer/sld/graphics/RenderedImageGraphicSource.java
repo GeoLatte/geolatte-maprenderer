@@ -27,7 +27,7 @@ import java.awt.image.RenderedImage;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 9/14/11
  */
-public class RenderedImageGraphicSource extends GraphicSource {
+public class RenderedImageGraphicSource extends ExternalGraphicSource {
 
     final private RenderedImage img;
 
