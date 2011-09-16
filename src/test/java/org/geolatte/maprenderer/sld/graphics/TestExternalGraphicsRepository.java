@@ -41,7 +41,7 @@ import static org.junit.Assert.fail;
  */
 public class TestExternalGraphicsRepository {
 
-    private static String LOCAL_GRAPHICS_PACKAGE = "graphics";
+    public static String LOCAL_GRAPHICS_PACKAGE = "graphics";
 
     //TODO can we link to a more stable graphics?
     private static String EXT_GRAPHIC_IMAGE_URL = "http://www.google.com/intl/en_com/images/srpr/logo3w.png";
