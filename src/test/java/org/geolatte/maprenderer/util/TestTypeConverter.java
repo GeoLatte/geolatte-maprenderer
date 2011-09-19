@@ -97,8 +97,7 @@ public class TestTypeConverter {
             TypeConverter.instance().convert("1000.12", Long.class);
             fail();
         } catch (ConversionException e) {
-            System.out.println("e = " + e);
-
+            //OK
         }
     }
 
@@ -133,14 +132,12 @@ public class TestTypeConverter {
             TypeConverter.instance().convert("2010-21-10", Long.class);
             fail();
         } catch (ConversionException e) {
-            System.out.println("e = " + e);
         }
 
         try {
             TypeConverter.instance().convert("1000.12", Long.class);
             fail();
         } catch (ConversionException e) {
-            System.out.println("e = " + e);
             //OK
         }
     }

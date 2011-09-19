@@ -24,10 +24,12 @@ package org.geolatte.maprenderer.sld.graphics;
 import java.awt.image.RenderedImage;
 
 /**
+ *  A {@link GraphicSource} for {@link ExternalGraphic}s that resolve to images.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 9/14/11
  */
-public class RenderedImageGraphicSource extends ExternalGraphicSource {
+public class RenderedImageGraphicSource extends GraphicSource {
 
     final private RenderedImage img;
 

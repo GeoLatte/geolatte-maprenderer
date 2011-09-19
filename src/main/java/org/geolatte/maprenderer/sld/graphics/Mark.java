@@ -21,11 +21,75 @@
 
 package org.geolatte.maprenderer.sld.graphics;
 
-import java.awt.*;
+import net.opengis.se.v_1_1_0.MarkType;
+import net.opengis.se.v_1_1_0.SvgParameterType;
+import org.geolatte.maprenderer.sld.SvgParameters;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Defines a shape which has coloring applied to it.
+ *
+ * <p>This implementation only supports marks with a well-known name.</p>
+ * <p>See SE, § 11.3.2 </p>
+ *
+ */
+public class Mark {
+
+    final private String name;
+    final private SvgParameters parameters;
+    private boolean hasFill = false;
+    private boolean hasStroke = false;
+
+    public Mark(String name, SvgParameters svgParams) {
+        this.name = name;
+        this.parameters = svgParams;
+    }
+
+    public Mark(MarkType type){
+        verify(type);
+        this.name = type.getWellKnownName();
+        List<SvgParameterType> parameters = collectParameters(type);
+        this.parameters = SvgParameters.from(parameters);
+    }
+
+    public String getWellKnownName() {
+        return name;
+    }
+
+    public SvgParameters getSvgParameters() {
+        return this.parameters;
+    }
 
 
-public interface Mark {
+    public boolean hasStroke() {
+        return this.hasStroke;
+    }
 
-    Shape generateMarkShape(double x, double y, double size);
+    public boolean hasFill() {
+        return this.hasFill;
+    }
 
+
+
+    private List<SvgParameterType> collectParameters(MarkType type) {
+        List<SvgParameterType> params = new ArrayList<SvgParameterType>();
+        if (type.getFill() != null){
+            params.addAll(type.getFill().getSvgParameter());
+            hasFill = true;
+        }
+        if (type.getStroke() != null) {
+            params.addAll(type.getStroke().getSvgParameter());
+            hasStroke = true;
+        }
+        return params;
+    }
+
+    private void verify(MarkType type) {
+        if (type.getWellKnownName() == null ||
+                type.getWellKnownName().isEmpty()) {
+            throw new UnsupportedOperationException("Only Well-known marks are supported");
+        }
+    }
 }

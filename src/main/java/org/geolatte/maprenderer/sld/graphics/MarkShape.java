@@ -23,14 +23,32 @@ package org.geolatte.maprenderer.sld.graphics;
 
 import java.awt.*;
 
+/**
+ * Determines the shape of a <code>Mark</code>.
+ *
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 9/19/11
+ */
+public abstract class MarkShape {
 
-public abstract class AbstractMark implements Mark {
+    private float defaultSize = 6; //For now this is hard-coded
 
+    public float getDefaultSize(){
+        return this.defaultSize;
+    }
 
-    private float size;
+    public Shape toShape(float x, float y) {
+        return toShape(x, y, defaultSize);
+    }
 
+    public abstract Shape toShape(float x, float y, float size);
 
-    public abstract Shape generateMarkShape(double x, double y, double size);
-
-
+    /**
+     * Allows subclasses to set the default size of the <code>Mark</code>.
+     *
+     * @param size
+     */
+    protected void setDefaultSize(float size){
+        this.defaultSize = size;
+    }
 }

@@ -42,12 +42,21 @@ import java.util.Map;
  */
 public class SvgParameters  {
 
-    //Defaults.
-    public static final Color DEFAULT_STROKE_COLOR = Color.BLACK;
+    private final Map<String, String> parameterMap;
 
-    Map<String, String> parameterMap;
+    //SVG Parameter names
+    public static final String STROKE = "stroke";
+    public static final String STROKE_WIDTH = "stroke-width";
+    public static final String STROKE_OPACITY = "stroke-opacity";
+    public static final String STROKE_LINEJOIN = "stroke-linejoin";
+    public static final String STROKE_LINECAP = "stroke-linecap";
+    public static final String STROKE_DASHARRAY = "stroke-dasharray";
+    public static final String STROKE_DASHOFFSET = "stroke-dashoffset";
+    public static final String FILL = "fill";
+    public static final String FILL_OPACITY = "fill-opacity";
 
     //Defaults (see symboly encoding specs.)
+    public static final Color DEFAULT_STROKE_COLOR = Color.BLACK;
     public static final float DEFAULT_STROKE_WIDTH = 1.0f;
     public static final float DEFAULT_STROKE_OPACITY = 1.0f;
     public static final int DEFAULT_STROKE_LINEJOIN = BasicStroke.JOIN_MITER;
@@ -57,7 +66,7 @@ public class SvgParameters  {
     public static final float DEFAULT_FILL_OPACITY = 1.0f;
 
 
-    public static SvgParameters create(List<SvgParameterType> types) {
+    public static SvgParameters from(List<SvgParameterType> types) {
         SvgParameters result = new SvgParameters(types.size());
         for (SvgParameterType param : types) {
             result.add(param);
@@ -65,9 +74,12 @@ public class SvgParameters  {
         return result;
     }
 
-    public void add(SvgParameterType svgParam) {
-        String value = JAXBHelper.extractValueToString(svgParam.getContent());
-        parameterMap.put(svgParam.getName().toLowerCase(), value);
+    public static SvgParameters from(Map<String, String> params) {
+        return new SvgParameters(params);
+    }
+
+    private SvgParameters(Map<String, String> params) {
+        this.parameterMap = params;
     }
 
     private SvgParameters(int size) {
@@ -75,24 +87,29 @@ public class SvgParameters  {
         parameterMap = new HashMap<String, String>(size);
     }
 
+    public void add(SvgParameterType svgParam) {
+        String value = JAXBHelper.extractValueToString(svgParam.getContent());
+        parameterMap.put(svgParam.getName().toLowerCase(), value);
+    }
+
     public boolean isEmpty() {
         return parameterMap.isEmpty();
     }
 
     public Color getStrokeColor() {
-        String colorRGB = parameterMap.get("stroke");
+        String colorRGB = parameterMap.get(STROKE);
         if (colorRGB == null) return DEFAULT_STROKE_COLOR;
         return Color.decode(colorRGB);
     }
 
     public float getStrokeWidth() {
-        String strokeWidth = parameterMap.get("stroke-width");
+        String strokeWidth = parameterMap.get(STROKE_WIDTH);
         if (strokeWidth == null) return DEFAULT_STROKE_WIDTH;
         return Float.parseFloat(strokeWidth);
     }
 
     public float getStrokeOpacity() {
-        String str = parameterMap.get("stroke-opacity");
+        String str = parameterMap.get(STROKE_OPACITY);
         if (str == null) return DEFAULT_STROKE_OPACITY;
         return Float.parseFloat(str);
     }
@@ -103,7 +120,7 @@ public class SvgParameters  {
      * @return the line join style as one of the static int members of <code>BasicStroke</code>
      */
     public int getStrokeLinejoin() {
-        String str = parameterMap.get("stroke-linejoin");
+        String str = parameterMap.get(STROKE_LINEJOIN);
         if (str == null) return DEFAULT_STROKE_LINEJOIN;
         if (str.equalsIgnoreCase("mitre")) return BasicStroke.JOIN_MITER;
         if (str.equalsIgnoreCase("round")) return BasicStroke.JOIN_ROUND;
@@ -118,7 +135,7 @@ public class SvgParameters  {
      * @return the line cap style as one of the static int members of <code>BasicStroke</code>
      */
     public int getStrokeLinecap() {
-        String str = parameterMap.get("stroke-linecap");
+        String str = parameterMap.get(STROKE_LINECAP);
         if (str == null) return DEFAULT_STROKE_LINECAP;
         if (str.equalsIgnoreCase("butt")) return BasicStroke.CAP_BUTT;
         if (str.equalsIgnoreCase("round")) return BasicStroke.CAP_ROUND;
@@ -128,7 +145,7 @@ public class SvgParameters  {
     }
 
     public float[] getStrokeDasharray() {
-        String str = parameterMap.get("stroke-dasharray");
+        String str = parameterMap.get(STROKE_DASHARRAY);
         if (str == null) return null;
         //If an odd number of values is given, then the
         //pattern is repeated twice to create the dasharray.
@@ -144,21 +161,21 @@ public class SvgParameters  {
     }
 
     public float getStrokeDashoffset() {
-        String str = parameterMap.get("stroke-dashoffset");
+        String str = parameterMap.get(STROKE_DASHOFFSET);
         if (str == null) return DEFAULT_STROKE_DASHOFFSET;
 
         return Float.parseFloat(str);
     }
 
     public Color getFillColor() {
-        String str = parameterMap.get("fill");
+        String str = parameterMap.get(FILL);
         if (str == null) return DEFAULT_FILL_COLOR;
         return Color.decode(str);
 
     }
 
     public float getFillOpacity() {
-        String str = parameterMap.get("fill-opacity");
+        String str = parameterMap.get(FILL_OPACITY);
         if (str == null) return DEFAULT_FILL_OPACITY;
         return Float.parseFloat(str);
     }

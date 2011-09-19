@@ -57,7 +57,7 @@ public class TestExternalGraphicsRepository {
 
     @Test
     public void testImageGraphicsReadFromClassPath() throws IOException {
-        ExternalGraphicSource source = repo.get("file://local.graphics/bus.png");
+        GraphicSource source = repo.get("file://local.graphics/bus.png");
         assertNotNull(source);
 
         assertTrue(source instanceof RenderedImageGraphicSource);
@@ -69,7 +69,7 @@ public class TestExternalGraphicsRepository {
 
     @Test
     public void testSVGGraphicsReadFromClassPath() throws IOException {
-        ExternalGraphicSource source = repo.get("file://local.graphics/information.svg");
+        GraphicSource source = repo.get("file://local.graphics/information.svg");
         assertNotNull(source);
         assertTrue(source instanceof SVGDocumentGraphicSource);
         //TODO -- test for image equality (based on transcoding?).
@@ -77,14 +77,14 @@ public class TestExternalGraphicsRepository {
 
     @Test
     public void testGraphicsFromURL() throws IOException {
-        ExternalGraphicSource source = repo.get(EXT_GRAPHIC_IMAGE_URL);
+        GraphicSource source = repo.get(EXT_GRAPHIC_IMAGE_URL);
         assertNotNull(source);
         assertTrue(source instanceof RenderedImageGraphicSource);
         RenderedImage img1 = (RenderedImage)source.getGraphic();
         TestSupport.writeImageToDisk(img1, "logo3w.png", "PNG"); // for visual check
 
         //Test that the image is in the cache
-        ExternalGraphicSource source2 = repo.getFromCache(EXT_GRAPHIC_IMAGE_URL);
+        GraphicSource source2 = repo.getFromCache(EXT_GRAPHIC_IMAGE_URL);
         assertNotNull(source2);
         RenderedImage img2 = (RenderedImage) source2.getGraphic();
         assertImageEquals(img1, img2);
@@ -92,13 +92,13 @@ public class TestExternalGraphicsRepository {
 
     @Test
     public void testSVGGraphicsReadFromURL() throws IOException {
-        ExternalGraphicSource source1 = repo.get(EXT_GRAPHIC_SVG_URL);
+        GraphicSource source1 = repo.get(EXT_GRAPHIC_SVG_URL);
         assertNotNull(source1);
         assertTrue(source1 instanceof SVGDocumentGraphicSource);
         //TODO -- test for image equality (based on transcoding?).
 
         //Test that the image is in the cache
-        ExternalGraphicSource source2 = repo.getFromCache(EXT_GRAPHIC_SVG_URL);
+        GraphicSource source2 = repo.getFromCache(EXT_GRAPHIC_SVG_URL);
         assertNotNull(source2);
         assertEquals(source1.getGraphic(), source2.getGraphic());
 

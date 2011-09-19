@@ -26,6 +26,7 @@ import net.opengis.se.v_1_1_0.*;
 import org.geolatte.maprenderer.map.MapGraphics;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,8 +40,7 @@ public class PolygonSymbolizer extends AbstractSymbolizer {
     final private String geometryProperty;
     final private SvgParameters svgParameters;
     final private Value<Float> perpendicularOffset;
-    private float displacementX = 0f;
-    private float displacementY = 0f;
+    private Point2D displacement;
     private boolean hasStroke = false;
     private boolean hasFill = false;
 
@@ -49,10 +49,10 @@ public class PolygonSymbolizer extends AbstractSymbolizer {
         GeometryType geometryType = type.getGeometry();
         geometryProperty = readGeometry(geometryType);
         List<SvgParameterType> params = collectSvgParameters(type);
-        svgParameters = SvgParameters.create(params);
+        svgParameters = SvgParameters.from(params);
         ParameterValueType offset = type.getPerpendicularOffset();
         perpendicularOffset = readPerpendicularOffset(offset);
-        readDisplacement(type.getDisplacement());
+        this.displacement = readDisplacement(type.getDisplacement());
 
     }
 
@@ -69,17 +69,13 @@ public class PolygonSymbolizer extends AbstractSymbolizer {
         return params;
     }
 
-    private void readDisplacement(DisplacementType displacementType) {
-        if (displacementType == null) return;
-        String dXStr = extractParameterValue(displacementType.getDisplacementX());
-        String dYStr = extractParameterValue(displacementType.getDisplacementY());
-        if (dXStr == null || dYStr == null) return;
-        displacementX = Float.parseFloat(dXStr);
-        displacementY = Float.parseFloat(dYStr);
+    private Point2D readDisplacement(DisplacementType displacementType) {
+        return SLD.instance().readDisplacement(displacementType);
     }
 
     @Override
     public void symbolize(MapGraphics graphics, Geometry geometry) {
+        //TODO -- take into account offset, displacement
         Shape[] shapes = toShapes(graphics, geometry);
         fill(graphics, shapes);
         stroke(graphics, shapes);
@@ -113,11 +109,7 @@ public class PolygonSymbolizer extends AbstractSymbolizer {
         return perpendicularOffset;
     }
 
-    public float getDisplacementX() {
-        return displacementX;
-    }
-
-    public float getDisplacementY() {
-        return displacementY;
+    public Point2D getDisplacement() {
+        return displacement;
     }
 }

@@ -25,10 +25,10 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
 
-public class CircleMark implements Mark {
+public class CircleMarkShape extends MarkShape {
 
-    public Shape generateMarkShape(double x, double y, double size) {
-        return new Ellipse2D.Double(x, y, size, size);
+    public Shape toShape(float x, float y, float size) {
+        return new Ellipse2D.Float(x, y, size, size);
 
     }
 }

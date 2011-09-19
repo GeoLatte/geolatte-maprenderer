@@ -21,10 +21,7 @@
 
 package org.geolatte.maprenderer.sld;
 
-import net.opengis.se.v_1_1_0.FeatureTypeStyleType;
-import net.opengis.se.v_1_1_0.LineSymbolizerType;
-import net.opengis.se.v_1_1_0.RuleType;
-import net.opengis.se.v_1_1_0.SymbolizerType;
+import net.opengis.se.v_1_1_0.*;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.sld.filter.AlwaysTrueSLDRuleFilter;
 import org.geolatte.maprenderer.sld.filter.ElseSLDRuleFilter;
@@ -111,7 +108,12 @@ public class FeatureTypeStyle {
         AbstractSymbolizer symbolizer = null;
         if (value instanceof LineSymbolizerType) {
             symbolizer = createSymbolizer((LineSymbolizerType) value);
+        } else if (value instanceof PolygonSymbolizerType) {
+            symbolizer = new PolygonSymbolizer((PolygonSymbolizerType) value);
+        } else {
+            throw new UnsupportedOperationException("Still to be implemented!");
         }
+
         symbolizers.add(symbolizer);
     }
 

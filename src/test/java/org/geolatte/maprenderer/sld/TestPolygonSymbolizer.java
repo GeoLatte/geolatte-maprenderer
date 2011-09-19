@@ -30,6 +30,7 @@ import org.geolatte.test.TestSupport;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.awt.geom.Point2D;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 
@@ -72,15 +73,9 @@ public class TestPolygonSymbolizer extends BaseFeatureTypeStyleTest {
     }
 
     @Test
-    public void testDisplacementX(){
-        assertEquals(5f, symbolizer.getDisplacementX(), 0.00001f);
+    public void testDisplacement(){
+        assertEquals(new Point2D.Float(5f, 10f), symbolizer.getDisplacement());
     }
-
-    @Test
-    public void testDisplacementY(){
-        assertEquals(10f, symbolizer.getDisplacementY(), 0.00001f);
-    }
-
 
     @Test
     public void testSymbolizeSimple() throws Exception {

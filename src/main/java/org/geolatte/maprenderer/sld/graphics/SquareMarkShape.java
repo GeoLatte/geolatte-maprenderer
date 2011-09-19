@@ -21,24 +21,12 @@
 
 package org.geolatte.maprenderer.sld.graphics;
 
-import org.w3c.dom.svg.SVGDocument;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
-/**
- *  A {@link GraphicSource} for {@link ExternalGraphic}s that resolve to SVG documents.
- *
- * @author Karel Maesen, Geovise BVBA
- *         creation-date: 9/14/11
- */
-public class SVGDocumentGraphicSource extends GraphicSource {
+public class SquareMarkShape extends MarkShape {
 
-    final private SVGDocument svg;
-
-    public SVGDocumentGraphicSource(SVGDocument svg) {
-        this.svg = svg;
-    }
-
-    @Override
-    public SVGDocument getGraphic() {
-        return svg;
+    public Shape toShape(float x, float y, float size) {
+        return new Rectangle2D.Float(x, y, size, size);
     }
 }

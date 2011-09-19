@@ -42,7 +42,7 @@ public class LineSymbolizer extends AbstractSymbolizer {
         perpendicularOffset = readPerpendicularOffset(type);
         StrokeType strokeType = type.getStroke();
         verify(strokeType);
-        svgParameters = SvgParameters.create(strokeType.getSvgParameter());
+        svgParameters = SvgParameters.from(strokeType.getSvgParameter());
         GeometryType geometryType = type.getGeometry();
         geometryProperty = readGeometry(geometryType);
     }

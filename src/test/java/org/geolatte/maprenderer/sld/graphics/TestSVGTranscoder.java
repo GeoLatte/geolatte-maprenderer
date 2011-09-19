@@ -46,7 +46,7 @@ public class TestSVGTranscoder {
 
     @Test
     public void testTranscodingImage() throws IOException {
-        ExternalGraphicSource source = repo.get(SVG_SRC);
+        GraphicSource source = repo.get(SVG_SRC);
         assertTrue(source instanceof SVGDocumentGraphicSource);
 
         SVGTranscoder transcoder = new SVGTranscoder();

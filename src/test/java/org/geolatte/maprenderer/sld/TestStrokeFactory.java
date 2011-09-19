@@ -69,9 +69,9 @@ public class TestStrokeFactory {
     public void setUp() {
         strokeFactory  = new StrokeFactory();
         StrokeType strokeType = SLD.instance().read(strokeFragment, StrokeType.class);
-        stroke = (BasicStroke)strokeFactory.create(SvgParameters.create(strokeType.getSvgParameter()));
+        stroke = (BasicStroke)strokeFactory.create(SvgParameters.from(strokeType.getSvgParameter()));
         strokeType = SLD.instance().read(dashedStrokeFragment, StrokeType.class);
-        dashedStroke = (BasicStroke)strokeFactory.create(SvgParameters.create(strokeType.getSvgParameter()));
+        dashedStroke = (BasicStroke)strokeFactory.create(SvgParameters.from(strokeType.getSvgParameter()));
     }
 
 

@@ -21,6 +21,8 @@
 
 package org.geolatte.maprenderer.sld;
 
+import net.opengis.se.v_1_1_0.AnchorPointType;
+import net.opengis.se.v_1_1_0.DisplacementType;
 import net.opengis.se.v_1_1_0.FeatureTypeStyleType;
 import net.opengis.se.v_1_1_0.ParameterValueType;
 import net.opengis.sld.v_1_1_0.ObjectFactory;
@@ -30,10 +32,15 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import java.awt.geom.Point2D;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.StringReader;
 
+/**
+ * A utility class for parsing SLD documents.
+ *
+ */
 public class SLD {
 
     private static SLD instance = new SLD();
@@ -92,7 +99,17 @@ public class SLD {
         }
     }
 
+    /**
+     * Extracts the value from a ParameterValueType element as String.
+     *
+     * <p>This implementation extracts all text from the element content. It does
+     * not currently parse or interpret this content as an OGC expression. </p>
+     *
+     * @param parameterValueType
+     * @return
+     */
     public String extractParameterValue(ParameterValueType parameterValueType) {
+        //TODO -- parse the OGC expression (if present).
         if (parameterValueType == null) {
             return null;
         }
@@ -103,4 +120,32 @@ public class SLD {
         return JAXBHelper.extractValueToString(content);
     }
 
+    /**
+     * Extracts the displacement as a <code>Point2D</code> from an Displacement-element.
+     *
+     * @param displacementType
+     * @return
+     */
+    public Point2D readDisplacement(DisplacementType displacementType) {
+        Point2D defaultDisplacement = new Point2D.Float(0f, 0f);
+        if (displacementType == null) return defaultDisplacement;
+        String dXStr = extractParameterValue(displacementType.getDisplacementX());
+        String dYStr = extractParameterValue(displacementType.getDisplacementY());
+        if (dXStr == null || dYStr == null) return defaultDisplacement;
+        float dX = Float.parseFloat(dXStr);
+        float dY = Float.parseFloat(dYStr);
+        return new Point2D.Float(dX, dY);
+    }
+
+
+    public Point2D readAnchorPoint(AnchorPointType anchorPoint) {
+        Point2D defaultDisplacement = new Point2D.Float(0.5f, 0.5f);
+        if (anchorPoint == null) return defaultDisplacement;
+        String aXStr = extractParameterValue(anchorPoint.getAnchorPointX());
+        String aYStr = extractParameterValue(anchorPoint.getAnchorPointY());
+        if (aXStr == null || aYStr == null) return defaultDisplacement;
+        float aX = Float.parseFloat(aXStr);
+        float aY = Float.parseFloat(aYStr);
+        return new Point2D.Float(aX, aY);
+    }
 }

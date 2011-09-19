@@ -21,12 +21,12 @@
 
 package org.geolatte.maprenderer.sld.graphics;
 
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
+/**
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 9/14/11
+ */
+public abstract class GraphicSource {
 
-public class SquareMark implements Mark {
+    public abstract Object getGraphic();
 
-    public Shape generateMarkShape(double x, double y, double size) {
-        return new Rectangle2D.Double(x, y, size, size);
-    }
 }

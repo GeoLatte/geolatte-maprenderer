@@ -22,11 +22,20 @@
 package org.geolatte.maprenderer.sld.graphics;
 
 /**
+ * A {@link GraphicSource} for {@link Mark}s.
+ *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 9/14/11
+ *         creation-date: 9/16/11
  */
-public abstract class ExternalGraphicSource {
+public class MarkGraphicSource extends GraphicSource {
 
-    public abstract Object getGraphic();
+    final private Mark mark;
 
+    public MarkGraphicSource(Mark mark) {
+        this.mark = mark;
+    }
+    @Override
+    public Mark getGraphic() {
+        return mark;
+    }
 }

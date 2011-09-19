@@ -81,13 +81,13 @@ public class TestSvgParameters {
     @Before
     public void setUp() {
         StrokeType strokeType = SLD.instance().read(stroke, StrokeType.class);
-        strokeParameters = SvgParameters.create(strokeType.getSvgParameter());
+        strokeParameters = SvgParameters.from(strokeType.getSvgParameter());
         strokeType = SLD.instance().read(emptyStroke, StrokeType.class);
-        strokeDefaultParameters = SvgParameters.create(strokeType.getSvgParameter());
+        strokeDefaultParameters = SvgParameters.from(strokeType.getSvgParameter());
         FillType fillType = SLD.instance().read(fill, FillType.class);
-        fillParameters = SvgParameters.create(fillType.getSvgParameter());
+        fillParameters = SvgParameters.from(fillType.getSvgParameter());
         fillType = SLD.instance().read(emptyFill, FillType.class);
-        fillDefaultParameters = SvgParameters.create(fillType.getSvgParameter());
+        fillDefaultParameters = SvgParameters.from(fillType.getSvgParameter());
     }
 
     @Test
