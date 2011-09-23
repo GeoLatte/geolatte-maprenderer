@@ -38,9 +38,9 @@ import java.util.*;
  */
 public class Graphic {
 
-    private static final float DEFAULT_OPACITY = 1.0f;
-    private static final float DEFAULT_SIZE = 16f;
-    private static final float DEFAULT_ROTATION = 0f;
+    public static final float DEFAULT_OPACITY = 1.0f;
+    public static final float DEFAULT_SIZE = 16f;
+    public static final float DEFAULT_ROTATION = 0f;
 
     private final List<MarkOrExternalGraphicHolder> sources;
     private final float opacity;
@@ -102,8 +102,7 @@ public class Graphic {
             if (o instanceof ExternalGraphicType) {
                 value = new ExternalGraphic((ExternalGraphicType) o);
             } else if (o instanceof MarkType) {
-                //TODO -- add support for Marks
-                throw new UnsupportedOperationException("No support for Marks");
+                value = new Mark((MarkType) o);
             } else {
                 throw new IllegalStateException(String.format("Element %s not supported.", o.getClass().getName()));
             }

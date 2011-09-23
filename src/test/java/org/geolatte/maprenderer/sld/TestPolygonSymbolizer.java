@@ -102,7 +102,7 @@ public class TestPolygonSymbolizer extends BaseFeatureTypeStyleTest {
     //TODO -- add test case for donut polygon
 
     private void testCase(String testCaseName) throws SpatialReferenceCreationException, IOException {
-        symbolizer = new PolygonSymbolizer(type);
+       symbolizer = new PolygonSymbolizer(type);
 
         MapGraphics g = createMapGraphics(100, 10000);
 

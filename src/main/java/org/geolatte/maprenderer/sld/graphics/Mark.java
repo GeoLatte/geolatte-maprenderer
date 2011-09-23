@@ -37,21 +37,25 @@ import java.util.List;
  */
 public class Mark {
 
+    private static final String DEFAULT_MARK_NAME = "square";
+
     final private String name;
     final private SvgParameters parameters;
     private boolean hasFill = false;
     private boolean hasStroke = false;
 
     public Mark(String name, SvgParameters svgParams) {
-        this.name = name;
+        this.name = getNameOrUseSquare(name);
         this.parameters = svgParams;
+        initDefault();
     }
 
     public Mark(MarkType type){
         verify(type);
-        this.name = type.getWellKnownName();
+        this.name = getNameOrUseSquare(type.getWellKnownName());
         List<SvgParameterType> parameters = collectParameters(type);
         this.parameters = SvgParameters.from(parameters);
+        initDefault();
     }
 
     public String getWellKnownName() {
@@ -62,13 +66,26 @@ public class Mark {
         return this.parameters;
     }
 
-
     public boolean hasStroke() {
         return this.hasStroke;
     }
 
     public boolean hasFill() {
         return this.hasFill;
+    }
+
+    /**
+     * Checks to see if default fill/stroke needs to be set.
+     */
+    private void initDefault() {
+        if (!hasFill && !hasStroke) {
+            hasFill = true;
+            hasStroke = true;
+        }
+    }
+
+    private String getNameOrUseSquare(String wkname) {
+        return wkname == null || wkname.isEmpty() ? DEFAULT_MARK_NAME : wkname;
     }
 
 
@@ -87,8 +104,8 @@ public class Mark {
     }
 
     private void verify(MarkType type) {
-        if (type.getWellKnownName() == null ||
-                type.getWellKnownName().isEmpty()) {
+        if (type.getInlineContent() != null ||
+                type.getOnlineResource() != null) {
             throw new UnsupportedOperationException("Only Well-known marks are supported");
         }
     }

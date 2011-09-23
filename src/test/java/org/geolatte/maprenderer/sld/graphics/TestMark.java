@@ -23,12 +23,11 @@ package org.geolatte.maprenderer.sld.graphics;
 
 import net.opengis.se.v_1_1_0.MarkType;
 import org.geolatte.maprenderer.sld.SLD;
+import org.geolatte.maprenderer.sld.SvgParameters;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -59,6 +58,17 @@ public class TestMark {
         assertTrue(wellKnownMark.hasFill());
     }
 
+    @Test
+    public void testEmptyMark() {
+        MarkType t = SLD.instance().read(emptyMark, MarkType.class);
+        Mark empty = new Mark(t);
+        assertEquals("square", empty.getWellKnownName());
+        assertTrue(empty.hasFill());
+        assertTrue(empty.hasStroke());
+        assertEquals(SvgParameters.DEFAULT_FILL_COLOR, empty.getSvgParameters().getFillColor());
+        assertEquals(SvgParameters.DEFAULT_STROKE_WIDTH, empty.getSvgParameters().getStrokeWidth(), 0.00001f);
+    }
+
     private final String xmlWellKnownMark =
              "<Mark version=\"1.1.0\"" +
                     "                  xmlns=\"http://www.opengis.net/se\"" +
@@ -70,4 +80,10 @@ public class TestMark {
                         "<SvgParameter name=\"fill-opacity\">0.75</SvgParameter> " +
                     "</Fill>" +
             "</Mark>";
+
+    private final String emptyMark =
+             "<Mark version=\"1.1.0\"" +
+                    "                  xmlns=\"http://www.opengis.net/se\"" +
+                    "                  xmlns:ogc=\"http://www.opengis.net/ogc\"" +
+                    "                  xmlns:xlink=\"http://www.w3.org/1999/xlink\"/>";
 }

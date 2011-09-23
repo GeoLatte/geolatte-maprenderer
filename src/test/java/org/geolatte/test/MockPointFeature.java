@@ -19,43 +19,35 @@
  *  Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.maprenderer.sld.graphics;
+package org.geolatte.test;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
-import org.geolatte.core.Feature;
 
+/**
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 9/23/11
+ */
+public class MockPointFeature extends AbstractMockFeature {
 
-public class PointSymbolizer {
-
-    private Mark graphic;
-    private double size;
-
-
-    public void setSize(double size) {
-        this.size = size;
+    public MockPointFeature(Point pnt) {
+        super(pnt);
     }
 
-    public double getSize() {
-        return this.size;
+    public MockPointFeature(){
+        super();
     }
 
-    public void setGraphic(Mark graphic) {
-        this.graphic = graphic;
+    @Override
+    protected Geometry generateGeom() {
+        double x = Math.random() * 90;
+        double y = Math.random() * 90;
+        return geomFactory.createPoint(new Coordinate(x, y));
     }
 
-    public void symbolize(Feature feature) {
-        Point pnt = getAnchor(feature);
-        //TODO -- assumes Map Units in meters
-//        Shape markShape = this.graphic.generateMarkShape(pnt.getX(), pnt.getY(), this.size * getGraphics().getMetersPerPixel());
-//        getGraphics().setColor(getFillColor());
-//        getGraphics().fill(markShape);
-//        getGraphics().setColor(getStrokeColor());
-//        getGraphics().draw(markShape);
-    }
-
-    private Point getAnchor(Feature feature) {
-        Geometry geom = feature.getGeometry();
-        return geom.getCentroid();
+    public static MockPointFeature createPoint(double x, double y){
+        Point pnt = geomFactory.createPoint(new Coordinate(x, y));
+        return new MockPointFeature(pnt);
     }
 }
