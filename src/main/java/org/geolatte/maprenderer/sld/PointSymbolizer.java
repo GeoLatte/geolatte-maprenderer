@@ -28,9 +28,9 @@ import net.opengis.se.v_1_1_0.PointSymbolizerType;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.sld.graphics.*;
 
-import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
@@ -64,56 +64,63 @@ public class PointSymbolizer extends AbstractSymbolizer {
     @Override
     public void symbolize(MapGraphics graphics, Geometry geometry) {
         Point point = getPoint(geometry);
-        symbolize(graphics, point, graphic);
-    }
-
-    private void symbolize(MapGraphics graphics, Point point, Graphic graphic) {
         for (MarkOrExternalGraphicHolder holder: graphic.getSources()){
-            try {
-                if (symbolize(graphics, point, graphic, holder)) return;
-            } catch (GraphicDrawException e) {
-                //TODO -- check exception handling policy.
-                throw new RuntimeException(e);
-            }
+            if (symbolize(graphics, point, holder)) return;
         }
     }
 
-    private boolean symbolize(MapGraphics graphics, Point point, Graphic graphic, MarkOrExternalGraphicHolder holder)
-            throws GraphicDrawException {
+    private boolean symbolize(MapGraphics graphics, Point point, MarkOrExternalGraphicHolder holder) {
         boolean success;
         if (holder.isExternalGraphic()) {
-            success = symbolize(graphics, point, graphic, holder.getExternalGrapic());
+            success = symbolize(graphics, point, holder.getExternalGrapic());
         } else {
-            success = symbolize(graphics, point, graphic, holder.getMark());
+            success = symbolize(graphics, point, holder.getMark());
         }
         return success;
     }
 
-    private boolean symbolize(MapGraphics graphics, Point point, Graphic graphic, Mark mark) {
-        return false; //TODO implement!
+    private boolean symbolize(MapGraphics graphics, Point point, Mark mark) {
+        //TODO implement!
+        throw new UnsupportedOperationException("Mark rendering to be implemented.");
     }
 
-    private boolean symbolize(MapGraphics graphics, Point point, Graphic graphic, ExternalGraphic externalGrapic) throws
-            GraphicDrawException {
+    private boolean symbolize(MapGraphics graphics, Point point, ExternalGraphic externalGraphic) {
+        BufferedImage image = null;
+        try {
+            image = getImageFromExternalGraphic(externalGraphic);
+        } catch (GraphicDrawException e) {
+            //TODO -- add logger for errors, and remember that this externalGraphic doesn't work !!
+            return false;
+        }
+        return drawImage(graphics, point, image);
+    }
+
+    private boolean drawImage(MapGraphics graphics, Point point, BufferedImage image) {
+        AffineTransform currentTransform = graphics.getTransform();
+        graphics.setTransform(new AffineTransform());
+        try {
+            AffineTransform pointTransform = getPointTransform(currentTransform, image, graphic);
+            Point2D dstPnt = determineAnchorPoint(point, pointTransform);
+            graphics.drawImage(image, (int)dstPnt.getX(), (int)dstPnt.getY(), (ImageObserver)null);
+        } finally {
+            graphics.setTransform(currentTransform);
+        }
+        return true;
+    }
+
+    private BufferedImage getImageFromExternalGraphic(ExternalGraphic externalGraphic) throws GraphicDrawException {
         GraphicSource gs = null;
         try {
-            gs = graphicsRepository.get(externalGrapic.getUrl());
+            gs = graphicsRepository.get(externalGraphic.getUrl());
         } catch (IOException e) {
             throw new GraphicDrawException(e);
         }
-        if (gs instanceof RenderedImageGraphicSource) {
-            AffineTransform currentTransform = graphics.getTransform();
-            RenderedImage image = (RenderedImage) gs.getGraphic();
-            graphics.setTransform(new AffineTransform());
-            try {
-                AffineTransform pointTransform = getPointTransform(currentTransform, image, graphic);
-                Point2D dstPnt = determineAnchorPoint(point, pointTransform);
-                graphics.drawImage((Image)image, (int)dstPnt.getX(), (int)dstPnt.getY(), (ImageObserver)null);
-            } finally {
-                graphics.setTransform(currentTransform);
-            }
+        if(gs instanceof RenderedImageGraphicSource) {
+            //TODO -- ensure we no longer have to cast to BufferedImage
+            return  (BufferedImage) gs.getGraphic();
         }
-        return true;
+        //TODO -- SVG rendering
+        throw new UnsupportedOperationException("Need to implement the SVG rendering");
     }
 
     /**
