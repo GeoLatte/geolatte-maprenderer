@@ -30,7 +30,6 @@ import org.geolatte.maprenderer.sld.graphics.*;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
@@ -72,14 +71,15 @@ public class PointSymbolizer extends AbstractSymbolizer {
         for (MarkOrExternalGraphicHolder holder: graphic.getSources()){
             try {
                 if (symbolize(graphics, point, graphic, holder)) return;
-            } catch (IOException e) {
+            } catch (GraphicDrawException e) {
                 //TODO -- check exception handling policy.
                 throw new RuntimeException(e);
             }
         }
     }
 
-    private boolean symbolize(MapGraphics graphics, Point point, Graphic graphic, MarkOrExternalGraphicHolder holder) throws IOException {
+    private boolean symbolize(MapGraphics graphics, Point point, Graphic graphic, MarkOrExternalGraphicHolder holder)
+            throws GraphicDrawException {
         boolean success;
         if (holder.isExternalGraphic()) {
             success = symbolize(graphics, point, graphic, holder.getExternalGrapic());
@@ -93,18 +93,22 @@ public class PointSymbolizer extends AbstractSymbolizer {
         return false; //TODO implement!
     }
 
-    private boolean symbolize(MapGraphics graphics, Point point, Graphic graphic, ExternalGraphic externalGrapic) throws IOException {
-        GraphicSource gs = graphicsRepository.get(externalGrapic.getUrl());
+    private boolean symbolize(MapGraphics graphics, Point point, Graphic graphic, ExternalGraphic externalGrapic) throws
+            GraphicDrawException {
+        GraphicSource gs = null;
+        try {
+            gs = graphicsRepository.get(externalGrapic.getUrl());
+        } catch (IOException e) {
+            throw new GraphicDrawException(e);
+        }
         if (gs instanceof RenderedImageGraphicSource) {
             AffineTransform currentTransform = graphics.getTransform();
             RenderedImage image = (RenderedImage) gs.getGraphic();
             graphics.setTransform(new AffineTransform());
             try {
-                AffineTransform inverseTx = currentTransform.createInverse();
-                Point2D dstPnt = determineAnchorPoint(point, inverseTx, graphic.getAnchorPoint(), image.getWidth(), image.getHeight());
+                AffineTransform pointTransform = getPointTransform(currentTransform, image, graphic);
+                Point2D dstPnt = determineAnchorPoint(point, pointTransform);
                 graphics.drawImage((Image)image, (int)dstPnt.getX(), (int)dstPnt.getY(), (ImageObserver)null);
-            } catch (NoninvertibleTransformException e) {
-                throw new RuntimeException(e);
             } finally {
                 graphics.setTransform(currentTransform);
             }
@@ -113,27 +117,24 @@ public class PointSymbolizer extends AbstractSymbolizer {
     }
 
     /**
-     * Determines the pixel on the <code>MapGraphics</code> where the image is to be drawn.
+     * Determines the transform of the anchorpoint from its geographic location to a pixel in the graphics' device
+     * space.
      *
      * <p>Not that SE specifies the anchorpoint in a coordinate system with origin in the lower-left
      * corner of the image, while java.awt.Graphics uses the top-left as origin</p>
-     *
-     *
-     *
-     * @param point - the point in map space coordinates
-     * @param inverseTx - the affine transform from map space to pixel space
-     * @param anchorPoint - the anchor point for the image
-     * @param width
-     *@param height @return
-     * @throws NoninvertibleTransformException
      */
-    private Point2D determineAnchorPoint(Point point, AffineTransform inverseTx, Point2D anchorPoint, int width, int height) throws NoninvertibleTransformException {
-       //TODO -add the anchorPoint translation to the affineTransform inverseTx, and
-        // split method into determineTransform and transformPoint
-        Point2D dstPnt = inverseTx.inverseTransform(new Point2D.Double(point.getX(), point.getY()), null);
-        double dX = dstPnt.getX() - anchorPoint.getX() * width;
-        double dY = dstPnt.getY() - (1- anchorPoint.getY()) * height;
-        return new Point2D.Double(dX, dY);
+    private AffineTransform getPointTransform(AffineTransform currentTransform, RenderedImage img, Graphic graphic) {
+        AffineTransform applyAnchorPoint = new AffineTransform();
+        Point2D anchorPoint = graphic.getAnchorPoint();
+        applyAnchorPoint.setToTranslation(
+                - anchorPoint.getX() * img.getWidth(),
+                - (1- anchorPoint.getY()) * img.getHeight());
+        applyAnchorPoint.concatenate(currentTransform);
+        return applyAnchorPoint;
+    }
+
+    private Point2D determineAnchorPoint(Point point, AffineTransform transform)  {
+        return transform.transform(new Point2D.Double(point.getX(), point.getY()), null);
     }
 
     private Point getPoint(Geometry geometry) {

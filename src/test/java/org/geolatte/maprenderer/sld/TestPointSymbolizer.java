@@ -42,26 +42,26 @@ import static org.junit.Assert.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 9/12/11
  */
-public class TestPointSymbolizer extends BaseFeatureTypeStyleTest{
+public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
 
     PointSymbolizer symbolizer;
     PointSymbolizerType type;
 
     @Before
-    public void before(){
+    public void before() {
         super.before();
         type = SLD.instance().read(xmlPointSymbolizer, PointSymbolizerType.class);
         symbolizer = new PointSymbolizer(type);
     }
 
     @Test
-    public void testGetGeometryProperty(){
+    public void testGetGeometryProperty() {
         assertEquals("point", symbolizer.getGeometryProperty());
     }
 
     @Test
     public void testGetGraphics() {
-        Graphic graphic  = symbolizer.getGraphic();
+        Graphic graphic = symbolizer.getGraphic();
         assertNotNull(graphic);
         assertEquals(4, graphic.getSize(), 0.00001f);
         assertEquals(2, graphic.getSources().size());
@@ -73,24 +73,48 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest{
     }
 
     @Test
-    public void testSymbolizerPNG() throws IOException, SpatialReferenceCreationException {
+    public void testSymbolizerCenterPng() throws IOException, SpatialReferenceCreationException {
         testCase(symbolizer, "point-bus-center.png");
     }
 
+    @Test
+    public void testSymbolizerGraphicPartiallyRenderedPng() throws IOException, SpatialReferenceCreationException {
+        testCase(symbolizer, 10000d, 5000d, "point-bus-right.png");
+    }
 
+    @Test
+    public void testAnchorPointToLowerLeft() throws IOException, SpatialReferenceCreationException {
+        symbolizer = getSymbolizer(xmlLowerLeftAnchorPoint);
+        testCase(symbolizer, "point-bus-anchorpoint-lower-left.png");
+    }
+
+    @Test
+    public void testAnchorPointToUpperRight() throws IOException, SpatialReferenceCreationException {
+        symbolizer = getSymbolizer(xmlUpperRightAnchorPoint);
+        testCase(symbolizer, "point-bus-anchorpoint-upper-right.png");
+    }
+
+
+    private void testCase(PointSymbolizer symbolizer, double x, double y, String testCaseName) throws SpatialReferenceCreationException, IOException {
+        MapGraphics g = createMapGraphics(100, 10000);
+        MockPointFeature feature = MockPointFeature.createPoint(x, y);
+        //a horizontal line in the middle of the image.
+        ShapeAdapter adapter = new ShapeAdapter(g.getTransform());
+        symbolizer.symbolize(g, feature.getGeometry());
+        RenderedImage img = g.createRendering();
+        TestSupport.writeImageToDisk(img, testCaseName, "PNG");
+        assertImageEquals("expected-" + testCaseName, img);
+    }
 
 
     private void testCase(PointSymbolizer symbolizer, String testCaseName) throws SpatialReferenceCreationException, IOException {
-           MapGraphics g = createMapGraphics(100, 10000);
-           //a horizontal line in the middle of the image.
-           MockPointFeature feature = MockPointFeature.createPoint(5000, 5000);
-           ShapeAdapter adapter = new ShapeAdapter(g.getTransform());
-           symbolizer.symbolize(g, feature.getGeometry());
-           RenderedImage img = g.createRendering();
-           TestSupport.writeImageToDisk(img, testCaseName, "PNG");
-           assertImageEquals("expected-" + testCaseName, img);
-       }
+        testCase(symbolizer, 5000d, 5000d, testCaseName);
+    }
 
+    private PointSymbolizer getSymbolizer(String name) {
+        PointSymbolizerType type = SLD.instance().read(name, PointSymbolizerType.class);
+        return new PointSymbolizer(type);
+    }
 
     String xmlPointSymbolizer =
             "<PointSymbolizer version=\"1.1.0\"" +
@@ -102,12 +126,49 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest{
                     "</Geometry>" +
                     "<Graphic>" +
                     "<ExternalGraphic>" +
-                        "<OnlineResource xlink:type=\"simple\" xlink:href=\"file://local.graphics/bus.png\"/>" +
+                    "<OnlineResource xlink:type=\"simple\" xlink:href=\"file://local.graphics/bus.png\"/>" +
                     "<Format>image/png</Format>" +
                     "</ExternalGraphic>" +
                     "<Mark/>" +
                     "<Size>4</Size>" +
                     "</Graphic>" +
-             "</PointSymbolizer>";
+                    "</PointSymbolizer>";
 
+    String xmlLowerLeftAnchorPoint = "<PointSymbolizer version=\"1.1.0\"" +
+                    "                  xmlns=\"http://www.opengis.net/se\"" +
+                    "                  xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
+                    "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
+                    "<Geometry>\n" +
+                    "    <ogc:PropertyName>\npoint\n</ogc:PropertyName>\n" +
+                    "</Geometry>" +
+                    "<Graphic>" +
+                    "<ExternalGraphic>" +
+                    "<OnlineResource xlink:type=\"simple\" xlink:href=\"file://local.graphics/bus.png\"/>" +
+                    "<Format>image/png</Format>" +
+                    "</ExternalGraphic>" +
+                    "<AnchorPoint>" +
+                        "<AnchorPointX>0</AnchorPointX>" +
+                        "<AnchorPointY>0</AnchorPointY>" +
+                    "</AnchorPoint>" +
+                    "</Graphic>" +
+                    "</PointSymbolizer>";
+
+        String xmlUpperRightAnchorPoint = "<PointSymbolizer version=\"1.1.0\"" +
+                    "                  xmlns=\"http://www.opengis.net/se\"" +
+                    "                  xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
+                    "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
+                    "<Geometry>\n" +
+                    "    <ogc:PropertyName>\npoint\n</ogc:PropertyName>\n" +
+                    "</Geometry>" +
+                    "<Graphic>" +
+                    "<ExternalGraphic>" +
+                    "<OnlineResource xlink:type=\"simple\" xlink:href=\"file://local.graphics/bus.png\"/>" +
+                    "<Format>image/png</Format>" +
+                    "</ExternalGraphic>" +
+                    "<AnchorPoint>" +
+                        "<AnchorPointX>1.0</AnchorPointX>" +
+                        "<AnchorPointY>1.0</AnchorPointY>" +
+                    "</AnchorPoint>" +
+                    "</Graphic>" +
+                    "</PointSymbolizer>";
 }
