@@ -27,6 +27,8 @@ import net.opengis.se.v_1_1_0.GraphicType;
 import net.opengis.se.v_1_1_0.PointSymbolizerType;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.sld.graphics.*;
+import org.w3c.dom.svg.SVGDocument;
+import org.w3c.dom.svg.SVGSVGElement;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -53,6 +55,8 @@ public class PointSymbolizer extends AbstractSymbolizer {
             new String[]{"graphics"}
     );
 
+    //TODO -- use memoization technique on calculated transforms + image resolutions
+
 
     public PointSymbolizer(PointSymbolizerType type) {
         super(type);
@@ -63,6 +67,7 @@ public class PointSymbolizer extends AbstractSymbolizer {
     @Override
     public void symbolize(MapGraphics graphics, Geometry geometry) {
         Point point = getPoint(geometry);
+        //TODO -- refinement: prefer the rendering of SVG images, then images, then marks
         for (MarkOrExternalGraphicHolder holder: graphic.getSources()){
             if (symbolize(graphics, point, holder)) return;
         }
@@ -86,7 +91,7 @@ public class PointSymbolizer extends AbstractSymbolizer {
     private boolean symbolize(MapGraphics graphics, Point point, ExternalGraphic externalGraphic) {
         BufferedImage image = null;
         try {
-            image = getImageFromExternalGraphic(externalGraphic);
+            image = getImageFromExternalGraphic(externalGraphic, graphic.getSize(), graphic.getRotation());
         } catch (GraphicDrawException e) {
             //TODO -- add logger for errors, and remember that this externalGraphic doesn't work !!
             return false;
@@ -107,7 +112,7 @@ public class PointSymbolizer extends AbstractSymbolizer {
         return true;
     }
 
-    private BufferedImage getImageFromExternalGraphic(ExternalGraphic externalGraphic) throws GraphicDrawException {
+    private BufferedImage getImageFromExternalGraphic(ExternalGraphic externalGraphic, float size, float rotation) throws GraphicDrawException {
         GraphicSource gs = null;
         try {
             gs = graphicsRepository.get(externalGraphic.getUrl());
@@ -118,8 +123,19 @@ public class PointSymbolizer extends AbstractSymbolizer {
             //TODO -- ensure we no longer have to cast to BufferedImage
             return  (BufferedImage) gs.getGraphic();
         }
-        //TODO -- SVG rendering
-        throw new UnsupportedOperationException("Need to implement the SVG rendering");
+        if (gs instanceof SVGDocumentGraphicSource) {
+            SVGTranscoder transcoder = new SVGTranscoder();
+            SVGDocument svg =(SVGDocument)gs.getGraphic();
+
+            SVGSVGElement svgRootElement = svg.getRootElement();
+            float svgWidth = svgRootElement.getWidth().getBaseVal().getValue();
+            float svgHeight = svgRootElement.getHeight().getBaseVal().getValue();
+            float aspectRatio = svgWidth/svgHeight;
+            int height = Math.round(size);
+            int width = (int)(aspectRatio * height);
+            return (BufferedImage) transcoder.transcode((SVGDocumentGraphicSource)gs, width, height);
+        }
+        throw new UnsupportedOperationException("Unsupported GraphicSource.");
     }
 
     /**
@@ -146,8 +162,8 @@ public class PointSymbolizer extends AbstractSymbolizer {
 
     private void applyDisplacement(Graphic graphic, AffineTransform transform) {
         Point2D displacement = graphic.getDisplacement();
-        transform.setToTranslation( transform.getTranslateX() + displacement.getX(),
-                transform.getTranslateY() -displacement.getY());
+        transform.setToTranslation(transform.getTranslateX() + displacement.getX(),
+                transform.getTranslateY() - displacement.getY());
     }
 
     private Point2D determineAnchorPoint(Point point, AffineTransform transform)  {

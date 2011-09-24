@@ -101,6 +101,12 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
         testCase(symbolizer, "point-bus-displacement.png");
     }
 
+    @Test
+    public void testSymbolizeSvg() throws IOException, SpatialReferenceCreationException {
+        symbolizer = getSymbolizer(xmlSVGGraphic);
+        testCase(symbolizer, "point-info-svg.png");
+    }
+
 
 
     private void testCase(PointSymbolizer symbolizer, double x, double y, String testCaseName) throws SpatialReferenceCreationException, IOException {
@@ -200,5 +206,22 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
                     "</Displacement>" +
                     "</Graphic>" +
                     "</PointSymbolizer>";
+
+        String xmlSVGGraphic = "<PointSymbolizer version=\"1.1.0\"" +
+                    "                  xmlns=\"http://www.opengis.net/se\"" +
+                    "                  xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
+                    "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
+                    "<Geometry>\n" +
+                    "    <ogc:PropertyName>\npoint\n</ogc:PropertyName>\n" +
+                    "</Geometry>" +
+                    "<Graphic>" +
+                    "<ExternalGraphic>" +
+                    "<OnlineResource xlink:type=\"simple\" xlink:href=\"file://local.graphics/information.svg\"/>" +
+                    "<Format>image/svg+xml</Format>" +
+                    "</ExternalGraphic>" +
+                    "<Size>10</Size>" +
+                    "</Graphic>" +
+                    "</PointSymbolizer>";
+
 
 }
