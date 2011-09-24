@@ -84,7 +84,7 @@ public class ExternalGraphicsRepository {
         ImageKey key = new ImageKey(url, size, rotation);
         BufferedImage image = getFromCache(key);
         if (image == null) {
-            image = retrieveScaleRotate(url, size, rotation);
+            image = rotate(retrieveScaled(url, size), rotation);
             storeInCache(key, image);
         }
         return image;
@@ -169,20 +169,42 @@ public class ExternalGraphicsRepository {
         throw new IOException("File " + path + " is neither image nor svg.");
     }
 
-    private BufferedImage retrieveScaleRotate(String url, float size, float rotation) throws IOException {
+    private BufferedImage retrieveScaled(String url, float size) throws IOException {
         //check if we have the image in default_size of
         BufferedImage unscaledImage = getFromCache(new ImageKey(url));
         if (unscaledImage != null) {
-            return scale(rotate(unscaledImage));
+            return scale(unscaledImage);
         }
         //check if we have it in the SVG Cache
         SVGDocument cachedSVG = this.svgCache.get(url);
         if (cachedSVG != null){
-            BufferedImage img = transCodeSVG(cachedSVG, size);
-            return rotate(img);
+            return transCodeSVG(cachedSVG, size);
         }
+        //if not, retrieve from URL.
+        HttpEntity entity = retrieveGraphicFromUrl(url);
+        if (contentTypeIsSVG(entity)) {
+            return SVGFromURLResponse(url, size, entity);
+        } else {
+            return scale(ImageFromURLResponse(url, entity));
+        }
+    }
 
-        //check if we have it
+    private BufferedImage ImageFromURLResponse(String url, HttpEntity entity) throws IOException {
+        BufferedImage img = ImageIO.read(entity.getContent());
+        if (img == null) throw new IOException("Response from " + url + " is not recognized as an image.");
+        //remember the default image (before rotating and scaling)
+        storeInCache(new ImageKey(url), img);
+        return img;
+    }
+
+    private BufferedImage SVGFromURLResponse(String url, float size, HttpEntity entity) throws IOException {
+        SVGDocument svg = SVGDocumentIO.read(url, entity.getContent());
+        if (svg == null) throw new IOException("Response from " + url + " is not recognized as SVG document.");
+        storeInSvgCache(url, svg);
+        return transCodeSVG(svg, size);
+    }
+
+    private HttpEntity retrieveGraphicFromUrl(String url) throws IOException {
         HttpGet httpGet = new HttpGet(url);
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = httpClient.execute(httpGet);
@@ -190,22 +212,10 @@ public class ExternalGraphicsRepository {
             throw new IOException("Can't retrieve image from " + url);
         }
 
-        HttpEntity entity = response.getEntity();
-        if (contentTypeIsSVG(entity)) {
-            SVGDocument svg = SVGDocumentIO.read(url, entity.getContent());
-            if (svg == null) throw new IOException("Response from " + url + " is not recognized as SVG document.");
-            storeInSvgCache(url, svg);
-            BufferedImage img = transCodeSVG(svg, size);
-            return rotate(img);
-
-        } else {
-            BufferedImage img = ImageIO.read(entity.getContent());
-            if (img == null) throw new IOException("Response from " + url + " is not recognized as an image.");
-            return img;
-        }
+        return response.getEntity();
     }
 
-    private BufferedImage rotate(BufferedImage img) {
+    private BufferedImage rotate(BufferedImage img, float rotation) {
         //TODO -- apply rotation
         return img;
     }
@@ -222,7 +232,6 @@ public class ExternalGraphicsRepository {
         int height = Math.round(size);
         int width = (int)(aspectRatio * height);
         return transcoder.transcode(svg, width, height);
-
     }
 
     private BufferedImage scale(BufferedImage unscaledImage) {

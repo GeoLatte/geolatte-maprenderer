@@ -26,7 +26,7 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
-import org.w3c.dom.svg.SVGDocument;
+import org.w3c.dom.svg.*;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -43,6 +43,14 @@ import java.io.IOException;
 public class SVGTranscoder {
 
 
+    /**
+     * Transcodes the specified <code>SVGDocument.</code>
+     *
+     * @param svg the input SVG Document
+     * @param width the width of the output image
+     * @param height the height of the output image
+     * @return
+     */
     public BufferedImage transcode(SVGDocument svg, int width, int height) {
         PNGTranscoder transcoder = prepareTranscoder(width, height);
         TranscoderInput input = new TranscoderInput(svg);
