@@ -25,14 +25,14 @@ import org.geolatte.test.ExpectedImages;
 import org.geolatte.test.TestSupport;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.svg.SVGDocument;
 
+import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 
-import static junit.framework.Assert.assertEquals;
 import static org.geolatte.test.TestSupport.assertImageEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -57,51 +57,39 @@ public class TestExternalGraphicsRepository {
 
     @Test
     public void testImageGraphicsReadFromClassPath() throws IOException {
-        GraphicSource source = repo.get("file://local.graphics/bus.png");
-        assertNotNull(source);
-
-        assertTrue(source instanceof RenderedImageGraphicSource);
-
+        BufferedImage image = repo.get("file://local.graphics/bus.png");
+        assertNotNull(image);
         RenderedImage expectedGraphic = ExpectedImages.getExpectedGraphic("bus.png");
-        assertImageEquals(expectedGraphic, (RenderedImage)source.getGraphic());
+        assertImageEquals(expectedGraphic, image);
 
     }
 
     @Test
     public void testSVGGraphicsReadFromClassPath() throws IOException {
-        GraphicSource source = repo.get("file://local.graphics/information.svg");
-        assertNotNull(source);
-        assertTrue(source instanceof SVGDocumentGraphicSource);
-        //TODO -- test for image equality (based on transcoding?).
+        SVGDocument svg = repo.getSVGFromCache("file://local.graphics/information.svg");
+        assertNotNull(svg);
     }
 
     @Test
     public void testGraphicsFromURL() throws IOException {
-        GraphicSource source = repo.get(EXT_GRAPHIC_IMAGE_URL);
-        assertNotNull(source);
-        assertTrue(source instanceof RenderedImageGraphicSource);
-        RenderedImage img1 = (RenderedImage)source.getGraphic();
-        TestSupport.writeImageToDisk(img1, "logo3w.png", "PNG"); // for visual check
+        BufferedImage image = repo.get(EXT_GRAPHIC_IMAGE_URL);
+        assertNotNull(image);
+        TestSupport.writeImageToDisk(image, "logo3w.png", "PNG"); // for visual check
 
         //Test that the image is in the cache
-        GraphicSource source2 = repo.getFromCache(EXT_GRAPHIC_IMAGE_URL);
-        assertNotNull(source2);
-        RenderedImage img2 = (RenderedImage) source2.getGraphic();
-        assertImageEquals(img1, img2);
+        BufferedImage fromCache = repo.getFromCache(new ExternalGraphicsRepository.ImageKey(EXT_GRAPHIC_IMAGE_URL));
+        assertNotNull(fromCache);
+        assertImageEquals(image, fromCache);
     }
 
     @Test
     public void testSVGGraphicsReadFromURL() throws IOException {
-        GraphicSource source1 = repo.get(EXT_GRAPHIC_SVG_URL);
-        assertNotNull(source1);
-        assertTrue(source1 instanceof SVGDocumentGraphicSource);
-        //TODO -- test for image equality (based on transcoding?).
+        BufferedImage img = repo.get(EXT_GRAPHIC_SVG_URL);
+        assertNotNull(img);
 
         //Test that the image is in the cache
-        GraphicSource source2 = repo.getFromCache(EXT_GRAPHIC_SVG_URL);
-        assertNotNull(source2);
-        assertEquals(source1.getGraphic(), source2.getGraphic());
-
+        SVGDocument svg = repo.getSVGFromCache(EXT_GRAPHIC_SVG_URL);
+        assertNotNull(svg);
     }
 
     @Test
@@ -130,14 +118,14 @@ public class TestExternalGraphicsRepository {
     public void testStoringNullValuesInRepoFails() throws IOException {
         RenderedImage expectedGraphic = ExpectedImages.getExpectedGraphic("bus.png");
         try {
-            repo.storeInCache(null, new RenderedImageGraphicSource(expectedGraphic));
+            repo.storeInCache(null, (BufferedImage)expectedGraphic);
             fail();
         } catch (IllegalArgumentException e) {
             //OK
         }
 
         try {
-            repo.storeInCache("key", null);
+            repo.storeInCache(new ExternalGraphicsRepository.ImageKey("key"), null);
             fail();
         } catch (IllegalArgumentException e) {
             //OK

@@ -48,8 +48,9 @@ public class Graphic {
     private final float rotation;
     private final Point2D displacement;
     private final Point2D anchorPoint;
+    private boolean isSizeSet = false;
 
-     //TODO -- improve reporting of XML parsing errors (e.g. formatting errors)
+    //TODO -- improve reporting of XML parsing errors (e.g. formatting errors)
 
     public Graphic(GraphicType type) {
         sources = new ArrayList<MarkOrExternalGraphicHolder>();
@@ -130,6 +131,8 @@ public class Graphic {
     private float readSize(ParameterValueType size) {
         if (size == null) return DEFAULT_SIZE;
         String value = SLD.instance().extractParameterValue(size);
+        if (value.isEmpty()) return DEFAULT_SIZE;
+        isSizeSet = true;
         return Float.parseFloat(value);
     }
 
@@ -145,5 +148,9 @@ public class Graphic {
 
     private Point2D readAnchorPoint(AnchorPointType anchorPoint) {
         return SLD.instance().readAnchorPoint(anchorPoint);
+    }
+
+    public boolean isSizeSet() {
+        return isSizeSet;
     }
 }

@@ -27,8 +27,6 @@ import net.opengis.se.v_1_1_0.GraphicType;
 import net.opengis.se.v_1_1_0.PointSymbolizerType;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.sld.graphics.*;
-import org.w3c.dom.svg.SVGDocument;
-import org.w3c.dom.svg.SVGSVGElement;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -54,9 +52,6 @@ public class PointSymbolizer extends AbstractSymbolizer {
     final private ExternalGraphicsRepository graphicsRepository = new ExternalGraphicsRepository(
             new String[]{"graphics"}
     );
-
-    //TODO -- use memoization technique on calculated transforms + image resolutions
-
 
     public PointSymbolizer(PointSymbolizerType type) {
         super(type);
@@ -113,29 +108,28 @@ public class PointSymbolizer extends AbstractSymbolizer {
     }
 
     private BufferedImage getImageFromExternalGraphic(ExternalGraphic externalGraphic, float size, float rotation) throws GraphicDrawException {
-        GraphicSource gs = null;
         try {
-            gs = graphicsRepository.get(externalGraphic.getUrl());
+            return graphicsRepository.get(externalGraphic.getUrl(), size, rotation);
         } catch (IOException e) {
             throw new GraphicDrawException(e);
         }
-        if(gs instanceof RenderedImageGraphicSource) {
-            //TODO -- ensure we no longer have to cast to BufferedImage
-            return  (BufferedImage) gs.getGraphic();
-        }
-        if (gs instanceof SVGDocumentGraphicSource) {
-            SVGTranscoder transcoder = new SVGTranscoder();
-            SVGDocument svg =(SVGDocument)gs.getGraphic();
-
-            SVGSVGElement svgRootElement = svg.getRootElement();
-            float svgWidth = svgRootElement.getWidth().getBaseVal().getValue();
-            float svgHeight = svgRootElement.getHeight().getBaseVal().getValue();
-            float aspectRatio = svgWidth/svgHeight;
-            int height = Math.round(size);
-            int width = (int)(aspectRatio * height);
-            return (BufferedImage) transcoder.transcode((SVGDocumentGraphicSource)gs, width, height);
-        }
-        throw new UnsupportedOperationException("Unsupported GraphicSource.");
+//        if(gs instanceof RenderedImageGraphicSource) {
+//            //TODO -- ensure we no longer have to cast to BufferedImage
+//            return  (BufferedImage) gs.getGraphic();
+//        }
+//        if (gs instanceof SVGDocumentGraphicSource) {
+//            SVGTranscoder transcoder = new SVGTranscoder();
+//            SVGDocument svg =(SVGDocument)gs.getGraphic();
+//
+//            SVGSVGElement svgRootElement = svg.getRootElement();
+//            float svgWidth = svgRootElement.getWidth().getBaseVal().getValue();
+//            float svgHeight = svgRootElement.getHeight().getBaseVal().getValue();
+//            float aspectRatio = svgWidth/svgHeight;
+//            int height = Math.round(size);
+//            int width = (int)(aspectRatio * height);
+//            return (BufferedImage) transcoder.transcode((SVGDocumentGraphicSource)gs, width, height);
+//        }
+//        throw new UnsupportedOperationException("Unsupported GraphicSource.");
     }
 
     /**

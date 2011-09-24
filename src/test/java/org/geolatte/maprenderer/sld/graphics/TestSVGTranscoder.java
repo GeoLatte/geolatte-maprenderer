@@ -22,6 +22,7 @@
 package org.geolatte.maprenderer.sld.graphics;
 
 import org.junit.Test;
+import org.w3c.dom.svg.SVGDocument;
 
 import java.awt.image.RenderedImage;
 import java.io.IOException;
@@ -30,7 +31,6 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static org.geolatte.test.TestSupport.assertImageEquals;
 import static org.geolatte.test.TestSupport.writeImageToDisk;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -46,17 +46,17 @@ public class TestSVGTranscoder {
 
     @Test
     public void testTranscodingImage() throws IOException {
-        GraphicSource source = repo.get(SVG_SRC);
-        assertTrue(source instanceof SVGDocumentGraphicSource);
+        SVGDocument source = repo.getSVGFromCache(SVG_SRC);
+        assertNotNull(source);
 
         SVGTranscoder transcoder = new SVGTranscoder();
-        RenderedImage img = transcoder.transcode((SVGDocumentGraphicSource)source, 62, 65);
+        RenderedImage img = transcoder.transcode(source, 62, 65);
         assertNotNull(img);
         assertEquals(62, img.getWidth());
         assertEquals(65, img.getHeight());
 
         writeImageToDisk(img, "information.png", "PNG");
-        assertImageEquals((RenderedImage)repo.get(PNG_SRC).getGraphic(), img);
+        assertImageEquals(repo.get(PNG_SRC), img);
 
 
     }

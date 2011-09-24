@@ -122,6 +122,16 @@ public class TestGraphic {
         assertEquals(new Point2D.Float(0.5f, 0.5f), defaultGraphic.getAnchorPoint());
     }
 
+    @Test
+    public void testSizeIsSet(){
+        assertTrue(graphic.isSizeSet());
+    }
+
+    @Test
+    public void testSizeDefaultNotSet(){
+        assertFalse(defaultGraphic.isSizeSet());
+    }
+
     private static String xmlFullyDefinedGraphic =
             "<Graphic version=\"1.1.0\"" +
                     "                  xmlns=\"http://www.opengis.net/se\"" +
