@@ -32,6 +32,7 @@ import org.geolatte.test.TestSupport;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 
@@ -94,13 +95,22 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
         testCase(symbolizer, "point-bus-anchorpoint-upper-right.png");
     }
 
+    @Test
+    public void testDisplacement() throws IOException, SpatialReferenceCreationException {
+        symbolizer = getSymbolizer(xmlDisplacement);
+        testCase(symbolizer, "point-bus-displacement.png");
+    }
+
+
 
     private void testCase(PointSymbolizer symbolizer, double x, double y, String testCaseName) throws SpatialReferenceCreationException, IOException {
         MapGraphics g = createMapGraphics(100, 10000);
         MockPointFeature feature = MockPointFeature.createPoint(x, y);
         //a horizontal line in the middle of the image.
         ShapeAdapter adapter = new ShapeAdapter(g.getTransform());
+        AffineTransform originalTransform = g.getTransform();
         symbolizer.symbolize(g, feature.getGeometry());
+        assertEquals("Test that symbolizer restores always the original transform", originalTransform, g.getTransform());
         RenderedImage img = g.createRendering();
         TestSupport.writeImageToDisk(img, testCaseName, "PNG");
         assertImageEquals("expected-" + testCaseName, img);
@@ -171,4 +181,24 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
                     "</AnchorPoint>" +
                     "</Graphic>" +
                     "</PointSymbolizer>";
+
+        String xmlDisplacement = "<PointSymbolizer version=\"1.1.0\"" +
+                    "                  xmlns=\"http://www.opengis.net/se\"" +
+                    "                  xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
+                    "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
+                    "<Geometry>\n" +
+                    "    <ogc:PropertyName>\npoint\n</ogc:PropertyName>\n" +
+                    "</Geometry>" +
+                    "<Graphic>" +
+                    "<ExternalGraphic>" +
+                    "<OnlineResource xlink:type=\"simple\" xlink:href=\"file://local.graphics/bus.png\"/>" +
+                    "<Format>image/png</Format>" +
+                    "</ExternalGraphic>" +
+                    "<Displacement>" +
+                        "<DisplacementX>10</DisplacementX>" +
+                        "<DisplacementY>20</DisplacementY>" +
+                    "</Displacement>" +
+                    "</Graphic>" +
+                    "</PointSymbolizer>";
+
 }

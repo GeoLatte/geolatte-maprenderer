@@ -32,7 +32,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
-import java.awt.image.RenderedImage;
 import java.io.IOException;
 
 /**
@@ -97,8 +96,8 @@ public class PointSymbolizer extends AbstractSymbolizer {
 
     private boolean drawImage(MapGraphics graphics, Point point, BufferedImage image) {
         AffineTransform currentTransform = graphics.getTransform();
-        graphics.setTransform(new AffineTransform());
         try {
+            graphics.setTransform(new AffineTransform());
             AffineTransform pointTransform = getPointTransform(currentTransform, image, graphic);
             Point2D dstPnt = determineAnchorPoint(point, pointTransform);
             graphics.drawImage(image, (int)dstPnt.getX(), (int)dstPnt.getY(), (ImageObserver)null);
@@ -130,14 +129,25 @@ public class PointSymbolizer extends AbstractSymbolizer {
      * <p>Not that SE specifies the anchorpoint in a coordinate system with origin in the lower-left
      * corner of the image, while java.awt.Graphics uses the top-left as origin</p>
      */
-    private AffineTransform getPointTransform(AffineTransform currentTransform, RenderedImage img, Graphic graphic) {
-        AffineTransform applyAnchorPoint = new AffineTransform();
+    private AffineTransform getPointTransform(AffineTransform currentTransform, BufferedImage img, Graphic graphic) {
+        AffineTransform transform = new AffineTransform();
+        applyAnchorPointTranslation(img, graphic, transform);
+        applyDisplacement(graphic, transform);
+        transform.concatenate(currentTransform);
+        return transform;
+    }
+
+    private void applyAnchorPointTranslation(BufferedImage img, Graphic graphic, AffineTransform transform) {
         Point2D anchorPoint = graphic.getAnchorPoint();
-        applyAnchorPoint.setToTranslation(
-                - anchorPoint.getX() * img.getWidth(),
-                - (1- anchorPoint.getY()) * img.getHeight());
-        applyAnchorPoint.concatenate(currentTransform);
-        return applyAnchorPoint;
+        transform.setToTranslation(
+                -anchorPoint.getX() * img.getWidth(),
+                -(1 - anchorPoint.getY()) * img.getHeight());
+    }
+
+    private void applyDisplacement(Graphic graphic, AffineTransform transform) {
+        Point2D displacement = graphic.getDisplacement();
+        transform.setToTranslation( transform.getTranslateX() + displacement.getX(),
+                transform.getTranslateY() -displacement.getY());
     }
 
     private Point2D determineAnchorPoint(Point point, AffineTransform transform)  {
