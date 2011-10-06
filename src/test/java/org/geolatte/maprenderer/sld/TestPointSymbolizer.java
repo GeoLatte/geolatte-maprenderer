@@ -64,7 +64,8 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
     public void testGetGraphics() {
         Graphic graphic = symbolizer.getGraphic();
         assertNotNull(graphic);
-        assertEquals(4, graphic.getSize(), 0.00001f);
+        assertEquals(16, graphic.getSize(), 0.00001f);
+        assertFalse(graphic.isSizeSet());
         assertEquals(2, graphic.getSources().size());
         MarkOrExternalGraphicHolder holder = graphic.getSources().get(0);
         assertTrue(holder.isExternalGraphic());
@@ -107,6 +108,13 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
         testCase(symbolizer, "point-info-svg.png");
     }
 
+    @Test
+    public void testScalePNG() throws IOException, SpatialReferenceCreationException {
+        symbolizer = getSymbolizer(xmlScale);
+        assertEquals(74f, symbolizer.getGraphic().getSize(), 0.0001f);
+        testCase(symbolizer, "point-bus-scale.png");
+    }
+
 
 
     private void testCase(PointSymbolizer symbolizer, double x, double y, String testCaseName) throws SpatialReferenceCreationException, IOException {
@@ -146,7 +154,6 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
                     "<Format>image/png</Format>" +
                     "</ExternalGraphic>" +
                     "<Mark/>" +
-                    "<Size>4</Size>" +
                     "</Graphic>" +
                     "</PointSymbolizer>";
 
@@ -220,6 +227,23 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
                     "<Format>image/svg+xml</Format>" +
                     "</ExternalGraphic>" +
                     "<Size>10</Size>" +
+                    "</Graphic>" +
+                    "</PointSymbolizer>";
+
+        String xmlScale =
+                "<PointSymbolizer version=\"1.1.0\"" +
+                    "                  xmlns=\"http://www.opengis.net/se\"" +
+                    "                  xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
+                    "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
+                    "<Geometry>\n" +
+                    "    <ogc:PropertyName>\npoint\n</ogc:PropertyName>\n" +
+                    "</Geometry>" +
+                    "<Graphic>" +
+                    "<ExternalGraphic>" +
+                    "<OnlineResource xlink:type=\"simple\" xlink:href=\"file://local.graphics/bus.png\"/>" +
+                    "<Format>image/png</Format>" +
+                    "</ExternalGraphic>" +
+                    "<Size>74</Size>" +
                     "</Graphic>" +
                     "</PointSymbolizer>";
 

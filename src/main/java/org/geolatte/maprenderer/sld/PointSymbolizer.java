@@ -86,7 +86,7 @@ public class PointSymbolizer extends AbstractSymbolizer {
     private boolean symbolize(MapGraphics graphics, Point point, ExternalGraphic externalGraphic) {
         BufferedImage image = null;
         try {
-            image = getImageFromExternalGraphic(externalGraphic, graphic.getSize(), graphic.getRotation());
+            image = getImageFromExternalGraphic(externalGraphic, graphic.getSize(), graphic.getRotation(), graphic.isSizeSet());
         } catch (GraphicDrawException e) {
             //TODO -- add logger for errors, and remember that this externalGraphic doesn't work !!
             return false;
@@ -107,29 +107,12 @@ public class PointSymbolizer extends AbstractSymbolizer {
         return true;
     }
 
-    private BufferedImage getImageFromExternalGraphic(ExternalGraphic externalGraphic, float size, float rotation) throws GraphicDrawException {
+    private BufferedImage getImageFromExternalGraphic(ExternalGraphic externalGraphic, float size, float rotation, boolean sizeSet) throws GraphicDrawException {
         try {
-            return graphicsRepository.get(externalGraphic.getUrl(), size, rotation);
+            return graphicsRepository.get(externalGraphic.getUrl(), size, rotation, sizeSet);
         } catch (IOException e) {
             throw new GraphicDrawException(e);
         }
-//        if(gs instanceof RenderedImageGraphicSource) {
-//            //TODO -- ensure we no longer have to cast to BufferedImage
-//            return  (BufferedImage) gs.getGraphic();
-//        }
-//        if (gs instanceof SVGDocumentGraphicSource) {
-//            SVGTranscoder transcoder = new SVGTranscoder();
-//            SVGDocument svg =(SVGDocument)gs.getGraphic();
-//
-//            SVGSVGElement svgRootElement = svg.getRootElement();
-//            float svgWidth = svgRootElement.getWidth().getBaseVal().getValue();
-//            float svgHeight = svgRootElement.getHeight().getBaseVal().getValue();
-//            float aspectRatio = svgWidth/svgHeight;
-//            int height = Math.round(size);
-//            int width = (int)(aspectRatio * height);
-//            return (BufferedImage) transcoder.transcode((SVGDocumentGraphicSource)gs, width, height);
-//        }
-//        throw new UnsupportedOperationException("Unsupported GraphicSource.");
     }
 
     /**

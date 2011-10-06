@@ -32,6 +32,9 @@ import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGSVGElement;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -77,14 +80,17 @@ public class ExternalGraphicsRepository {
     }
 
     public BufferedImage get(String url) throws IOException {
-        return get(url, DEFAULT_SIZE, DEFAULT_ROTATION);
+        return get(url, DEFAULT_SIZE, DEFAULT_ROTATION, false);
     }
 
-    public BufferedImage get(String url, float size, float rotation) throws IOException {
+    public BufferedImage get(String url, float size, float rotation, boolean sizeSet) throws IOException {
         ImageKey key = new ImageKey(url, size, rotation);
         BufferedImage image = getFromCache(key);
         if (image == null) {
-            image = rotate(retrieveScaled(url, size), rotation);
+            image = retrieve(url, size, sizeSet);
+            if (rotation != 0) {
+                image = rotate(image, rotation);
+            }
             storeInCache(key, image);
         }
         return image;
@@ -169,11 +175,23 @@ public class ExternalGraphicsRepository {
         throw new IOException("File " + path + " is neither image nor svg.");
     }
 
-    private BufferedImage retrieveScaled(String url, float size) throws IOException {
+    /**
+     * Retrieves the image from specified URL.
+     *
+     * If the url points to an SVG, the SVG is rendered at the specified size. If the
+     * url points to an bitmap image, then the image is scaled to size only if sizeSet is true.
+     *
+     * @param url URL to the graphic source.
+     * @param size size at which to render the image (for SVG) or to which to scale (if sizeSet)
+     * @param sizeSet whether or not a specific size is explicitly requested for the image
+     * @return
+     * @throws IOException
+     */
+    private BufferedImage retrieve(String url, float size, boolean sizeSet) throws IOException {
         //check if we have the image in default_size of
         BufferedImage unscaledImage = getFromCache(new ImageKey(url));
         if (unscaledImage != null) {
-            return scale(unscaledImage);
+            return sizeSet ? scale(unscaledImage, size) : unscaledImage;
         }
         //check if we have it in the SVG Cache
         SVGDocument cachedSVG = this.svgCache.get(url);
@@ -185,7 +203,7 @@ public class ExternalGraphicsRepository {
         if (contentTypeIsSVG(entity)) {
             return SVGFromURLResponse(url, size, entity);
         } else {
-            return scale(ImageFromURLResponse(url, entity));
+            return scale(ImageFromURLResponse(url, entity), size);
         }
     }
 
@@ -228,15 +246,27 @@ public class ExternalGraphicsRepository {
         SVGSVGElement svgRootElement = svg.getRootElement();
         float svgWidth = svgRootElement.getWidth().getBaseVal().getValue();
         float svgHeight = svgRootElement.getHeight().getBaseVal().getValue();
-        float aspectRatio = svgWidth/svgHeight;
-        int height = Math.round(size);
-        int width = (int)(aspectRatio * height);
-        return transcoder.transcode(svg, width, height);
+//        float aspectRatio = svgWidth/svgHeight;
+//        int height = Math.round(size);
+//        int width = (int)(aspectRatio * height);
+        Dimension dim = getWidthAndHeight(svgWidth, svgHeight, size);
+        return transcoder.transcode(svg, dim.width, dim.height);
     }
 
-    private BufferedImage scale(BufferedImage unscaledImage) {
-        //TODO -- apply scaling and buffering
-        return unscaledImage;
+    private BufferedImage scale(BufferedImage unscaledImage, float size) {
+        Dimension dim = getWidthAndHeight(unscaledImage.getWidth(), unscaledImage.getHeight(), size);
+        AffineTransform tx = new AffineTransform();
+        tx.scale(((double)dim.width / unscaledImage.getWidth()), ((double)dim.height) / unscaledImage.getHeight());
+        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BICUBIC);
+        return op.filter(unscaledImage, null);
+    }
+
+    private Dimension getWidthAndHeight(float originalWidth, float originalHeight, float newSize){
+        float aspectRatio = originalWidth/originalHeight;
+        Dimension dim;
+        int height = Math.round(newSize);
+        int width = (int)(aspectRatio * height);
+        return new Dimension(width, height);
     }
 
     private boolean contentTypeIsSVG(HttpEntity entity) {
