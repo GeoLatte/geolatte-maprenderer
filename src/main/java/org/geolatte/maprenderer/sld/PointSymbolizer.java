@@ -99,7 +99,7 @@ public class PointSymbolizer extends AbstractSymbolizer {
         try {
             graphics.setTransform(new AffineTransform());
             AffineTransform pointTransform = getPointTransform(currentTransform, image, graphic);
-            Point2D dstPnt = determineAnchorPoint(point, pointTransform);
+            Point2D dstPnt = applyTransform(point, pointTransform);
             graphics.drawImage(image, (int)dstPnt.getX(), (int)dstPnt.getY(), (ImageObserver)null);
         } finally {
             graphics.setTransform(currentTransform);
@@ -143,7 +143,7 @@ public class PointSymbolizer extends AbstractSymbolizer {
                 transform.getTranslateY() - displacement.getY());
     }
 
-    private Point2D determineAnchorPoint(Point point, AffineTransform transform)  {
+    private Point2D applyTransform(Point point, AffineTransform transform)  {
         return transform.transform(new Point2D.Double(point.getX(), point.getY()), null);
     }
 

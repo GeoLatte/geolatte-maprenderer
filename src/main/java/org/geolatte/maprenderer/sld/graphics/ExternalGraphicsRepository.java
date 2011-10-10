@@ -234,8 +234,14 @@ public class ExternalGraphicsRepository {
     }
 
     private BufferedImage rotate(BufferedImage img, float rotation) {
-        //TODO -- apply rotation
-        return img;
+        AffineTransform tx = new AffineTransform();
+        //determine center point of image
+        int sx = img.getMinX() + img.getWidth()/2;
+        int sy = img.getMinY() + img.getHeight()/2;
+        double theta = Math.toRadians(rotation);
+        tx.rotate(theta, sx, sy);
+        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+        return op.filter(img, null);
     }
 
     private BufferedImage transCodeSVG(SVGDocument svg, float size){

@@ -115,6 +115,19 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
         testCase(symbolizer, "point-bus-scale.png");
     }
 
+    @Test
+    public void testRotatePNG() throws IOException, SpatialReferenceCreationException {
+        symbolizer = getSymbolizer(xmlRotate);
+        assertEquals(90f, symbolizer.getGraphic().getRotation(), 0.0001f);
+        testCase(symbolizer, "point-bus-rotate.png");
+    }
+
+    @Test
+    public void testRotateSVG() throws IOException, SpatialReferenceCreationException {
+        symbolizer = getSymbolizer(xmlSVGGraphicRotate);
+        assertEquals(90f, symbolizer.getGraphic().getRotation(), 0.0001f);
+        testCase(symbolizer, "point-info-svg-rotate.png");
+    }
 
 
     private void testCase(PointSymbolizer symbolizer, double x, double y, String testCaseName) throws SpatialReferenceCreationException, IOException {
@@ -246,6 +259,41 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
                     "<Size>74</Size>" +
                     "</Graphic>" +
                     "</PointSymbolizer>";
+
+        String xmlRotate =
+            "<PointSymbolizer version=\"1.1.0\"" +
+                "                  xmlns=\"http://www.opengis.net/se\"" +
+                "                  xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
+                "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
+                "<Geometry>\n" +
+                "    <ogc:PropertyName>\npoint\n</ogc:PropertyName>\n" +
+                "</Geometry>" +
+                "<Graphic>" +
+                "<ExternalGraphic>" +
+                "<OnlineResource xlink:type=\"simple\" xlink:href=\"file://local.graphics/bus.png\"/>" +
+                "<Format>image/png</Format>" +
+                "</ExternalGraphic>" +
+                "<Rotation>90.0</Rotation>" +
+                "</Graphic>" +
+                "</PointSymbolizer>";
+
+        String xmlSVGGraphicRotate = "<PointSymbolizer version=\"1.1.0\"" +
+                    "                  xmlns=\"http://www.opengis.net/se\"" +
+                    "                  xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
+                    "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
+                    "<Geometry>\n" +
+                    "    <ogc:PropertyName>\npoint\n</ogc:PropertyName>\n" +
+                    "</Geometry>" +
+                    "<Graphic>" +
+                    "<ExternalGraphic>" +
+                    "<OnlineResource xlink:type=\"simple\" xlink:href=\"file://local.graphics/information.svg\"/>" +
+                    "<Format>image/svg+xml</Format>" +
+                    "</ExternalGraphic>" +
+                    "<Size>40</Size>" +
+                    "<Rotation>90.0</Rotation>" +
+                    "</Graphic>" +
+                    "</PointSymbolizer>";
+
 
 
 }
