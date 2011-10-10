@@ -28,6 +28,7 @@ import net.opengis.se.v_1_1_0.PointSymbolizerType;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.sld.graphics.*;
 
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -95,16 +96,25 @@ public class PointSymbolizer extends AbstractSymbolizer {
     }
 
     private boolean drawImage(MapGraphics graphics, Point point, BufferedImage image) {
+        //remember transform
         AffineTransform currentTransform = graphics.getTransform();
         try {
             graphics.setTransform(new AffineTransform());
             AffineTransform pointTransform = getPointTransform(currentTransform, image, graphic);
             Point2D dstPnt = applyTransform(point, pointTransform);
+            applyOpacity(graphics);
             graphics.drawImage(image, (int)dstPnt.getX(), (int)dstPnt.getY(), (ImageObserver)null);
         } finally {
+            // restore transform
             graphics.setTransform(currentTransform);
         }
         return true;
+    }
+
+    private void applyOpacity(MapGraphics graphics) {
+        if (graphic.getOpacity() < 1.0f) {
+            graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, graphic.getOpacity()));
+        }
     }
 
     private BufferedImage getImageFromExternalGraphic(ExternalGraphic externalGraphic, float size, float rotation, boolean sizeSet) throws GraphicDrawException {

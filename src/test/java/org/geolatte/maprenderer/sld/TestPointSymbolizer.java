@@ -129,6 +129,13 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
         testCase(symbolizer, "point-info-svg-rotate.png");
     }
 
+    @Test
+    public void testOpacityPNG() throws IOException, SpatialReferenceCreationException {
+        symbolizer = getSymbolizer(xmlOpacity);
+        assertEquals(0.5f, symbolizer.getGraphic().getOpacity(), 0.00001f);
+        testCase(symbolizer, "point-bus-opacity.png");
+    }
+
 
     private void testCase(PointSymbolizer symbolizer, double x, double y, String testCaseName) throws SpatialReferenceCreationException, IOException {
         MapGraphics g = createMapGraphics(100, 10000);
@@ -293,6 +300,24 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
                     "<Rotation>90.0</Rotation>" +
                     "</Graphic>" +
                     "</PointSymbolizer>";
+
+        String xmlOpacity =
+                "<PointSymbolizer version=\"1.1.0\"" +
+                                   "                  xmlns=\"http://www.opengis.net/se\"" +
+                                   "                  xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
+                                   "                  xmlns:ogc=\"http://www.opengis.net/ogc\">" +
+                                   "<Geometry>\n" +
+                                   "    <ogc:PropertyName>\npoint\n</ogc:PropertyName>\n" +
+                                   "</Geometry>" +
+                                   "<Graphic>" +
+                                   "<ExternalGraphic>" +
+                                   "<OnlineResource xlink:type=\"simple\" xlink:href=\"file://local.graphics/bus.png\"/>" +
+                                   "<Format>image/png</Format>" +
+                                   "</ExternalGraphic>" +
+                                   "<Opacity>0.5</Opacity>" +
+                                   "</Graphic>" +
+                                   "</PointSymbolizer>";
+
 
 
 
