@@ -120,8 +120,9 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <!-- Must be version > 2.7 because of issue http://jira.codehaus.org/browse/SUREFIRE-482 -->
+                <version>2.7</version>
                 <configuration>
-                    <skip>true</skip>
                 </configuration>
             </plugin>
         </plugins>

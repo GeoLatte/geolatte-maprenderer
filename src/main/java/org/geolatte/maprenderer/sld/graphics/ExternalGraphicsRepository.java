@@ -60,8 +60,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ExternalGraphicsRepository {
 
-    public final static float DEFAULT_SIZE = -1f;  //Negative size to signal that no scaling needs to occur.
-    public final static float DEFAULT_SVG_SIZE = 16f; //default rendering size for SVG
+    public final static float DEFAULT_SIZE = 16f;
     public final static float DEFAULT_ROTATION = 0f;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ExternalGraphicsRepository.class);
@@ -246,7 +245,7 @@ public class ExternalGraphicsRepository {
 
     private BufferedImage transCodeSVG(SVGDocument svg, float size){
         if (size < 0) {
-            size = DEFAULT_SVG_SIZE;
+            size = DEFAULT_SIZE;
         }
         SVGTranscoder transcoder = new SVGTranscoder();
         SVGSVGElement svgRootElement = svg.getRootElement();
