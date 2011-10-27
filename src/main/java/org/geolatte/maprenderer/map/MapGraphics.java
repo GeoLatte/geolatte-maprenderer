@@ -45,6 +45,6 @@ public abstract class MapGraphics extends Graphics2D {
 
     abstract public void setToExtent(SpatialExtent extent);
 
-    abstract public double getMetersPerPixel();
+    abstract public double getMapUnitsPerPixel();
 
 }

@@ -73,7 +73,7 @@ public class Rule  {
     public boolean withinScaleBounds(MapGraphics graphics) {
         //TODO -take account of real pixelsizes.
         double actualPixelSize = getActualPixelSizeInMeters(graphics);
-        double metersPerPixel = graphics.getMetersPerPixel();
+        double metersPerPixel = graphics.getMapUnitsPerPixel();
         double actualScaleDenominator = metersPerPixel / actualPixelSize;
         double multiplier = STND_PIXEL_SIZE_IN_M / actualPixelSize;
         double standardScaleDenominator = multiplier * actualScaleDenominator;

@@ -37,12 +37,11 @@ import java.util.Map;
 
 public class JAIMapGraphics extends MapGraphics {
 
-    private static final int IMAGE_TYPE = BufferedImage.TYPE_INT_ARGB;
     private static final boolean OPTIMIZE_FOR_QUALITY = true;
 
     private final static Color DEFAULT_BACKGROUND_COLOR = new Color(1.0f, 1.0f, 1.0f, 0.0f);
 
-    private double metersPerPixel;
+    private double mapUnitsPerPixel;
     private final int width;
     private final int height;
     private Graphics2D g2;
@@ -134,7 +133,7 @@ public class JAIMapGraphics extends MapGraphics {
         AffineTransform atf = new AffineTransform();
         double sx = width / extent.getWidth();
         double sy = height / extent.getHeight();
-        this.metersPerPixel = Math.max(1 / sx, 1 / sy);
+        this.mapUnitsPerPixel = Math.max(1 / sx, 1 / sy);
         //we don't maintain aspect-ratio here!
         atf.scale(sx, -sy);
         atf.translate(-extent.getMinX(), -extent.getMaxY());
@@ -153,9 +152,8 @@ public class JAIMapGraphics extends MapGraphics {
 
 
     @Override
-    public double getMetersPerPixel() {
-        //TODO - determine map units from SRID (when available) and convert to meters when necessary
-        return this.metersPerPixel;
+    public double getMapUnitsPerPixel() {
+        return this.mapUnitsPerPixel;
     }
 
     @Override
@@ -376,19 +374,19 @@ public class JAIMapGraphics extends MapGraphics {
         if (s instanceof PerpendicularOffsetStroke) {
             PerpendicularOffsetStroke orig = (PerpendicularOffsetStroke) s;
             float origOffset = orig.getPerpendicularOffset();
-            float scaledOffset = (float) (origOffset* getMetersPerPixel());
-            return new PerpendicularOffsetStroke((float) (orig.getLineWidth() * getMetersPerPixel()),
+            float scaledOffset = (float) (origOffset* getMapUnitsPerPixel());
+            return new PerpendicularOffsetStroke((float) (orig.getLineWidth() * getMapUnitsPerPixel()),
                     scaledOffset,
                     orig.getLineJoin(), orig.getEndCap(),
                     scaleArray(orig.getDashArray()),
-                    (float) (orig.getDashPhase() * getMetersPerPixel()));
+                    (float) (orig.getDashPhase() * getMapUnitsPerPixel()));
         }
         if (s instanceof BasicStroke) {
             BasicStroke orig = (BasicStroke) s;
-            return new BasicStroke((float) (orig.getLineWidth() * getMetersPerPixel()),
+            return new BasicStroke((float) (orig.getLineWidth() * getMapUnitsPerPixel()),
                     orig.getEndCap(), orig.getLineJoin(),
                     orig.getMiterLimit(), scaleArray(orig.getDashArray()),
-                    (float) (orig.getDashPhase() * getMetersPerPixel())
+                    (float) (orig.getDashPhase() * getMapUnitsPerPixel())
             );
         }
         throw new IllegalArgumentException("Can't scale stroke.");
@@ -398,7 +396,7 @@ public class JAIMapGraphics extends MapGraphics {
         if (dashArray == null) return null;
         float[] result = new float[dashArray.length];
         for (int i = 0; i < result.length; i++) {
-            result[i] = (float) (dashArray[i] * metersPerPixel);
+            result[i] = (float) (dashArray[i] * mapUnitsPerPixel);
         }
         return result;
     }
