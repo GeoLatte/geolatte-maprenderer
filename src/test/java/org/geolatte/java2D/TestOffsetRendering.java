@@ -1,15 +1,22 @@
 /*
- * This file is part of the GeoLatte project. This code is licenced under
- * the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing permissions and limitations under the
- * License.
+ * This file is part of the GeoLatte project.
  *
- * Copyright (C) 2010 - 2010 and Ownership of code is shared by:
- * Qmino bvba - Romeinsestraat 18 - 3001 Heverlee (http://www.Qmino.com)
- * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
+ *     GeoLatte is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     GeoLatte is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Lesser General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Copyright (C) 2010 - 2011 and Ownership of code is shared by:
+ *  Qmino bvba - Esperantolaan 4 - 3001 Heverlee  (http://www.qmino.com)
+ *  Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
 package org.geolatte.java2D;
@@ -20,20 +27,18 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import org.geolatte.maprenderer.geotools.GTSpatialReference;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
+import org.geolatte.maprenderer.java2D.PerpendicularOffsetStroke;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
-import org.geolatte.maprenderer.shape.BasicScalableStroke;
-import org.geolatte.maprenderer.shape.ScalableStroke;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
+import org.geolatte.test.TestSupport;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.RenderedImage;
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -42,31 +47,33 @@ import java.io.IOException;
  */
 public class TestOffsetRendering {
 
+    /*TODO -- add tests for these cases:
+        1. linestring with very small linesegments (relative to offset)
+        2. non-contiguous paths (i.e. with intermediate moveTo's
+     */
+
 
     private static final float LINE_WIDTH = 5.0f;
     private static final float OFFSET  = 8.0f;
-    private static final float OFFSET_LINE_WIDTH = 1.0f;
+    private static final float NEG_OFFSET = -8.0f;
+    private static final float OFFSET_LINE_WIDTH = 2.0f;
     private static final int NUM_IMG = 90;
 
     private SpatialReference spatialReference;
     private SpatialExtent extent;
     private java.awt.Dimension dim = new java.awt.Dimension(512, 512);
-    private ScalableStroke stroke;
-    private ScalableStroke offsetStroke;
-    private ScalableStroke negOffsetStroke;
+    private PerpendicularOffsetStroke stroke;
+    private PerpendicularOffsetStroke offsetStroke;
+    private PerpendicularOffsetStroke negOffsetStroke;
     private GeometryFactory geomFactory;
 
     @Before
     public void setUp() throws SpatialReferenceCreationException {
         this.spatialReference = new GTSpatialReference("4236", true);
-        this.extent = new SpatialExtent(-90, -90, 90, 90, spatialReference);
-        this.stroke = new BasicScalableStroke(LINE_WIDTH); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.offsetStroke = new BasicScalableStroke(OFFSET_LINE_WIDTH); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.offsetStroke.setPerpendicularOffset(-OFFSET);
-        this.negOffsetStroke = new BasicScalableStroke(OFFSET_LINE_WIDTH); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
-        this.negOffsetStroke.setPerpendicularOffset(OFFSET);
-
-
+        this.extent = new SpatialExtent(-100, -100, 100, 100, spatialReference);
+        this.stroke = new PerpendicularOffsetStroke(LINE_WIDTH); //e, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
+        this.offsetStroke = new PerpendicularOffsetStroke(OFFSET_LINE_WIDTH, OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
+        this.negOffsetStroke = new PerpendicularOffsetStroke(OFFSET_LINE_WIDTH, NEG_OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
         geomFactory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4236);
 
     }
@@ -74,32 +81,31 @@ public class TestOffsetRendering {
 
     @Test
     public void test_paint_lines_left_to_right_with_offset() throws IOException {
-        renderImage(offsetStroke, "/tmp/img/offset-left-to-right-painter-", true);
+        renderImage(offsetStroke, "offset-left-to-right-painter-", true);
     }
 
     @Test
     public void test_paint_lines_right_to_left_with_offset() throws IOException {
-        renderImage(offsetStroke, "/tmp/img/offset-right-to-left-painter-", false);
+        renderImage(offsetStroke, "offset-right-to-left-painter-", false);
     }
 
 
     @Test
     public void test_paint_lines_left_to_right_with_negative_offset() throws IOException {
-        renderImage(negOffsetStroke, "/tmp/img/negative-offset-left-to-right-", true);
+        renderImage(negOffsetStroke, "negative-offset-left-to-right-", true);
     }
 
     @Test
     public void test_paint_lines_right_to_left_with_negative_offset() throws IOException {
-        renderImage(negOffsetStroke, "/tmp/img/negative-offset-right-to-left-", false);
+        renderImage(negOffsetStroke, "negative-offset-right-to-left-", false);
     }
 
-    private void renderImage(ScalableStroke offsetStroke, String path, boolean leftToRight) throws IOException {
+    private void renderImage(PerpendicularOffsetStroke offsetStroke, String path, boolean leftToRight) throws IOException {
 
         double theta = 2 * Math.PI / NUM_IMG;
         for (int i = 0; i < NUM_IMG; i++) {
             System.out.println("i = " + i);
-            MapGraphics mapGraphics = new JAIMapGraphics(dim, spatialReference);
-            mapGraphics.setToExtent(extent);
+            MapGraphics mapGraphics = new JAIMapGraphics(dim, spatialReference, extent);
 
             LineString line = generateLineStrings(i, theta, leftToRight);
             mapGraphics.setStroke(stroke);
@@ -113,9 +119,7 @@ public class TestOffsetRendering {
             drawLineString(line, mapGraphics);
 
             RenderedImage img = mapGraphics.createRendering();
-            File file = new File(path + i + ".png");
-            ImageIO.write(img, "PNG", file);
-
+            TestSupport.writeImageToDisk(img,path + i + ".png", "PNG");
         }
 
     }

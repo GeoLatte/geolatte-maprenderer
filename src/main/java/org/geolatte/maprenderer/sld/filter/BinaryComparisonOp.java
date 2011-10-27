@@ -1,85 +1,72 @@
 /*
- * This file is part of the GeoLatte project. This code is licenced under
- * the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing permissions and limitations under the
- * License.
+ * This file is part of the GeoLatte project.
  *
- * Copyright (C) 2010 - 2010 and Ownership of code is shared by:
- * Qmino bvba - Romeinsestraat 18 - 3001 Heverlee (http://www.Qmino.com)
- * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
+ *     GeoLatte is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     GeoLatte is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Lesser General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Copyright (C) 2010 - 2011 and Ownership of code is shared by:
+ *  Qmino bvba - Esperantolaan 4 - 3001 Heverlee  (http://www.qmino.com)
+ *  Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
 package org.geolatte.maprenderer.sld.filter;
 
 import org.geolatte.core.Feature;
-import org.geolatte.maprenderer.util.DataConvertor;
-
-import java.util.Date;
+import org.geolatte.maprenderer.util.TypeConverter;
 
 
-public class BinaryComparisonOp extends Expr<Boolean, Object> {
+public class BinaryComparisonOp extends Expression<Boolean, Object> {
 
-    Expr<Object, ?> operand1;
-    Expr<Object, ?> operand2;
-    Comparison operator;
-    boolean matchCase;
+    private final Comparison operator;
+    private final boolean matchCase;
+    Expression<Object, ?> operand1;
+    Expression<Object, ?> operand2;
 
-    private DataConvertor convertor = new DataConvertor();
-
-    public boolean isMatchCase() {
-        return matchCase;
-    }
-
-    public void setMatchCase(boolean matchCase) {
+    BinaryComparisonOp(Comparison operator, boolean matchCase) {
+        this.operator = operator;
         this.matchCase = matchCase;
     }
-
-    public Comparison getOperator() {
-        return operator;
-    }
-
-    public void setOperator(Comparison operator) {
-        this.operator = operator;
-    }
-
 
     public Boolean evaluate(Feature feature) {
         Object v1 = this.operand1.evaluate(feature);
         Object v2 = this.operand2.evaluate(feature);
+        Comparable c1;
+        Comparable c2;
 
-
-        if (v1 instanceof java.util.Date || v2 instanceof java.util.Date) {
-            Date d1 = this.convertor.convertToDate(v1);
-            Date d2 = this.convertor.convertToDate(v2);
-            return eval(d1.compareTo(d2));
+        if (v1 instanceof String && !(v2 instanceof String)) {
+            c1 = convertToComparable(v1, v2);
+            c2 = (Comparable) v2;
+        } else if (!(v1 instanceof String) && v2 instanceof String) {
+            c2 = convertToComparable(v2, v1);
+            c1 = (Comparable) v1;
+        } else if (v1 instanceof String && v1 instanceof String) {
+            return StringCompare(v1, v2);
+        } else {
+            c1 = (Comparable) v1;
+            c2 = (Comparable) v2;
         }
-
-        if (v1 instanceof Integer || v1 instanceof Long ||
-                v2 instanceof Integer || v2 instanceof Long) {
-            Long l1 = this.convertor.convertToLong(v1);
-            Long l2 = this.convertor.convertToLong(v2);
-            return eval(l1.compareTo(l2));
-        }
-
-        if (v1 instanceof Float || v1 instanceof Double ||
-                v2 instanceof Float || v2 instanceof Double) {
-            Double d1 = this.convertor.convertToDouble(v1);
-            Double d2 = this.convertor.convertToDouble(v2);
-            return eval(d1.compareTo(d2));
-        }
-
-        if (v1 instanceof String || v2 instanceof String) {
-            String s1 = this.convertor.convertToString(v1);
-            String s2 = this.convertor.convertToString(v2);
-            return this.matchCase ? eval(s1.compareTo(s2)) :
-                    eval(s1.compareToIgnoreCase(s2));
-        }
-        throw new RuntimeException("Objects do not match known type.");
+        return eval(c1.compareTo(c2));
     }
 
+    private boolean StringCompare(Object v1, Object v2) {
+        String s1 = (String) v1;
+        String s2 = (String) v2;
+        return this.matchCase ? eval(s1.compareTo(s1)) : eval(s1.compareToIgnoreCase(s2));
+    }
+
+    private Comparable convertToComparable(Object v1, Object v2) {
+        return TypeConverter.instance().convert((String) v1, (Class<Comparable>) v2.getClass());
+    }
 
     private Boolean eval(int compare) {
 
@@ -107,9 +94,9 @@ public class BinaryComparisonOp extends Expr<Boolean, Object> {
     }
 
     @Override
-    public void setArgs(Expr<Object, ?>[] args) {
-        this.operand1 = args[0];
-        this.operand2 = args[1];
+    public void setArg(int i, Expression<Object, ?> arg) {
+        if (i == 0) this.operand1 = arg;
+        if (i == 1) this.operand2 = arg;
     }
 
     public String toString() {

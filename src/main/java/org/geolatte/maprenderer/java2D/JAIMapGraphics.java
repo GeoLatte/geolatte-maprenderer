@@ -1,15 +1,22 @@
 /*
- * This file is part of the GeoLatte project. This code is licenced under
- * the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing permissions and limitations under the
- * License.
+ * This file is part of the GeoLatte project.
  *
- * Copyright (C) 2010 - 2010 and Ownership of code is shared by:
- * Qmino bvba - Romeinsestraat 18 - 3001 Heverlee (http://www.Qmino.com)
- * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
+ *     GeoLatte is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Lesser General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     GeoLatte is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Lesser General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Lesser General Public License
+ *     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Copyright (C) 2010 - 2011 and Ownership of code is shared by:
+ *  Qmino bvba - Esperantolaan 4 - 3001 Heverlee  (http://www.qmino.com)
+ *  Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
 package org.geolatte.maprenderer.java2D;
@@ -30,12 +37,11 @@ import java.util.Map;
 
 public class JAIMapGraphics extends MapGraphics {
 
-    private static final int IMAGE_TYPE = BufferedImage.TYPE_INT_ARGB;
     private static final boolean OPTIMIZE_FOR_QUALITY = true;
 
     private final static Color DEFAULT_BACKGROUND_COLOR = new Color(1.0f, 1.0f, 1.0f, 0.0f);
 
-    private float scale;
+    private double mapUnitsPerPixel;
     private final int width;
     private final int height;
     private Graphics2D g2;
@@ -43,36 +49,32 @@ public class JAIMapGraphics extends MapGraphics {
     private final BufferedImage image;
 
 
-    public JAIMapGraphics(Dimension dimension, SpatialReference reference, ColorModel colorModel) {
-        this.spatialReference = reference;
-        this.width = (int) dimension.getWidth();
-        this.height = (int) dimension.getHeight();
-        WritableRaster raster = colorModel.createCompatibleWritableRaster(this.width, this.height);
-        this.image = new BufferedImage(colorModel, raster, colorModel.isAlphaPremultiplied(), null);
-        initGraphics();
-    }
-
-    public JAIMapGraphics(Dimension dimension, SpatialReference reference, boolean transparency) {
-        ColorModel colorModel = null;
-
+    private static ColorModel makeColorModel(boolean transparency) {
         if (transparency) {
             ColorSpace space = ColorSpace.getInstance(ColorSpace.CS_sRGB);
-            colorModel = new DirectColorModel(space, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000, true, DataBuffer.TYPE_INT);
+            return new DirectColorModel(space, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000, true, DataBuffer.TYPE_INT);
         } else {
             ColorSpace space = ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
-            colorModel = new DirectColorModel(space, 24, 0xff0000, 0x00ff00, 0x000ff, 0, false, DataBuffer.TYPE_INT);
+            return new DirectColorModel(space, 24, 0xff0000, 0x00ff00, 0x000ff, 0, false, DataBuffer.TYPE_INT);
         }
+    }
 
+    public JAIMapGraphics(Dimension dimension, SpatialReference reference, SpatialExtent extent, ColorModel colorModel) {
         this.spatialReference = reference;
         this.width = (int) dimension.getWidth();
         this.height = (int) dimension.getHeight();
         WritableRaster raster = colorModel.createCompatibleWritableRaster(this.width, this.height);
         this.image = new BufferedImage(colorModel, raster, colorModel.isAlphaPremultiplied(), null);
         initGraphics();
+        setToExtent(extent);
     }
 
-    public JAIMapGraphics(Dimension dimension, SpatialReference reference) {
-        this(dimension, reference, true);
+    public JAIMapGraphics(Dimension dimension, SpatialReference reference, SpatialExtent extent, boolean transparency) {
+        this(dimension, reference, extent, makeColorModel(transparency));
+    }
+
+    public JAIMapGraphics(Dimension dimension, SpatialReference reference, SpatialExtent extent) {
+        this(dimension, reference, extent, true);
     }
 
     public void initGraphics() {
@@ -120,18 +122,16 @@ public class JAIMapGraphics extends MapGraphics {
         return hints;
     }
 
-    @Override
-    public void setToExtent(SpatialExtent extent) {
+    private void setToExtent(SpatialExtent extent) {
         if (!extent.getSpatialReference().equals(getSpatialReference()))
             throw new IllegalArgumentException("Spatial Reference of extent object must be EPSG: " + getSpatialReference().getEPSGCode());
         AffineTransform atf = new AffineTransform();
         double sx = width / extent.getWidth();
         double sy = height / extent.getHeight();
-        this.scale = (float) Math.min(sx, sy);
+        this.mapUnitsPerPixel = Math.max(1 / sx, 1 / sy);
+        //we don't maintain aspect-ratio here!
         atf.scale(sx, -sy);
         atf.translate(-extent.getMinX(), -extent.getMaxY());
-//        AffineTransform tr = (AffineTransform) projection.clone();
-//        tr.concatenate(modelView);
         setTransform(atf);
     }
 
@@ -145,9 +145,10 @@ public class JAIMapGraphics extends MapGraphics {
         return this.spatialReference;
     }
 
+
     @Override
-    public float getScale() {
-        return this.scale;
+    public double getMapUnitsPerPixel() {
+        return this.mapUnitsPerPixel;
     }
 
     @Override
@@ -360,8 +361,41 @@ public class JAIMapGraphics extends MapGraphics {
     }
 
     public void setStroke(Stroke s) {
-        g2.setStroke(s);
+        Stroke scaledStroke = scaleStroke(s);
+        g2.setStroke(scaledStroke);
     }
+
+    private Stroke scaleStroke(Stroke s) {
+        if (s instanceof PerpendicularOffsetStroke) {
+            PerpendicularOffsetStroke orig = (PerpendicularOffsetStroke) s;
+            float origOffset = orig.getPerpendicularOffset();
+            float scaledOffset = (float) (origOffset* getMapUnitsPerPixel());
+            return new PerpendicularOffsetStroke((float) (orig.getLineWidth() * getMapUnitsPerPixel()),
+                    scaledOffset,
+                    orig.getLineJoin(), orig.getEndCap(),
+                    scaleArray(orig.getDashArray()),
+                    (float) (orig.getDashPhase() * getMapUnitsPerPixel()));
+        }
+        if (s instanceof BasicStroke) {
+            BasicStroke orig = (BasicStroke) s;
+            return new BasicStroke((float) (orig.getLineWidth() * getMapUnitsPerPixel()),
+                    orig.getEndCap(), orig.getLineJoin(),
+                    orig.getMiterLimit(), scaleArray(orig.getDashArray()),
+                    (float) (orig.getDashPhase() * getMapUnitsPerPixel())
+            );
+        }
+        throw new IllegalArgumentException("Can't scale stroke.");
+    }
+
+    private float[] scaleArray(float[] dashArray) {
+        if (dashArray == null) return null;
+        float[] result = new float[dashArray.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (float) (dashArray[i] * mapUnitsPerPixel);
+        }
+        return result;
+    }
+
 
     public void setRenderingHint(RenderingHints.Key hintKey, Object hintValue) {
         g2.setRenderingHint(hintKey, hintValue);
