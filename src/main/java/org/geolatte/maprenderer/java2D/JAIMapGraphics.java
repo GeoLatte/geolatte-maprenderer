@@ -49,36 +49,32 @@ public class JAIMapGraphics extends MapGraphics {
     private final BufferedImage image;
 
 
-    public JAIMapGraphics(Dimension dimension, SpatialReference reference, ColorModel colorModel) {
-        this.spatialReference = reference;
-        this.width = (int) dimension.getWidth();
-        this.height = (int) dimension.getHeight();
-        WritableRaster raster = colorModel.createCompatibleWritableRaster(this.width, this.height);
-        this.image = new BufferedImage(colorModel, raster, colorModel.isAlphaPremultiplied(), null);
-        initGraphics();
-    }
-
-    public JAIMapGraphics(Dimension dimension, SpatialReference reference, boolean transparency) {
-        ColorModel colorModel = null;
-
+    private static ColorModel makeColorModel(boolean transparency) {
         if (transparency) {
             ColorSpace space = ColorSpace.getInstance(ColorSpace.CS_sRGB);
-            colorModel = new DirectColorModel(space, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000, true, DataBuffer.TYPE_INT);
+            return new DirectColorModel(space, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000, true, DataBuffer.TYPE_INT);
         } else {
             ColorSpace space = ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
-            colorModel = new DirectColorModel(space, 24, 0xff0000, 0x00ff00, 0x000ff, 0, false, DataBuffer.TYPE_INT);
+            return new DirectColorModel(space, 24, 0xff0000, 0x00ff00, 0x000ff, 0, false, DataBuffer.TYPE_INT);
         }
+    }
 
+    public JAIMapGraphics(Dimension dimension, SpatialReference reference, SpatialExtent extent, ColorModel colorModel) {
         this.spatialReference = reference;
         this.width = (int) dimension.getWidth();
         this.height = (int) dimension.getHeight();
         WritableRaster raster = colorModel.createCompatibleWritableRaster(this.width, this.height);
         this.image = new BufferedImage(colorModel, raster, colorModel.isAlphaPremultiplied(), null);
         initGraphics();
+        setToExtent(extent);
     }
 
-    public JAIMapGraphics(Dimension dimension, SpatialReference reference) {
-        this(dimension, reference, true);
+    public JAIMapGraphics(Dimension dimension, SpatialReference reference, SpatialExtent extent, boolean transparency) {
+        this(dimension, reference, extent, makeColorModel(transparency));
+    }
+
+    public JAIMapGraphics(Dimension dimension, SpatialReference reference, SpatialExtent extent) {
+        this(dimension, reference, extent, true);
     }
 
     public void initGraphics() {
@@ -126,8 +122,7 @@ public class JAIMapGraphics extends MapGraphics {
         return hints;
     }
 
-    @Override
-    public void setToExtent(SpatialExtent extent) {
+    private void setToExtent(SpatialExtent extent) {
         if (!extent.getSpatialReference().equals(getSpatialReference()))
             throw new IllegalArgumentException("Spatial Reference of extent object must be EPSG: " + getSpatialReference().getEPSGCode());
         AffineTransform atf = new AffineTransform();

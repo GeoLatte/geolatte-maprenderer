@@ -105,8 +105,7 @@ public class TestOffsetRendering {
         double theta = 2 * Math.PI / NUM_IMG;
         for (int i = 0; i < NUM_IMG; i++) {
             System.out.println("i = " + i);
-            MapGraphics mapGraphics = new JAIMapGraphics(dim, spatialReference);
-            mapGraphics.setToExtent(extent);
+            MapGraphics mapGraphics = new JAIMapGraphics(dim, spatialReference, extent);
 
             LineString line = generateLineStrings(i, theta, leftToRight);
             mapGraphics.setStroke(stroke);

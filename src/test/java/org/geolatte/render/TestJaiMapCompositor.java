@@ -66,8 +66,7 @@ public class TestJaiMapCompositor {
 
         List<RenderedImage> images = new ArrayList<RenderedImage>();
 
-        MapGraphics map = new JAIMapGraphics(new Dimension(256, 256), crs);
-        map.setToExtent(new SpatialExtent(0, 0, 90, 90, crs));
+        MapGraphics map = new JAIMapGraphics(new Dimension(256, 256), crs, new SpatialExtent(0, 0, 90, 90, crs));
         map.setColor(new Color(0f, 1f, 0f, 0.5f));
         map.fillRect(10, 10, 50, 50);
         RenderedImage img = map.createRendering();
@@ -75,8 +74,7 @@ public class TestJaiMapCompositor {
         images.add(img);
 
 
-        map = new JAIMapGraphics(new Dimension(256, 256), crs);
-        map.setToExtent(new SpatialExtent(0, 0, 90, 90, crs));
+        map = new JAIMapGraphics(new Dimension(256, 256), crs, new SpatialExtent(0, 0, 90, 90, crs));
         map.setColor(new Color(0f, 0f, 1f, 0.5f));
         map.fillRect(10, 10, 10, 10);
         map.fillRect(20, 20, 10, 10);
@@ -88,8 +86,7 @@ public class TestJaiMapCompositor {
         writeToFile(img, "in2");
         images.add(img);
 
-        map = new JAIMapGraphics(new Dimension(256, 256), crs);
-        map.setToExtent(new SpatialExtent(0, 0, 90, 90, crs));
+        map = new JAIMapGraphics(new Dimension(256, 256), crs,new SpatialExtent(0, 0, 90, 90, crs));
         map.setColor(Color.RED);
 
         map.drawOval(15, 15, 1, 1);

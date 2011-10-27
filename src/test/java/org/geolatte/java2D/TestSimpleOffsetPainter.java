@@ -60,7 +60,7 @@ public class TestSimpleOffsetPainter {
         this.spatialReference = new GTSpatialReference("4236", true);
         this.extent = new SpatialExtent(5,5,40,40, spatialReference);
         java.awt.Dimension dim = new java.awt.Dimension(512, 512);
-        this.mapGraphics = new JAIMapGraphics(dim, spatialReference);
+        this.mapGraphics = new JAIMapGraphics(dim, spatialReference, extent);
 
         this.features.add( new MockLineStringFeature());
 
@@ -69,7 +69,6 @@ public class TestSimpleOffsetPainter {
 
     @Test
     public void test_paint_lines_with_offset() throws IOException {
-        this.mapGraphics.setToExtent(extent);
         Painter painter = new SimpleOffsetPainter(this.mapGraphics);
         painter.paint(features);
         RenderedImage img = this.mapGraphics.createRendering();

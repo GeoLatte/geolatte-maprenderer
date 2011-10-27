@@ -45,8 +45,7 @@ public class BaseFeatureTypeStyleTest {
         SpatialReference spatialReference = new GTSpatialReference("31370", true);
         SpatialExtent extent = new SpatialExtent(0, 0, extentSize, extentSize, spatialReference);
         java.awt.Dimension dim = new java.awt.Dimension(pixelSize, pixelSize);
-        MapGraphics mapGraphics =  new JAIMapGraphics(dim, spatialReference);
-        mapGraphics.setToExtent(extent);
+        MapGraphics mapGraphics =  new JAIMapGraphics(dim, spatialReference, extent);
         return mapGraphics;
     }
 
