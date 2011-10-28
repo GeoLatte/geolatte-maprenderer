@@ -25,11 +25,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
+import org.geolatte.geom.Envelope;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.java2D.PerpendicularOffsetStroke;
 import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.test.TestSupport;
 import org.junit.Before;
@@ -58,7 +58,7 @@ public class TestOffsetRendering {
     private static final int NUM_IMG = 90;
 
     private CrsId spatialReference;
-    private SpatialExtent extent;
+    private Envelope extent;
     private java.awt.Dimension dim = new java.awt.Dimension(512, 512);
     private PerpendicularOffsetStroke stroke;
     private PerpendicularOffsetStroke offsetStroke;
@@ -68,7 +68,7 @@ public class TestOffsetRendering {
     @Before
     public void setUp() {
         this.spatialReference = new CrsId("EPSG",4236);
-        this.extent = new SpatialExtent(-100, -100, 100, 100, spatialReference);
+        this.extent = new Envelope(-100, -100, 100, 100, spatialReference);
         this.stroke = new PerpendicularOffsetStroke(LINE_WIDTH); //e, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
         this.offsetStroke = new PerpendicularOffsetStroke(OFFSET_LINE_WIDTH, OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
         this.negOffsetStroke = new PerpendicularOffsetStroke(OFFSET_LINE_WIDTH, NEG_OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);

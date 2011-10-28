@@ -21,9 +21,9 @@
 
 package org.geolatte.maprenderer.java2D;
 
+import org.geolatte.geom.Envelope;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.map.SpatialExtent;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -59,7 +59,7 @@ public class JAIMapGraphics extends MapGraphics {
         }
     }
 
-    public JAIMapGraphics(Dimension dimension, CrsId reference, SpatialExtent extent, ColorModel colorModel) {
+    public JAIMapGraphics(Dimension dimension, CrsId reference, Envelope extent, ColorModel colorModel) {
         this.spatialReference = reference;
         this.width = (int) dimension.getWidth();
         this.height = (int) dimension.getHeight();
@@ -69,11 +69,11 @@ public class JAIMapGraphics extends MapGraphics {
         setToExtent(extent);
     }
 
-    public JAIMapGraphics(Dimension dimension, CrsId reference, SpatialExtent extent, boolean transparency) {
+    public JAIMapGraphics(Dimension dimension, CrsId reference, Envelope extent, boolean transparency) {
         this(dimension, reference, extent, makeColorModel(transparency));
     }
 
-    public JAIMapGraphics(Dimension dimension, CrsId reference, SpatialExtent extent) {
+    public JAIMapGraphics(Dimension dimension, CrsId reference, Envelope extent) {
         this(dimension, reference, extent, true);
     }
 
@@ -122,8 +122,8 @@ public class JAIMapGraphics extends MapGraphics {
         return hints;
     }
 
-    private void setToExtent(SpatialExtent extent) {
-        if (extent.getSpatialReference().getCode() != getSpatialReference().getCode())
+    private void setToExtent(Envelope extent) {
+        if (extent.getCrsId().getCode() != getSpatialReference().getCode())
             throw new IllegalArgumentException("Spatial Reference of extent object must be EPSG: " + getSpatialReference().getCode());
         AffineTransform atf = new AffineTransform();
         double sx = width / extent.getWidth();

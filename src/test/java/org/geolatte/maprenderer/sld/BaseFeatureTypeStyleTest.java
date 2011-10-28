@@ -22,10 +22,10 @@
 package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.FeatureTypeStyleType;
+import org.geolatte.geom.Envelope;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.map.SpatialExtent;
 import org.junit.BeforeClass;
 
 import java.io.InputStream;
@@ -40,7 +40,7 @@ public class BaseFeatureTypeStyleTest {
     }
 
     public MapGraphics createMapGraphics(int pixelSize, double extentSize) {
-        SpatialExtent extent = new SpatialExtent(0, 0, extentSize, extentSize, new CrsId("EPSG",31370));
+        Envelope extent = new Envelope(0, 0, extentSize, extentSize, new CrsId("EPSG",31370));
         java.awt.Dimension dim = new java.awt.Dimension(pixelSize, pixelSize);
         MapGraphics mapGraphics =  new JAIMapGraphics(dim, new CrsId("EPSG",31370), extent);
         return mapGraphics;

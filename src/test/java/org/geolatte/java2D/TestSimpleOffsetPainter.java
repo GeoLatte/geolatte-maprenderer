@@ -22,11 +22,11 @@
 package org.geolatte.java2D;
 
 import org.geolatte.common.Feature;
+import org.geolatte.geom.Envelope;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
-import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.test.MockLineStringFeature;
 import org.geolatte.test.TestSupport;
 import org.junit.Before;
@@ -48,7 +48,7 @@ public class TestSimpleOffsetPainter {
 
     private MapGraphics mapGraphics;
     private CrsId spatialReference;
-    private SpatialExtent extent;
+    private Envelope extent;
 
     private List<Feature> features = new ArrayList<Feature>();
 
@@ -56,7 +56,7 @@ public class TestSimpleOffsetPainter {
     @Before
     public void setUp() {
         this.spatialReference = new CrsId("EPSG",4236);
-        this.extent = new SpatialExtent(5,5,40,40, spatialReference);
+        this.extent = new Envelope(5,5,40,40, spatialReference);
         java.awt.Dimension dim = new java.awt.Dimension(512, 512);
         this.mapGraphics = new JAIMapGraphics(dim, new CrsId("EPSG",4236), extent);
 

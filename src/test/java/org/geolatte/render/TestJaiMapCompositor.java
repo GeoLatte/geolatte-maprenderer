@@ -21,12 +21,12 @@
 
 package org.geolatte.render;
 
+import org.geolatte.geom.Envelope;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.java2D.JaiMapCompositor;
 import org.geolatte.maprenderer.map.MapCompositor;
 import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.test.TestSupport;
 import org.junit.Test;
 
@@ -53,7 +53,7 @@ public class TestJaiMapCompositor {
 
         List<RenderedImage> images = new ArrayList<RenderedImage>();
 
-        MapGraphics map = new JAIMapGraphics(new Dimension(256, 256), crsId, new SpatialExtent(0, 0, 90, 90, crsId));
+        MapGraphics map = new JAIMapGraphics(new Dimension(256, 256), crsId, new Envelope(0, 0, 90, 90, crsId));
         map.setColor(new Color(0f, 1f, 0f, 0.5f));
         map.fillRect(10, 10, 50, 50);
         RenderedImage img = map.createRendering();
@@ -61,7 +61,7 @@ public class TestJaiMapCompositor {
         images.add(img);
 
 
-        map = new JAIMapGraphics(new Dimension(256, 256), crsId, new SpatialExtent(0, 0, 90, 90, crsId));
+        map = new JAIMapGraphics(new Dimension(256, 256), crsId, new Envelope(0, 0, 90, 90, crsId));
         map.setColor(new Color(0f, 0f, 1f, 0.5f));
         map.fillRect(10, 10, 10, 10);
         map.fillRect(20, 20, 10, 10);
@@ -73,7 +73,7 @@ public class TestJaiMapCompositor {
         writeToFile(img, "in2");
         images.add(img);
 
-        map = new JAIMapGraphics(new Dimension(256, 256), crsId, new SpatialExtent(0, 0, 90, 90, crsId));
+        map = new JAIMapGraphics(new Dimension(256, 256), crsId, new Envelope(0, 0, 90, 90, crsId));
         map.setColor(Color.RED);
 
         map.drawOval(15, 15, 1, 1);
