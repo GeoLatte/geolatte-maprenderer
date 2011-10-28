@@ -123,7 +123,7 @@ public class JAIMapGraphics extends MapGraphics {
     }
 
     private void setToExtent(SpatialExtent extent) {
-        if (extent.getSpatialReference().getEPSGCode() != getSpatialReference().getCode())
+        if (extent.getSpatialReference().getCode() != getSpatialReference().getCode())
             throw new IllegalArgumentException("Spatial Reference of extent object must be EPSG: " + getSpatialReference().getCode());
         AffineTransform atf = new AffineTransform();
         double sx = width / extent.getWidth();

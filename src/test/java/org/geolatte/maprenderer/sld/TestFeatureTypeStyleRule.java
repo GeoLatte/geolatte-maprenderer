@@ -22,7 +22,6 @@
 package org.geolatte.maprenderer.sld;
 
 import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.maprenderer.sld.filter.AlwaysTrueSLDRuleFilter;
 import org.geolatte.maprenderer.sld.filter.ElseSLDRuleFilter;
 import org.geolatte.maprenderer.sld.filter.SLDRuleFilter;
@@ -83,7 +82,7 @@ public class TestFeatureTypeStyleRule extends BaseFeatureTypeStyleTest {
     }
 
     @Test
-    public void testScaleDenominatorWithinBounds() throws SpatialReferenceCreationException {
+    public void testScaleDenominatorWithinBounds() {
         Rule rule = getFeatureTypeStyle().getRules().get(0);
         //this assumes the standard pixel size of 0.28x0.28mm!!
         MapGraphics g = createMapGraphics(100, 2.8d);
@@ -93,7 +92,7 @@ public class TestFeatureTypeStyleRule extends BaseFeatureTypeStyleTest {
     }
 
     @Test
-    public void testScaleDenominatorNotWithinBounds() throws SpatialReferenceCreationException {
+    public void testScaleDenominatorNotWithinBounds() {
         Rule rule = getFeatureTypeStyle().getRules().get(0);
         //this assumes the standard pixel size of 0.28x0.28mm
         MapGraphics g = createMapGraphics(1000, 290d);

@@ -26,12 +26,10 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import org.geolatte.geom.crs.CrsId;
-import org.geolatte.maprenderer.geotools.GTSpatialReference;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.java2D.PerpendicularOffsetStroke;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.SpatialExtent;
-import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.test.TestSupport;
 import org.junit.Before;
@@ -59,7 +57,7 @@ public class TestOffsetRendering {
     private static final float OFFSET_LINE_WIDTH = 2.0f;
     private static final int NUM_IMG = 90;
 
-    private GTSpatialReference spatialReference;
+    private CrsId spatialReference;
     private SpatialExtent extent;
     private java.awt.Dimension dim = new java.awt.Dimension(512, 512);
     private PerpendicularOffsetStroke stroke;
@@ -68,8 +66,8 @@ public class TestOffsetRendering {
     private GeometryFactory geomFactory;
 
     @Before
-    public void setUp() throws SpatialReferenceCreationException {
-        this.spatialReference = new GTSpatialReference("4236", true);
+    public void setUp() {
+        this.spatialReference = new CrsId("EPSG",4236);
         this.extent = new SpatialExtent(-100, -100, 100, 100, spatialReference);
         this.stroke = new PerpendicularOffsetStroke(LINE_WIDTH); //e, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
         this.offsetStroke = new PerpendicularOffsetStroke(OFFSET_LINE_WIDTH, OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
@@ -105,7 +103,7 @@ public class TestOffsetRendering {
         double theta = 2 * Math.PI / NUM_IMG;
         for (int i = 0; i < NUM_IMG; i++) {
             System.out.println("i = " + i);
-            CrsId crsId = new CrsId("EPSG", spatialReference.getEPSGCode());
+            CrsId crsId = new CrsId("EPSG", spatialReference.getCode());
             MapGraphics mapGraphics = new JAIMapGraphics(dim, crsId, extent);
 
             LineString line = generateLineStrings(i, theta, leftToRight);

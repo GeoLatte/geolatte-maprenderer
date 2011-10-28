@@ -23,7 +23,6 @@ package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.PointSymbolizerType;
 import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.maprenderer.sld.graphics.Graphic;
 import org.geolatte.maprenderer.sld.graphics.MarkOrExternalGraphicHolder;
@@ -75,69 +74,69 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
     }
 
     @Test
-    public void testSymbolizerCenterPng() throws IOException, SpatialReferenceCreationException {
+    public void testSymbolizerCenterPng() throws IOException {
         testCase(symbolizer, "point-bus-center.png");
     }
 
     @Test
-    public void testSymbolizerGraphicPartiallyRenderedPng() throws IOException, SpatialReferenceCreationException {
+    public void testSymbolizerGraphicPartiallyRenderedPng() throws IOException {
         testCase(symbolizer, 10000d, 5000d, "point-bus-right.png");
     }
 
     @Test
-    public void testAnchorPointToLowerLeft() throws IOException, SpatialReferenceCreationException {
+    public void testAnchorPointToLowerLeft() throws IOException {
         symbolizer = getSymbolizer(xmlLowerLeftAnchorPoint);
         testCase(symbolizer, "point-bus-anchorpoint-lower-left.png");
     }
 
     @Test
-    public void testAnchorPointToUpperRight() throws IOException, SpatialReferenceCreationException {
+    public void testAnchorPointToUpperRight() throws IOException {
         symbolizer = getSymbolizer(xmlUpperRightAnchorPoint);
         testCase(symbolizer, "point-bus-anchorpoint-upper-right.png");
     }
 
     @Test
-    public void testDisplacement() throws IOException, SpatialReferenceCreationException {
+    public void testDisplacement() throws IOException {
         symbolizer = getSymbolizer(xmlDisplacement);
         testCase(symbolizer, "point-bus-displacement.png");
     }
 
     @Test
-    public void testSymbolizeSvg() throws IOException, SpatialReferenceCreationException {
+    public void testSymbolizeSvg() throws IOException {
         symbolizer = getSymbolizer(xmlSVGGraphic);
         testCase(symbolizer, "point-info-svg.png");
     }
 
     @Test
-    public void testScalePNG() throws IOException, SpatialReferenceCreationException {
+    public void testScalePNG() throws IOException {
         symbolizer = getSymbolizer(xmlScale);
         assertEquals(74f, symbolizer.getGraphic().getSize(), 0.0001f);
         testCase(symbolizer, "point-bus-scale.png");
     }
 
     @Test
-    public void testRotatePNG() throws IOException, SpatialReferenceCreationException {
+    public void testRotatePNG() throws IOException {
         symbolizer = getSymbolizer(xmlRotate);
         assertEquals(90f, symbolizer.getGraphic().getRotation(), 0.0001f);
         testCase(symbolizer, "point-bus-rotate.png");
     }
 
     @Test
-    public void testRotateSVG() throws IOException, SpatialReferenceCreationException {
+    public void testRotateSVG() throws IOException {
         symbolizer = getSymbolizer(xmlSVGGraphicRotate);
         assertEquals(90f, symbolizer.getGraphic().getRotation(), 0.0001f);
         testCase(symbolizer, "point-info-svg-rotate.png");
     }
 
     @Test
-    public void testOpacityPNG() throws IOException, SpatialReferenceCreationException {
+    public void testOpacityPNG() throws IOException {
         symbolizer = getSymbolizer(xmlOpacity);
         assertEquals(0.5f, symbolizer.getGraphic().getOpacity(), 0.00001f);
         testCase(symbolizer, "point-bus-opacity.png");
     }
 
 
-    private void testCase(PointSymbolizer symbolizer, double x, double y, String testCaseName) throws SpatialReferenceCreationException, IOException {
+    private void testCase(PointSymbolizer symbolizer, double x, double y, String testCaseName) throws IOException {
         MapGraphics g = createMapGraphics(100, 10000);
         MockPointFeature feature = MockPointFeature.createPoint(x, y);
         //a horizontal line in the middle of the image.
@@ -151,7 +150,7 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
     }
 
 
-    private void testCase(PointSymbolizer symbolizer, String testCaseName) throws SpatialReferenceCreationException, IOException {
+    private void testCase(PointSymbolizer symbolizer, String testCaseName) throws IOException {
         testCase(symbolizer, 5000d, 5000d, testCaseName);
     }
 

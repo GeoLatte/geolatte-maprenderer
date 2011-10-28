@@ -23,11 +23,9 @@ package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.FeatureTypeStyleType;
 import org.geolatte.geom.crs.CrsId;
-import org.geolatte.maprenderer.geotools.GTSpatialReference;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.SpatialExtent;
-import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.junit.BeforeClass;
 
 import java.io.InputStream;
@@ -37,13 +35,12 @@ public class BaseFeatureTypeStyleTest {
     static FeatureTypeStyleType sldRoot;
     FeatureTypeStyle featureTypeStyle;
 
-    public MapGraphics createMapGraphics() throws SpatialReferenceCreationException {
+    public MapGraphics createMapGraphics() {
         return createMapGraphics(100, 10000);
     }
 
-    public MapGraphics createMapGraphics(int pixelSize, double extentSize) throws SpatialReferenceCreationException {
-        GTSpatialReference spatialReference = new GTSpatialReference("31370", true);
-        SpatialExtent extent = new SpatialExtent(0, 0, extentSize, extentSize, spatialReference);
+    public MapGraphics createMapGraphics(int pixelSize, double extentSize) {
+        SpatialExtent extent = new SpatialExtent(0, 0, extentSize, extentSize, new CrsId("EPSG",31370));
         java.awt.Dimension dim = new java.awt.Dimension(pixelSize, pixelSize);
         MapGraphics mapGraphics =  new JAIMapGraphics(dim, new CrsId("EPSG",31370), extent);
         return mapGraphics;

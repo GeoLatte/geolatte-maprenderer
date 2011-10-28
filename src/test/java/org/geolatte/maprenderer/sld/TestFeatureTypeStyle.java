@@ -21,7 +21,6 @@
 
 package org.geolatte.maprenderer.sld;
 
-import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +44,7 @@ public class TestFeatureTypeStyle extends BaseFeatureTypeStyleTest {
     }
 
     @Test
-    public void test_createPainter() throws SpatialReferenceCreationException {
+    public void test_createPainter() {
         assertNotNull(getFeatureTypeStyle().createPainter(createMapGraphics()));
     }
 

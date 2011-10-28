@@ -21,11 +21,10 @@
 
 package org.geolatte.cache;
 
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.cache.MapCache;
 import org.geolatte.maprenderer.cache.MapCacheKey;
-import org.geolatte.maprenderer.geotools.GTSpatialReference;
 import org.geolatte.maprenderer.map.SpatialExtent;
-import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,12 +42,12 @@ import static org.junit.Assert.*;
  */
 public class TestMapCache {
 
-    private GTSpatialReference srs;
+    private CrsId srs;
 
     @Before
-    public void reset() throws SpatialReferenceCreationException {
+    public void reset() {
         MapCache.getInstance().clear();
-        srs = new GTSpatialReference("4326", true);
+        srs = new CrsId("EPSG",4326);
     }
 
     @Test
