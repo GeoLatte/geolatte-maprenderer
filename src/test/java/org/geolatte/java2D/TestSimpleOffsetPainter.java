@@ -21,7 +21,7 @@
 
 package org.geolatte.java2D;
 
-import org.geolatte.core.Feature;
+import org.geolatte.common.Feature;
 import org.geolatte.maprenderer.geotools.GTSpatialReference;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;

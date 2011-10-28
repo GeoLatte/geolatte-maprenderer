@@ -61,4 +61,8 @@ public class MockLineStringFeature extends AbstractMockFeature{
     }
 
 
+    @Override
+    public String getGeometryName() {
+        return "geometry";
+    }
 }
