@@ -25,12 +25,12 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.geotools.GTSpatialReference;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.java2D.PerpendicularOffsetStroke;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.SpatialExtent;
-import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.test.TestSupport;
@@ -59,7 +59,7 @@ public class TestOffsetRendering {
     private static final float OFFSET_LINE_WIDTH = 2.0f;
     private static final int NUM_IMG = 90;
 
-    private SpatialReference spatialReference;
+    private GTSpatialReference spatialReference;
     private SpatialExtent extent;
     private java.awt.Dimension dim = new java.awt.Dimension(512, 512);
     private PerpendicularOffsetStroke stroke;
@@ -105,7 +105,8 @@ public class TestOffsetRendering {
         double theta = 2 * Math.PI / NUM_IMG;
         for (int i = 0; i < NUM_IMG; i++) {
             System.out.println("i = " + i);
-            MapGraphics mapGraphics = new JAIMapGraphics(dim, spatialReference, extent);
+            CrsId crsId = new CrsId("EPSG", spatialReference.getEPSGCode());
+            MapGraphics mapGraphics = new JAIMapGraphics(dim, crsId, extent);
 
             LineString line = generateLineStrings(i, theta, leftToRight);
             mapGraphics.setStroke(stroke);

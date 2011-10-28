@@ -22,12 +22,11 @@
 package org.geolatte.maprenderer.reference;
 
 
+import org.geolatte.maprenderer.geotools.GTSpatialReference;
+
 public interface SpatialReferenceFactory {
 
-    public Projector createProjector(SpatialReference source,
-                                     SpatialReference target);
-
-    public SpatialReference createSpatialReference(String epsgCode, boolean longLatAxisOrder) throws SpatialReferenceException;
-
+    public Projector createProjector(GTSpatialReference source,
+                                     GTSpatialReference target);
 
 }

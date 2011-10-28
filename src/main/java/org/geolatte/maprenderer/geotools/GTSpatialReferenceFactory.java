@@ -25,7 +25,6 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import org.geolatte.maprenderer.map.SpatialExtent;
 import org.geolatte.maprenderer.reference.Projector;
-import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.maprenderer.reference.SpatialReferenceFactory;
 import org.geotools.geometry.jts.JTS;
@@ -44,23 +43,15 @@ import java.util.Set;
 public class GTSpatialReferenceFactory implements SpatialReferenceFactory {
 
 
-    public Projector createProjector(SpatialReference source,
-                                     SpatialReference target) {
+    public Projector createProjector(GTSpatialReference source,
+                                     GTSpatialReference target) {
         CoordinateReferenceSystem sourceCRS = findCRS(source);
         CoordinateReferenceSystem targetCRS = findCRS(target);
         return new CRSProjector(sourceCRS, targetCRS);
     }
 
-    public SpatialReference createSpatialReference(String epsgCode, boolean inLatLong) throws SpatialReferenceCreationException {
-        return new GTSpatialReference(epsgCode, inLatLong);
-    }
-
-    public CoordinateReferenceSystem findCRS(SpatialReference source) {
-        if (source instanceof GTSpatialReference) {
-            return ((GTSpatialReference) source).getCoordinateReferenceSystem();
-        } else {
-            throw new UnsupportedOperationException("This operation works only with GTSpatialReference");
-        }
+    public CoordinateReferenceSystem findCRS(GTSpatialReference source) {
+        return source.getCoordinateReferenceSystem();
     }
 
 
@@ -84,16 +75,16 @@ public class GTSpatialReferenceFactory implements SpatialReferenceFactory {
         private final boolean inLongLat;
         private final String sourceSRID;
         private final String targetSRID;
-        private final SpatialReference sourceSpatialReference;
-        private final SpatialReference targetSpatialReference;
+        private final GTSpatialReference sourceSpatialReference;
+        private final GTSpatialReference targetSpatialReference;
 
         public CRSProjector(String source, String target, boolean inLongLat) {
             try {
                 this.inLongLat = inLongLat;
                 CRSAuthorityFactory factory = CRS.getAuthorityFactory(inLongLat);
                 GTSpatialReferenceFactory referenceFactory = new GTSpatialReferenceFactory();
-                this.sourceSpatialReference = referenceFactory.createSpatialReference(source, inLongLat);
-                this.targetSpatialReference = referenceFactory.createSpatialReference(target, inLongLat);
+                this.sourceSpatialReference = new GTSpatialReference(source, inLongLat);
+                this.targetSpatialReference = new GTSpatialReference(target, inLongLat);
                 this.sourceCRS = factory.createCoordinateReferenceSystem("EPSG:" + source);
                 this.targetCRS = factory.createCoordinateReferenceSystem("EPSG:" + target);
                 this.transform = CRS.findMathTransform(sourceCRS, targetCRS);
@@ -114,8 +105,8 @@ public class GTSpatialReferenceFactory implements SpatialReferenceFactory {
                 this.targetSRID = extractSRID(targetCRS);
                 this.sourceSRID = extractSRID(sourceCRS);
                 GTSpatialReferenceFactory referenceFactory = new GTSpatialReferenceFactory();
-                this.sourceSpatialReference = referenceFactory.createSpatialReference(sourceSRID, inLongLat);
-                this.targetSpatialReference = referenceFactory.createSpatialReference(targetSRID, inLongLat);
+                this.sourceSpatialReference = new GTSpatialReference(sourceSRID, inLongLat);
+                this.targetSpatialReference = new GTSpatialReference(targetSRID, inLongLat);
             } catch (FactoryException e) {
                 throw new RuntimeException(e);
             } catch (SpatialReferenceCreationException e) {
@@ -151,7 +142,7 @@ public class GTSpatialReferenceFactory implements SpatialReferenceFactory {
             }
         }
 
-        private SpatialExtent transform(SpatialExtent extent, MathTransform transform, SpatialReference targetReference) {
+        private SpatialExtent transform(SpatialExtent extent, MathTransform transform, GTSpatialReference targetReference) {
             Envelope env = extent.toEnvelope();
             try {
                 Envelope transformed = JTS.transform(env, transform);

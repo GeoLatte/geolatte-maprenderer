@@ -23,10 +23,9 @@ package org.geolatte.cache;
 
 import org.geolatte.maprenderer.cache.MapCache;
 import org.geolatte.maprenderer.cache.MapCacheKey;
-import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.maprenderer.geotools.GTSpatialReference;
 import org.geolatte.maprenderer.map.SpatialExtent;
-import org.geolatte.maprenderer.reference.SpatialReference;
+import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,7 +43,7 @@ import static org.junit.Assert.*;
  */
 public class TestMapCache {
 
-    private SpatialReference srs;
+    private GTSpatialReference srs;
 
     @Before
     public void reset() throws SpatialReferenceCreationException {

@@ -22,12 +22,12 @@
 package org.geolatte.java2D;
 
 import org.geolatte.common.Feature;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.geotools.GTSpatialReference;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.maprenderer.map.SpatialExtent;
-import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.test.MockLineStringFeature;
 import org.geolatte.test.TestSupport;
@@ -49,7 +49,7 @@ public class TestSimpleOffsetPainter {
 
 
     private MapGraphics mapGraphics;
-    private SpatialReference spatialReference;
+    private GTSpatialReference spatialReference;
     private SpatialExtent extent;
 
     private List<Feature> features = new ArrayList<Feature>();
@@ -60,7 +60,7 @@ public class TestSimpleOffsetPainter {
         this.spatialReference = new GTSpatialReference("4236", true);
         this.extent = new SpatialExtent(5,5,40,40, spatialReference);
         java.awt.Dimension dim = new java.awt.Dimension(512, 512);
-        this.mapGraphics = new JAIMapGraphics(dim, spatialReference, extent);
+        this.mapGraphics = new JAIMapGraphics(dim, new CrsId("EPSG",4236), extent);
 
         this.features.add( new MockLineStringFeature());
 

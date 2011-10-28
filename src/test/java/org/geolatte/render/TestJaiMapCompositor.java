@@ -21,15 +21,14 @@
 
 package org.geolatte.render;
 
-import org.geolatte.maprenderer.geotools.GTSpatialReferenceFactory;
+import org.geolatte.geom.crs.CrsId;
+import org.geolatte.maprenderer.geotools.GTSpatialReference;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.java2D.JaiMapCompositor;
 import org.geolatte.maprenderer.map.MapCompositor;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.SpatialExtent;
-import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceException;
-import org.geolatte.maprenderer.reference.SpatialReferenceFactory;
 import org.geolatte.test.TestSupport;
 import org.junit.Test;
 
@@ -48,13 +47,13 @@ import java.util.List;
  */
 public class TestJaiMapCompositor {
 
-    final static public SpatialReferenceFactory crsFactory = new GTSpatialReferenceFactory();
+    static public CrsId crsId = new CrsId("EPSG",4326);
 
-    static public SpatialReference crs;
+    static public GTSpatialReference crs;
 
     static {
         try {
-            crs = crsFactory.createSpatialReference("4326", true);
+            crs = new GTSpatialReference("4326", true);
         } catch (SpatialReferenceException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -66,7 +65,7 @@ public class TestJaiMapCompositor {
 
         List<RenderedImage> images = new ArrayList<RenderedImage>();
 
-        MapGraphics map = new JAIMapGraphics(new Dimension(256, 256), crs, new SpatialExtent(0, 0, 90, 90, crs));
+        MapGraphics map = new JAIMapGraphics(new Dimension(256, 256), crsId, new SpatialExtent(0, 0, 90, 90, crs));
         map.setColor(new Color(0f, 1f, 0f, 0.5f));
         map.fillRect(10, 10, 50, 50);
         RenderedImage img = map.createRendering();
@@ -74,7 +73,7 @@ public class TestJaiMapCompositor {
         images.add(img);
 
 
-        map = new JAIMapGraphics(new Dimension(256, 256), crs, new SpatialExtent(0, 0, 90, 90, crs));
+        map = new JAIMapGraphics(new Dimension(256, 256), crsId, new SpatialExtent(0, 0, 90, 90, crs));
         map.setColor(new Color(0f, 0f, 1f, 0.5f));
         map.fillRect(10, 10, 10, 10);
         map.fillRect(20, 20, 10, 10);
@@ -86,7 +85,7 @@ public class TestJaiMapCompositor {
         writeToFile(img, "in2");
         images.add(img);
 
-        map = new JAIMapGraphics(new Dimension(256, 256), crs,new SpatialExtent(0, 0, 90, 90, crs));
+        map = new JAIMapGraphics(new Dimension(256, 256), crsId, new SpatialExtent(0, 0, 90, 90, crs));
         map.setColor(Color.RED);
 
         map.drawOval(15, 15, 1, 1);

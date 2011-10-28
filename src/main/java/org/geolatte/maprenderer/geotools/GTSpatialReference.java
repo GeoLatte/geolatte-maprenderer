@@ -21,7 +21,6 @@
 
 package org.geolatte.maprenderer.geotools;
 
-import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
@@ -29,7 +28,7 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
-public class GTSpatialReference implements SpatialReference {
+public class GTSpatialReference {
 
     private final CoordinateReferenceSystem crs;
     private final int epsgId;

@@ -23,7 +23,6 @@ package org.geolatte.maprenderer.geotools;
 
 import com.vividsolutions.jts.geom.*;
 import org.geolatte.maprenderer.map.SpatialExtent;
-import org.geolatte.maprenderer.reference.SpatialReference;
 import org.geolatte.maprenderer.reference.SpatialReferenceException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
@@ -39,7 +38,7 @@ public class SpatialExtentAdaptor {
     static private GeometryFactory geometryFactory = new GeometryFactory();
 
     public static ReferencedEnvelope toReferencedEnvelope(SpatialExtent extent) throws SpatialReferenceException {
-        SpatialReference sr = extent.getSpatialReference();
+        GTSpatialReference sr = extent.getSpatialReference();
         int code = sr.getEPSGCode();
         try {
             CRSAuthorityFactory factory = CRS.getAuthorityFactory(true);

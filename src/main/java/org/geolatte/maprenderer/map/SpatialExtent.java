@@ -22,7 +22,7 @@
 package org.geolatte.maprenderer.map;
 
 import com.vividsolutions.jts.geom.Envelope;
-import org.geolatte.maprenderer.reference.SpatialReference;
+import org.geolatte.maprenderer.geotools.GTSpatialReference;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -39,9 +39,9 @@ public class SpatialExtent implements Serializable {
 
     private final double maxY;
 
-    private final SpatialReference spatialReference;
+    private final GTSpatialReference spatialReference;
 
-    public SpatialExtent(SpatialReference reference) {
+    public SpatialExtent(GTSpatialReference reference) {
         this.minX = 0;
         this.minY = 0;
         this.maxX = 0;
@@ -49,7 +49,7 @@ public class SpatialExtent implements Serializable {
         this.spatialReference = reference;
     }
 
-    public SpatialExtent(double minX, double minY, Dimension dimension, SpatialReference reference) {
+    public SpatialExtent(double minX, double minY, Dimension dimension, GTSpatialReference reference) {
         this.minX = minX;
         this.minY = minY;
         this.maxX = this.minX + dimension.getWidth();
@@ -57,7 +57,7 @@ public class SpatialExtent implements Serializable {
         this.spatialReference = reference;
     }
 
-    public SpatialExtent(double minX, double minY, double maxX, double maxY, SpatialReference reference) {
+    public SpatialExtent(double minX, double minY, double maxX, double maxY, GTSpatialReference reference) {
         this.minX = minX;
         this.minY = minY;
         this.maxX = maxX;
@@ -65,7 +65,7 @@ public class SpatialExtent implements Serializable {
         this.spatialReference = reference;
     }
 
-    public SpatialReference getSpatialReference() {
+    public GTSpatialReference getSpatialReference() {
         return this.spatialReference;
     }
 
@@ -121,7 +121,7 @@ public class SpatialExtent implements Serializable {
         return new SpatialExtent(minX, minY, maxX, maxY, bounds.getSpatialReference());
     }
 
-    public static SpatialExtent fromEnvelope(Envelope envelope, SpatialReference reference) {
+    public static SpatialExtent fromEnvelope(Envelope envelope, GTSpatialReference reference) {
         return new SpatialExtent(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), reference);
     }
 
