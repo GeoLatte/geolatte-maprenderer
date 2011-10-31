@@ -47,7 +47,6 @@ public class TestSimpleOffsetPainter {
 
 
     private MapGraphics mapGraphics;
-    private CrsId spatialReference;
     private Envelope extent;
 
     private List<Feature> features = new ArrayList<Feature>();
@@ -55,10 +54,9 @@ public class TestSimpleOffsetPainter {
             
     @Before
     public void setUp() {
-        this.spatialReference = new CrsId("EPSG",4236);
-        this.extent = new Envelope(5,5,40,40, spatialReference);
+        this.extent = new Envelope(5,5,40,40, new CrsId("EPSG",4236));
         java.awt.Dimension dim = new java.awt.Dimension(512, 512);
-        this.mapGraphics = new JAIMapGraphics(dim, new CrsId("EPSG",4236), extent);
+        this.mapGraphics = new JAIMapGraphics(dim, extent);
 
         this.features.add( new MockLineStringFeature());
 

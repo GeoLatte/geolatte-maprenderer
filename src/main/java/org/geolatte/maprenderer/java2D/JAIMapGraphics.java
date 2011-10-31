@@ -59,8 +59,8 @@ public class JAIMapGraphics extends MapGraphics {
         }
     }
 
-    public JAIMapGraphics(Dimension dimension, CrsId reference, Envelope extent, ColorModel colorModel) {
-        this.spatialReference = reference;
+    public JAIMapGraphics(Dimension dimension, Envelope extent, ColorModel colorModel) {
+        this.spatialReference = extent.getCrsId();
         this.width = (int) dimension.getWidth();
         this.height = (int) dimension.getHeight();
         WritableRaster raster = colorModel.createCompatibleWritableRaster(this.width, this.height);
@@ -69,12 +69,12 @@ public class JAIMapGraphics extends MapGraphics {
         setToExtent(extent);
     }
 
-    public JAIMapGraphics(Dimension dimension, CrsId reference, Envelope extent, boolean transparency) {
-        this(dimension, reference, extent, makeColorModel(transparency));
+    public JAIMapGraphics(Dimension dimension, Envelope extent, boolean transparency) {
+        this(dimension, extent, makeColorModel(transparency));
     }
 
-    public JAIMapGraphics(Dimension dimension, CrsId reference, Envelope extent) {
-        this(dimension, reference, extent, true);
+    public JAIMapGraphics(Dimension dimension, Envelope extent) {
+        this(dimension, extent, true);
     }
 
     public void initGraphics() {

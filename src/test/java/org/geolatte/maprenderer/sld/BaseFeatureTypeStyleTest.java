@@ -42,7 +42,7 @@ public class BaseFeatureTypeStyleTest {
     public MapGraphics createMapGraphics(int pixelSize, double extentSize) {
         Envelope extent = new Envelope(0, 0, extentSize, extentSize, new CrsId("EPSG",31370));
         java.awt.Dimension dim = new java.awt.Dimension(pixelSize, pixelSize);
-        MapGraphics mapGraphics =  new JAIMapGraphics(dim, new CrsId("EPSG",31370), extent);
+        MapGraphics mapGraphics =  new JAIMapGraphics(dim, extent);
         return mapGraphics;
     }
 

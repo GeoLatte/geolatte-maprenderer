@@ -57,7 +57,6 @@ public class TestOffsetRendering {
     private static final float OFFSET_LINE_WIDTH = 2.0f;
     private static final int NUM_IMG = 90;
 
-    private CrsId spatialReference;
     private Envelope extent;
     private java.awt.Dimension dim = new java.awt.Dimension(512, 512);
     private PerpendicularOffsetStroke stroke;
@@ -67,8 +66,7 @@ public class TestOffsetRendering {
 
     @Before
     public void setUp() {
-        this.spatialReference = new CrsId("EPSG",4236);
-        this.extent = new Envelope(-100, -100, 100, 100, spatialReference);
+        this.extent = new Envelope(-100, -100, 100, 100, new CrsId("EPSG",4236));
         this.stroke = new PerpendicularOffsetStroke(LINE_WIDTH); //e, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
         this.offsetStroke = new PerpendicularOffsetStroke(OFFSET_LINE_WIDTH, OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
         this.negOffsetStroke = new PerpendicularOffsetStroke(OFFSET_LINE_WIDTH, NEG_OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
@@ -103,8 +101,7 @@ public class TestOffsetRendering {
         double theta = 2 * Math.PI / NUM_IMG;
         for (int i = 0; i < NUM_IMG; i++) {
             System.out.println("i = " + i);
-            CrsId crsId = new CrsId("EPSG", spatialReference.getCode());
-            MapGraphics mapGraphics = new JAIMapGraphics(dim, crsId, extent);
+            MapGraphics mapGraphics = new JAIMapGraphics(dim, extent);
 
             LineString line = generateLineStrings(i, theta, leftToRight);
             mapGraphics.setStroke(stroke);
