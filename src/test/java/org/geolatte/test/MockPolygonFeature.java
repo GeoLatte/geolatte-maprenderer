@@ -69,4 +69,8 @@ public class MockPolygonFeature extends AbstractMockFeature {
         return new MockPolygonFeature(geomFactory.createPolygon(shell, null));
     }
 
+    @Override
+    public String getGeometryName() {
+        return "geometry";
+    }
 }

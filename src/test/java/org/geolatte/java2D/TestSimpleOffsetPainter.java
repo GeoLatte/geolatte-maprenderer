@@ -21,14 +21,12 @@
 
 package org.geolatte.java2D;
 
-import org.geolatte.core.Feature;
-import org.geolatte.maprenderer.geotools.GTSpatialReference;
+import org.geolatte.common.Feature;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
-import org.geolatte.maprenderer.map.SpatialExtent;
-import org.geolatte.maprenderer.reference.SpatialReference;
-import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.test.MockLineStringFeature;
 import org.geolatte.test.TestSupport;
 import org.junit.Before;
@@ -49,18 +47,16 @@ public class TestSimpleOffsetPainter {
 
 
     private MapGraphics mapGraphics;
-    private SpatialReference spatialReference;
-    private SpatialExtent extent;
+    private Envelope extent;
 
     private List<Feature> features = new ArrayList<Feature>();
 
             
     @Before
-    public void setUp() throws SpatialReferenceCreationException {
-        this.spatialReference = new GTSpatialReference("4236", true);
-        this.extent = new SpatialExtent(5,5,40,40, spatialReference);
+    public void setUp() {
+        this.extent = new Envelope(5,5,40,40, new CrsId("EPSG",4236));
         java.awt.Dimension dim = new java.awt.Dimension(512, 512);
-        this.mapGraphics = new JAIMapGraphics(dim, spatialReference, extent);
+        this.mapGraphics = new JAIMapGraphics(dim, extent);
 
         this.features.add( new MockLineStringFeature());
 

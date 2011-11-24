@@ -22,7 +22,7 @@
 package org.geolatte.maprenderer.sld;
 
 import com.vividsolutions.jts.geom.Geometry;
-import org.geolatte.core.Feature;
+import org.geolatte.common.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.sld.filter.SLDRuleFilter;
 

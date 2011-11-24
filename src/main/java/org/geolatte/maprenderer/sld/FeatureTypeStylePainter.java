@@ -22,7 +22,7 @@
 package org.geolatte.maprenderer.sld;
 
 
-import org.geolatte.core.Feature;
+import org.geolatte.common.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.maprenderer.shape.ShapeAdapter;

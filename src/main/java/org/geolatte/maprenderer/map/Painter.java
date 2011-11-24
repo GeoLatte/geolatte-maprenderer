@@ -21,7 +21,7 @@
 
 package org.geolatte.maprenderer.map;
 
-import org.geolatte.core.Feature;
+import org.geolatte.common.Feature;
 
 /**
  * Paints features  onto a <code>MapGraphics</code>.

@@ -21,18 +21,18 @@
 
 package org.geolatte.maprenderer.cache;
 
-import org.geolatte.maprenderer.map.SpatialExtent;
+import org.geolatte.geom.Envelope;
 
 
 public class MapCacheKey {
 
     private final String layerName;
     private final String format;
-    private final SpatialExtent extent;
+    private final Envelope extent;
     private final int width;
     private final int height;
 
-    public MapCacheKey(String layerName, String format, SpatialExtent extent, int width, int height) {
+    public MapCacheKey(String layerName, String format, Envelope extent, int width, int height) {
         this.layerName = layerName;
         this.format = format;
         this.extent = extent;
@@ -48,7 +48,7 @@ public class MapCacheKey {
         return format;
     }
 
-    public SpatialExtent getExtent() {
+    public Envelope getExtent() {
         return extent;
     }
 

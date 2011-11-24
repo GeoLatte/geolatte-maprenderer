@@ -23,7 +23,6 @@ package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.PolygonSymbolizerType;
 import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.test.MockPolygonFeature;
 import org.geolatte.test.TestSupport;
@@ -101,7 +100,7 @@ public class TestPolygonSymbolizer extends BaseFeatureTypeStyleTest {
 
     //TODO -- add test case for donut polygon
 
-    private void testCase(String testCaseName) throws SpatialReferenceCreationException, IOException {
+    private void testCase(String testCaseName) throws IOException {
        symbolizer = new PolygonSymbolizer(type);
 
         MapGraphics g = createMapGraphics(100, 10000);
