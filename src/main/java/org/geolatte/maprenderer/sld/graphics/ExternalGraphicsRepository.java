@@ -36,10 +36,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import java.io.*;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
@@ -155,18 +152,22 @@ public class ExternalGraphicsRepository {
      * @throws IOException
      */
     private void retrieveAndStore(String uri, String path) throws IOException {
-        File file = getResourceAsFile(path);
-        if (file == null) {
+        InputStream inputStream = getResourceAsInputStream(path);
+        if (inputStream == null) {
             throw new IOException(String.format("Graphics file %s not found on classpath.", path));
         }
+
         //try to read it as an image (png, jpeg,..)
-        BufferedImage img = ImageIO.read(file);
+        BufferedImage img = ImageIO.read(inputStream);
         if (img != null) {
             storeInCache(new ImageKey(uri),img);
             return;
         }
+        //ImageIO.read() removes the first 8 characters from the input stream, so we need to reset it.
+        inputStream = getResourceAsInputStream(path);
+
         //if unsuccesfull, try to read it as an SVG
-        SVGDocument svg = SVGDocumentIO.read(uri, file);
+        SVGDocument svg = SVGDocumentIO.read(uri, inputStream);
         if (svg != null) {
             storeInSvgCache(uri, svg);
             return;
@@ -282,13 +283,8 @@ public class ExternalGraphicsRepository {
         return Thread.currentThread().getContextClassLoader().getResourceAsStream(packageName + "/graphics.index");
     }
 
-    private File getResourceAsFile(String resource)  {
-        //TODO -- the line below doesn't seem to work with SAX parser. Why?
-        // the returned InputStream, when fed to the SAX parser, complains about content not allowed in
-        // prolog. But the file has certainly no content before prolog and has no BOM (I checked with hd).
-        //return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
-        URL url = Thread.currentThread().getContextClassLoader().getResource(resource);
-        return new File(url.getFile());
+    private InputStream getResourceAsInputStream(String resource)  {
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
     }
 
 

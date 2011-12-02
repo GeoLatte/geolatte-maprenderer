@@ -21,7 +21,7 @@
 
 package org.geolatte.maprenderer.sld.filter;
 
-import org.geolatte.core.Feature;
+import org.geolatte.common.Feature;
 import org.geolatte.maprenderer.util.TypeConverter;
 
 

@@ -21,12 +21,10 @@
 
 package org.geolatte.cache;
 
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.cache.MapCache;
 import org.geolatte.maprenderer.cache.MapCacheKey;
-import org.geolatte.maprenderer.reference.SpatialReferenceCreationException;
-import org.geolatte.maprenderer.geotools.GTSpatialReference;
-import org.geolatte.maprenderer.map.SpatialExtent;
-import org.geolatte.maprenderer.reference.SpatialReference;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,12 +42,12 @@ import static org.junit.Assert.*;
  */
 public class TestMapCache {
 
-    private SpatialReference srs;
+    private CrsId crsId;
 
     @Before
-    public void reset() throws SpatialReferenceCreationException {
+    public void reset() {
         MapCache.getInstance().clear();
-        srs = new GTSpatialReference("4326", true);
+        crsId = new CrsId("EPSG",4326);
     }
 
     @Test
@@ -60,7 +58,7 @@ public class TestMapCache {
     @Test
     public void test_map_read_write_image() {
         BufferedImage expected = new BufferedImage(256, 256, BufferedImage.TYPE_INT_ARGB);
-        MapCacheKey key = new MapCacheKey("aaa", "JPEG", new SpatialExtent(0, 0, 30, 30, srs), expected.getWidth(), expected.getHeight());
+        MapCacheKey key = new MapCacheKey("aaa", "JPEG", new Envelope(0, 0, 30, 30, crsId), expected.getWidth(), expected.getHeight());
         MapCache.getInstance().put(key, expected);
         RenderedImage received = MapCache.getInstance().get(key);
         assertEquals(expected, received);
@@ -69,7 +67,7 @@ public class TestMapCache {
     @Test
     public void test_clear() {
         BufferedImage expected = new BufferedImage(256, 256, BufferedImage.TYPE_INT_ARGB);
-        MapCacheKey key = new MapCacheKey("aaa", "JPEG", new SpatialExtent(0, 0, 256, 256, srs), expected.getWidth(), expected.getHeight());
+        MapCacheKey key = new MapCacheKey("aaa", "JPEG", new Envelope(0, 0, 256, 256, crsId), expected.getWidth(), expected.getHeight());
         MapCache.getInstance().put(key, expected);
         RenderedImage received = MapCache.getInstance().get(key);
         assertEquals(expected, received);
@@ -79,7 +77,7 @@ public class TestMapCache {
 
     @Test
     public void test_null_on_cache_miss() {
-        MapCacheKey key = new MapCacheKey("aaa", "JPEG", new SpatialExtent(0, 0, 40, 40, srs), 256, 256);
+        MapCacheKey key = new MapCacheKey("aaa", "JPEG", new Envelope(0, 0, 40, 40, crsId), 256, 256);
         assertNull(MapCache.getInstance().get(key));
     }
 

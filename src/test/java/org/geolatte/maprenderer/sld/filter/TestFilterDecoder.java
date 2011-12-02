@@ -22,7 +22,7 @@
 package org.geolatte.maprenderer.sld.filter;
 
 import net.opengis.filter.v_1_1_0.FilterType;
-import org.geolatte.core.Feature;
+import org.geolatte.common.Feature;
 import org.geolatte.maprenderer.sld.SLD;
 import org.geolatte.maprenderer.util.ConversionException;
 import org.junit.Test;

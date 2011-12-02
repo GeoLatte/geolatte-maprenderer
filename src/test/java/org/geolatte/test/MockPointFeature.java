@@ -50,4 +50,9 @@ public class MockPointFeature extends AbstractMockFeature {
         Point pnt = geomFactory.createPoint(new Coordinate(x, y));
         return new MockPointFeature(pnt);
     }
+
+    @Override
+    public String getGeometryName() {
+        return "geometry";
+    }
 }

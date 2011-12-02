@@ -21,7 +21,7 @@
 
 package org.geolatte.maprenderer.map;
 
-import org.geolatte.maprenderer.reference.SpatialReference;
+import org.geolatte.geom.crs.CrsId;
 
 import java.awt.*;
 import java.awt.image.RenderedImage;
@@ -39,7 +39,7 @@ public abstract class MapGraphics extends Graphics2D {
 
     abstract public RenderedImage createRendering();
 
-    abstract public SpatialReference getSpatialReference();
+    abstract public CrsId getSpatialReference();
 
     abstract public double getMapUnitsPerPixel();
 

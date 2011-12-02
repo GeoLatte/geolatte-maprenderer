@@ -21,9 +21,9 @@
 
 package org.geolatte.maprenderer.java2D;
 
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.map.SpatialExtent;
-import org.geolatte.maprenderer.reference.SpatialReference;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -45,7 +45,7 @@ public class JAIMapGraphics extends MapGraphics {
     private final int width;
     private final int height;
     private Graphics2D g2;
-    private final SpatialReference spatialReference;
+    private final CrsId spatialReference;
     private final BufferedImage image;
 
 
@@ -59,8 +59,8 @@ public class JAIMapGraphics extends MapGraphics {
         }
     }
 
-    public JAIMapGraphics(Dimension dimension, SpatialReference reference, SpatialExtent extent, ColorModel colorModel) {
-        this.spatialReference = reference;
+    public JAIMapGraphics(Dimension dimension, Envelope extent, ColorModel colorModel) {
+        this.spatialReference = extent.getCrsId();
         this.width = (int) dimension.getWidth();
         this.height = (int) dimension.getHeight();
         WritableRaster raster = colorModel.createCompatibleWritableRaster(this.width, this.height);
@@ -69,12 +69,12 @@ public class JAIMapGraphics extends MapGraphics {
         setToExtent(extent);
     }
 
-    public JAIMapGraphics(Dimension dimension, SpatialReference reference, SpatialExtent extent, boolean transparency) {
-        this(dimension, reference, extent, makeColorModel(transparency));
+    public JAIMapGraphics(Dimension dimension, Envelope extent, boolean transparency) {
+        this(dimension, extent, makeColorModel(transparency));
     }
 
-    public JAIMapGraphics(Dimension dimension, SpatialReference reference, SpatialExtent extent) {
-        this(dimension, reference, extent, true);
+    public JAIMapGraphics(Dimension dimension, Envelope extent) {
+        this(dimension, extent, true);
     }
 
     public void initGraphics() {
@@ -122,9 +122,9 @@ public class JAIMapGraphics extends MapGraphics {
         return hints;
     }
 
-    private void setToExtent(SpatialExtent extent) {
-        if (!extent.getSpatialReference().equals(getSpatialReference()))
-            throw new IllegalArgumentException("Spatial Reference of extent object must be EPSG: " + getSpatialReference().getEPSGCode());
+    private void setToExtent(Envelope extent) {
+        if (extent.getCrsId().getCode() != getSpatialReference().getCode())
+            throw new IllegalArgumentException("Spatial Reference of extent object must be EPSG: " + getSpatialReference().getCode());
         AffineTransform atf = new AffineTransform();
         double sx = width / extent.getWidth();
         double sy = height / extent.getHeight();
@@ -141,7 +141,7 @@ public class JAIMapGraphics extends MapGraphics {
     }
 
     @Override
-    public SpatialReference getSpatialReference() {
+    public CrsId getSpatialReference() {
         return this.spatialReference;
     }
 
