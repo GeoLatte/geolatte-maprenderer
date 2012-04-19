@@ -21,8 +21,8 @@
 
 package org.geolatte.test;
 
-import com.vividsolutions.jts.geom.*;
 import org.geolatte.common.Feature;
+import org.geolatte.geom.Geometry;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +35,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 //TODO Replace by Mockito
 public abstract class AbstractMockFeature implements Feature {
-    protected static final GeometryFactory geomFactory = new GeometryFactory();
     protected Geometry geom;
     protected Integer id;
     protected static AtomicInteger counter = new AtomicInteger(0);

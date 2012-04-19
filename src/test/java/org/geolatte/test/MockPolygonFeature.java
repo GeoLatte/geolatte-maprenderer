@@ -21,10 +21,9 @@
 
 package org.geolatte.test;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
+
+import org.geolatte.geom.*;
+import org.geolatte.geom.crs.CrsId;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -46,27 +45,25 @@ public class MockPolygonFeature extends AbstractMockFeature {
         double width = Math.random() * 90;
         double height = Math.random() * 90;
 
-        Coordinate[] coordinates = new Coordinate[]{
-                new Coordinate(startx, starty),
-                new Coordinate(startx, starty + height),
-                new Coordinate(startx + width, starty + height),
-                new Coordinate(startx + width, starty),
-                new Coordinate(startx, starty),
-        };
-        LinearRing shell = geomFactory.createLinearRing(coordinates);
-        return new Polygon(shell, null, geomFactory);        
-    };
+        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(5, DimensionalFlag.XY);
+        sequenceBuilder.add(startx, starty);
+        sequenceBuilder.add(startx, starty + height);
+        sequenceBuilder.add(startx + width, starty + height);
+        sequenceBuilder.add(startx + width, starty);
+        sequenceBuilder.add(startx, starty);
+        LinearRing shell = new LinearRing(sequenceBuilder.toPointSequence(), CrsId.UNDEFINED);
+        return new Polygon(new LinearRing[] { shell });
+    }
 
     public static MockPolygonFeature createRect(double minX, double minY, double maxX, double maxY) {
-        Coordinate[] coordinates = new Coordinate[]{
-                new Coordinate(minX, minY),
-                new Coordinate(minX, maxY),
-                new Coordinate(maxX, maxY),
-                new Coordinate(maxX, minY),
-                new Coordinate(minX, minY)
-    };
-        LinearRing shell = geomFactory.createLinearRing(coordinates);
-        return new MockPolygonFeature(geomFactory.createPolygon(shell, null));
+        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(5, DimensionalFlag.XY);
+        sequenceBuilder.add(minX, minY);
+        sequenceBuilder.add(minX, maxY);
+        sequenceBuilder.add(maxX, maxY);
+        sequenceBuilder.add(maxX, minY);
+        sequenceBuilder.add(minX, minY);
+        LinearRing shell = new LinearRing(sequenceBuilder.toPointSequence(), CrsId.UNDEFINED);
+        return new MockPolygonFeature(new Polygon(new LinearRing[] { shell }));
     }
 
     @Override
