@@ -22,6 +22,7 @@
 package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.LineSymbolizerType;
+import org.geolatte.geom.jts.JTS;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.test.MockLineStringFeature;
@@ -123,7 +124,7 @@ public class TestLineSymbolizer extends BaseFeatureTypeStyleTest {
         //a horizontal line in the middle of the image.
         MockLineStringFeature feature = MockLineStringFeature.createLine(10000d, 50000d, 90000d, 50000d);
         ShapeAdapter adapter = new ShapeAdapter(g.getTransform());
-        lineSymbolizer.symbolize(g, feature.getGeometry());
+        lineSymbolizer.symbolize(g, JTS.to(feature.getGeometry()));
         RenderedImage img = g.createRendering();
         TestSupport.writeImageToDisk(img, "lineSymbolizer-1.png", "PNG");
         assertImageEquals("expected-lineSymbolizer-1.png", img);

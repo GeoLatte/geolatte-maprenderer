@@ -21,9 +21,9 @@
 
 package org.geolatte.test;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.Points;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -43,11 +43,11 @@ public class MockPointFeature extends AbstractMockFeature {
     protected Geometry generateGeom() {
         double x = Math.random() * 90;
         double y = Math.random() * 90;
-        return geomFactory.createPoint(new Coordinate(x, y));
+        return Points.create(x, y);
     }
 
     public static MockPointFeature createPoint(double x, double y){
-        Point pnt = geomFactory.createPoint(new Coordinate(x, y));
+        Point pnt = Points.create(x, y);
         return new MockPointFeature(pnt);
     }
 
