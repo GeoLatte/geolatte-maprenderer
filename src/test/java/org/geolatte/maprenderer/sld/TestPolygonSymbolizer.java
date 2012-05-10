@@ -22,6 +22,7 @@
 package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.PolygonSymbolizerType;
+import org.geolatte.geom.jts.JTS;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.test.MockPolygonFeature;
@@ -108,7 +109,7 @@ public class TestPolygonSymbolizer extends BaseFeatureTypeStyleTest {
         //a horizontal line in the middle of the image.
         MockPolygonFeature feature = MockPolygonFeature.createRect(3000, 3000, 6000, 6000);
         ShapeAdapter adapter = new ShapeAdapter(g.getTransform());
-        symbolizer.symbolize(g, feature.getGeometry());
+        symbolizer.symbolize(g, JTS.to(feature.getGeometry()));
         RenderedImage img = g.createRendering();
         TestSupport.writeImageToDisk(img, testCaseName, "PNG");
         assertImageEquals("expected-" + testCaseName, img);

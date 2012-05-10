@@ -21,20 +21,21 @@
 
 package org.geolatte.test;
 
-import com.vividsolutions.jts.geom.*;
+import org.geolatte.geom.*;
+import org.geolatte.geom.crs.CrsId;
 
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: May 23, 2010
  */
-public class MockLineStringFeature extends AbstractMockFeature{
+public class MockLineStringFeature extends AbstractMockFeature {
 
 
     public MockLineStringFeature(Geometry geom) {
         super(geom);
     }
 
-    public MockLineStringFeature(){
+    public MockLineStringFeature() {
         super();
     }
 
@@ -42,21 +43,19 @@ public class MockLineStringFeature extends AbstractMockFeature{
         double startx = 10;
         double starty = 10;
 
-        Coordinate[] coordinates = new Coordinate[]{
-                new Coordinate(startx, starty),
-                new Coordinate(startx + 10.0, starty + 12.0),
-                new Coordinate(startx + 20.0, starty),
-                new Coordinate(startx + 30, starty+10.0)
-        };
-        return geomFactory.createLineString(coordinates);
+        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.XY);
+        sequenceBuilder.add(startx, starty);
+        sequenceBuilder.add(startx + 10.0, starty + 12.0);
+        sequenceBuilder.add(startx + 20.0, starty);
+        sequenceBuilder.add(startx + 30, starty + 10.0);
+        return new LineString(sequenceBuilder.toPointSequence(), CrsId.UNDEFINED);
     }
 
-    public static MockLineStringFeature createLine(double startX, double startY, double endX, double endY){
-        Coordinate[] coordinates = new Coordinate[]{
-                new Coordinate(startX, startY),
-                new Coordinate(endX, endY)
-        };
-        Geometry geom =  geomFactory.createLineString(coordinates);
+    public static MockLineStringFeature createLine(double startX, double startY, double endX, double endY) {
+        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XY);
+        sequenceBuilder.add(startX, startY);
+        sequenceBuilder.add(endX, endY);
+        Geometry geom = new LineString(sequenceBuilder.toPointSequence(), CrsId.UNDEFINED);
         return new MockLineStringFeature(geom);
     }
 

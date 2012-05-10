@@ -23,11 +23,10 @@ package org.geolatte.maprenderer.sld;
 
 
 import org.geolatte.common.Feature;
+import org.geolatte.geom.jts.JTS;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
-import org.geolatte.maprenderer.shape.ShapeAdapter;
 
-import java.awt.*;
 import java.util.List;
 
 /**
@@ -60,7 +59,7 @@ public class FeatureTypeStylePainter implements Painter {
         for (Feature feature : features){
             for (Rule rule : rules){
                 if (!rule.accepts(feature)) continue;
-                rule.symbolize(graphics, feature.getGeometry());
+                rule.symbolize(graphics, JTS.to(feature.getGeometry()));
             }
         }
 

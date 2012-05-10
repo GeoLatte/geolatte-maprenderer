@@ -22,6 +22,7 @@
 package org.geolatte.java2D;
 
 import org.geolatte.common.Feature;
+import org.geolatte.geom.jts.JTS;
 import org.geolatte.maprenderer.java2D.PerpendicularOffsetStroke;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
@@ -52,9 +53,9 @@ public class SimpleOffsetPainter implements Painter {
 
         PerpendicularOffsetStroke offsetStroke = new PerpendicularOffsetStroke(2.0f, OFFSET_IN_PIXELS);
 
-        for(Feature feature : features){
-            Shape[] shapes = shapeAdapter.toShape(feature.getGeometry());
-            for (Shape shape : shapes){
+        for(Feature feature : features) {
+            Shape[] shapes = shapeAdapter.toShape(JTS.to(feature.getGeometry()));
+            for (Shape shape : shapes) {
                 graphics.setColor(Color.RED);
                 graphics.setStroke(baseStroke);
                 graphics.draw(shape);
