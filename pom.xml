@@ -2,7 +2,7 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.geolatte</groupId>
-    <artifactId>maprenderer</artifactId>
+    <artifactId>geolatte-maprenderer</artifactId>
     <packaging>jar</packaging>
     <version>0.2</version>
     <name>Geolatte Maprenderer</name>
@@ -180,7 +180,6 @@
 
     </dependencies>
     <build>
-        <finalName>geolatte-maprenderer</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
