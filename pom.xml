@@ -4,7 +4,7 @@
     <groupId>org.geolatte</groupId>
     <artifactId>geolatte-maprenderer</artifactId>
     <packaging>jar</packaging>
-    <version>0.2</version>
+    <version>0.3-SNAPSHOT</version>
     <name>Geolatte Maprenderer</name>
     <url>http://www.geolatte.org/confluence/display/mrend</url>
     <description>A renderer with a geo-centered API.</description>
