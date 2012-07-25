@@ -4,9 +4,81 @@
     <groupId>org.geolatte</groupId>
     <artifactId>maprenderer</artifactId>
     <packaging>jar</packaging>
-    <version>0.2-SNAPSHOT</version>
-    <name>maprenderer</name>
-    <url>http://maven.apache.org</url>
+    <version>0.2</version>
+    <name>Geolatte Maprenderer</name>
+    <url>http://www.geolatte.org/confluence/display/mrend</url>
+    <description>A renderer with a geo-centered API.</description>
+
+    <organization>
+        <name>geolatte.org</name>
+        <url>http://www.geolatte.org/</url>
+    </organization>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <licenses>
+        <license>
+            <name>LGPL 3.0</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:GeoLatte/geolatte-maprenderer.git</connection>
+        <url>scm:git:git@github.com:GeoLatte/geolatte-maprenderer.git</url>
+        <developerConnection>scm:git:git@github.com:GeoLatte/geolatte-maprenderer.git</developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>maesenka</id>
+            <name>Karel Maesen</name>
+            <email>karel@geovise.com</email>
+            <roles>
+                <role>Contributor</role>
+                <role>Committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>bertvh</id>
+            <name>Bert Vanhooff</name>
+            <email>bert.vanhooff@qmino.com</email>
+            <roles>
+                <role>Contributor</role>
+                <role>Committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>yvesv</id>
+            <name>Yves Vandewoude</name>
+            <email>yves.vandewoude@qmino.com</email>
+            <roles>
+                <role>Contributor</role>
+                <role>Committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>rigolepe</id>
+            <name>Peter Rigole</name>
+            <email>peter.rigole@qmino.com</email>
+            <roles>
+                <role>Contributor</role>
+                <role>Committer</role>
+            </roles>
+        </developer>
+    </developers>
+
+
     <repositories>
         <repository>
             <id>osgeo</id>
@@ -23,7 +95,7 @@
         <dependency>
             <groupId>org.geolatte</groupId>
             <artifactId>geolatte-common</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>0.5</version>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
@@ -113,6 +185,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
