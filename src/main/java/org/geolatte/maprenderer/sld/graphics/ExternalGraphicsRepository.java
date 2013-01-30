@@ -250,8 +250,8 @@ public class ExternalGraphicsRepository {
         }
         SVGTranscoder transcoder = new SVGTranscoder();
         SVGSVGElement svgRootElement = svg.getRootElement();
-        float svgWidth = svgRootElement.getWidth().getBaseVal().getValue();
-        float svgHeight = svgRootElement.getHeight().getBaseVal().getValue();
+        float svgWidth = svgRootElement.getWidth().getBaseVal().getValueInSpecifiedUnits();
+        float svgHeight = svgRootElement.getHeight().getBaseVal().getValueInSpecifiedUnits();
 //        float aspectRatio = svgWidth/svgHeight;
 //        int height = Math.round(size);
 //        int width = (int)(aspectRatio * height);
