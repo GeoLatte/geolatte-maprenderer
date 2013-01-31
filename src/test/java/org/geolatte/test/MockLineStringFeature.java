@@ -43,19 +43,19 @@ public class MockLineStringFeature extends AbstractMockFeature {
         double startx = 10;
         double starty = 10;
 
-        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.XY);
+        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.d2D, CrsId.UNDEFINED);
         sequenceBuilder.add(startx, starty);
         sequenceBuilder.add(startx + 10.0, starty + 12.0);
         sequenceBuilder.add(startx + 20.0, starty);
         sequenceBuilder.add(startx + 30, starty + 10.0);
-        return new LineString(sequenceBuilder.toPointSequence(), CrsId.UNDEFINED);
+        return new LineString(sequenceBuilder.toPointSequence());
     }
 
     public static MockLineStringFeature createLine(double startX, double startY, double endX, double endY) {
-        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XY);
+        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D, CrsId.UNDEFINED);
         sequenceBuilder.add(startX, startY);
         sequenceBuilder.add(endX, endY);
-        Geometry geom = new LineString(sequenceBuilder.toPointSequence(), CrsId.UNDEFINED);
+        Geometry geom = new LineString(sequenceBuilder.toPointSequence());
         return new MockLineStringFeature(geom);
     }
 

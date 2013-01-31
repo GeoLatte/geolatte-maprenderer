@@ -45,24 +45,24 @@ public class MockPolygonFeature extends AbstractMockFeature {
         double width = Math.random() * 90;
         double height = Math.random() * 90;
 
-        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(5, DimensionalFlag.XY);
+        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D, CrsId.UNDEFINED);
         sequenceBuilder.add(startx, starty);
         sequenceBuilder.add(startx, starty + height);
         sequenceBuilder.add(startx + width, starty + height);
         sequenceBuilder.add(startx + width, starty);
         sequenceBuilder.add(startx, starty);
-        LinearRing shell = new LinearRing(sequenceBuilder.toPointSequence(), CrsId.UNDEFINED);
+        LinearRing shell = new LinearRing(sequenceBuilder.toPointSequence());
         return new Polygon(new LinearRing[] { shell });
     }
 
     public static MockPolygonFeature createRect(double minX, double minY, double maxX, double maxY) {
-        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(5, DimensionalFlag.XY);
+        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D, CrsId.UNDEFINED);
         sequenceBuilder.add(minX, minY);
         sequenceBuilder.add(minX, maxY);
         sequenceBuilder.add(maxX, maxY);
         sequenceBuilder.add(maxX, minY);
         sequenceBuilder.add(minX, minY);
-        LinearRing shell = new LinearRing(sequenceBuilder.toPointSequence(), CrsId.UNDEFINED);
+        LinearRing shell = new LinearRing(sequenceBuilder.toPointSequence());
         return new MockPolygonFeature(new Polygon(new LinearRing[] { shell }));
     }
 

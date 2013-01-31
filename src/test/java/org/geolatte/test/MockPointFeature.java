@@ -43,11 +43,11 @@ public class MockPointFeature extends AbstractMockFeature {
     protected Geometry generateGeom() {
         double x = Math.random() * 90;
         double y = Math.random() * 90;
-        return Points.create(x, y);
+        return Points.create2D(x, y);
     }
 
     public static MockPointFeature createPoint(double x, double y){
-        Point pnt = Points.create(x, y);
+        Point pnt = Points.create2D(x, y);
         return new MockPointFeature(pnt);
     }
 
