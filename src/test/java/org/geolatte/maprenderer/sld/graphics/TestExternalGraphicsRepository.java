@@ -21,15 +21,15 @@
 
 package org.geolatte.maprenderer.sld.graphics;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.IOException;
+
 import org.geolatte.test.ExpectedImages;
 import org.geolatte.test.TestSupport;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.svg.SVGDocument;
-
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.IOException;
 
 import static org.geolatte.test.TestSupport.assertImageEquals;
 import static org.junit.Assert.assertNotNull;
@@ -45,7 +45,7 @@ public class TestExternalGraphicsRepository {
 
     //TODO can we link to a more stable graphics?
     private static String EXT_GRAPHIC_IMAGE_URL = "http://www.google.com/intl/en_com/images/srpr/logo3w.png";
-    private static String EXT_GRAPHIC_SVG_URL = "http://www.gbwiki.net/wiki/images/3/35/Information_icon.svg";
+    private static String EXT_GRAPHIC_SVG_URL = "http://upload.wikimedia.org/wikipedia/commons/e/e6/%22Bookmark%22.svg";
 
 
     private ExternalGraphicsRepository repo;
