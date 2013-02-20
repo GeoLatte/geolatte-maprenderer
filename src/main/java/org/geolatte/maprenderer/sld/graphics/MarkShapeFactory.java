@@ -65,7 +65,9 @@ public class MarkShapeFactory {
     public <T extends MarkShape> T getWellKnownMark(String name) {
         for (WellKnownMark mark : WellKnownMark.values()) {
             if (mark.getName().equalsIgnoreCase(name)) {
-                return createMarkInstance(mark);
+				//the this.<T>... invocation is used as a workaround
+				//to http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6302954
+                return this.<T>createMarkInstance(mark);
             }
         }
         throw new UnsupportedOperationException(String.format("Name %s is not known in MarkFactory.", name));
