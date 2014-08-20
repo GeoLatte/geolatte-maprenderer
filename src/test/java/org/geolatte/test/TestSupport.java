@@ -22,6 +22,8 @@
 package org.geolatte.test;
 
 import org.geolatte.maprenderer.java2D.ImageComparator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.RenderedImage;
@@ -36,6 +38,8 @@ import static junit.framework.Assert.fail;
  */
 public class TestSupport {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(TestSupport.class);
+
     /**
      * The sub-directory of java.io.tmpdir where the
      * image files will be written during unit tests (if enabled).
@@ -45,6 +49,8 @@ public class TestSupport {
     /**
      * Java system property that controls whether to write image files to
      * TEST_WRITE_DIR during unit testing.
+     *
+     * To activate add VM option: -DWRITE_TEST_FILES=True
      *
      */
     final static public String WRITE_TEST_IMAGES_TO_DISK = "WRITE_TEST_FILES";
@@ -68,6 +74,7 @@ public class TestSupport {
     public static void writeImageToDisk(RenderedImage img, String imageName, String type) throws IOException {
         if (TestSupport.writeTestImagesToDiskIsActive()){
             File file = new File(getTempDir(),imageName);
+            LOGGER.debug("Writing image to file: " + file.getCanonicalPath());
             ImageIO.write(img, type, file);
         }
     }

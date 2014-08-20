@@ -38,6 +38,8 @@ public class PerpendicularOffsetStroke implements Stroke {
 
     private static Logger LOGGER = LoggerFactory.getLogger(PerpendicularOffsetStroke.class);
 
+    public static double EPSILON = 0.025d;
+
     private static float FLATNESS = .01f;
     private float perpendicularOffset = 0f;
     private BasicStroke delegate;
@@ -147,13 +149,18 @@ public class PerpendicularOffsetStroke implements Stroke {
                         // at the last point, and ends in the intersection of the two offset lines.
                         double iRadius = offset / Math.cos(halfOffsetAngle);
 
+                        LOGGER.debug("offset = " + offset);
                         LOGGER.debug("offsetAngle = " + 2.0*halfOffsetAngle);
                         LOGGER.debug("halfOffsetAngle = " + halfOffsetAngle);
                         LOGGER.debug("iRadius = " + iRadius);
-                        if (offset > 0 && halfOffsetAngle < -Math.PI /4 ||
+                        if (offset > 0 && halfOffsetAngle < (Math.PI/2 + EPSILON) && halfOffsetAngle > (Math.PI/2 - EPSILON) ||
+                                offset < 0 && halfOffsetAngle > (  - Math.PI/2 - EPSILON) && halfOffsetAngle < (- Math.PI/2 + EPSILON)) {
+                            LOGGER.debug("CORNER CASE");
+                            // do nothing
+                        } else if (offset > 0 && halfOffsetAngle < -Math.PI /4 ||
                                 offset < 0 && halfOffsetAngle > Math.PI/4) {
                             //In these cases the offset-lines intersect too far beyond the last point
-                            //corect iRadius
+                            //correct iRadius
                             iRadius = offset/ Math.cos(Math.PI/4);
                             float iloX = lastX + (float)(iRadius * Math.cos(segmentAngle + Math.PI/2 - 2*halfOffsetAngle - Math.signum(offset) * Math.PI/4));
                             float iloY = lastY + (float)(iRadius * Math.sin(segmentAngle + Math.PI/2 - 2*halfOffsetAngle - Math.signum(offset) * Math.PI/4));

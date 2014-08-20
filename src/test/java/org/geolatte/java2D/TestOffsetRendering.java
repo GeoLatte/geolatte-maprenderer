@@ -52,10 +52,10 @@ public class TestOffsetRendering {
 
 
     private static final float LINE_WIDTH = 5.0f;
-    private static final float OFFSET  = 8.0f;
+    private static final float OFFSET = 8.0f;
     private static final float NEG_OFFSET = -8.0f;
     private static final float OFFSET_LINE_WIDTH = 2.0f;
-    private static final int NUM_IMG = 90;
+    private static final int NUM_IMG = 250;
 
     private Envelope extent;
     private java.awt.Dimension dim = new java.awt.Dimension(512, 512);
@@ -66,7 +66,7 @@ public class TestOffsetRendering {
 
     @Before
     public void setUp() {
-        this.extent = new Envelope(-100, -100, 100, 100, new CrsId("EPSG",4236));
+        this.extent = new Envelope(-100, -100, 100, 100, new CrsId("EPSG", 4236));
         this.stroke = new PerpendicularOffsetStroke(LINE_WIDTH); //e, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
         this.offsetStroke = new PerpendicularOffsetStroke(OFFSET_LINE_WIDTH, OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
         this.negOffsetStroke = new PerpendicularOffsetStroke(OFFSET_LINE_WIDTH, NEG_OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
@@ -96,28 +96,49 @@ public class TestOffsetRendering {
         renderImage(negOffsetStroke, "negative-offset-right-to-left-", false);
     }
 
-    private void renderImage(PerpendicularOffsetStroke offsetStroke, String path, boolean leftToRight) throws IOException {
+    @Test
+    public void test_paint_close_by_corner_cases() throws IOException {
+        double[] angles = new double[]{
+                Math.PI - 3 * PerpendicularOffsetStroke.EPSILON,
+                Math.PI + 3 * PerpendicularOffsetStroke.EPSILON,
+                -Math.PI - 3 * PerpendicularOffsetStroke.EPSILON,
+                - Math.PI + 3 * PerpendicularOffsetStroke.EPSILON
+        };
+        renderImage(negOffsetStroke, "cornercase-negative-offset-right-to-left-", false, angles);
+        renderImage(negOffsetStroke, "cornercase-negative-offset-left-to-right-", true, angles);
+        renderImage(offsetStroke, "cornercase-offset-right-to-left-", false, angles);
+        renderImage(offsetStroke, "cornercase-offset-left-to-right-", true, angles);
 
+    }
+
+    private void renderImage(PerpendicularOffsetStroke offsetStroke, String path, boolean leftToRight) throws IOException {
+        double[] angles = new double[NUM_IMG];
         double theta = 2 * Math.PI / NUM_IMG;
         for (int i = 0; i < NUM_IMG; i++) {
+            angles[i] = i * theta;
+        }
+        renderImage(offsetStroke, path, leftToRight, angles);
+    }
+
+    private void renderImage(PerpendicularOffsetStroke offsetStroke, String path, boolean leftToRight, double[] angles) throws IOException {
+
+        for (int i = 0; i < angles.length; i++) {
             System.out.println("i = " + i);
             MapGraphics mapGraphics = new JAIMapGraphics(dim, extent);
 
-            LineString line = generateLineStrings(i, theta, leftToRight);
+            LineString line = generateLineStrings(angles[i], leftToRight);
             mapGraphics.setStroke(stroke);
             mapGraphics.setColor(Color.BLACK);
             drawLineString(line, mapGraphics);
 
             mapGraphics.setStroke(offsetStroke);
-            Color red = new Color(255,0,0,120);
-//            mapGraphics.setColor(Color.RED);
+            Color red = new Color(255, 0, 0, 120);
             mapGraphics.setColor(red);
             drawLineString(line, mapGraphics);
 
             RenderedImage img = mapGraphics.createRendering();
-            TestSupport.writeImageToDisk(img,path + i + ".png", "PNG");
+            TestSupport.writeImageToDisk(img, path + i + ".png", "PNG");
         }
-
     }
 
 
@@ -129,19 +150,19 @@ public class TestOffsetRendering {
         }
     }
 
-    private LineString generateLineStrings(int i, double theta, boolean leftToRight) {
+    private LineString generateLineStrings(double theta, boolean leftToRight) {
 
         Coordinate[] coordinates = new Coordinate[3];
         if (leftToRight) {
             coordinates[0] = new Coordinate(-90, 0.0f);
             coordinates[1] = new Coordinate(0.0f, 0.0f);
-            System.out.println("theta = " + i * theta);
-            coordinates[2] = new Coordinate(90.0 * Math.cos(i * theta), 90.0 * Math.sin(i * theta));
+            System.out.println("theta = " + theta);
+            coordinates[2] = new Coordinate(90.0 * Math.cos(theta), 90.0 * Math.sin(theta));
         } else {
             coordinates[0] = new Coordinate(90, 0.0f);
             coordinates[1] = new Coordinate(0.0f, 0.0f);
-            System.out.println("theta = " + i * theta);
-            coordinates[2] = new Coordinate(-90.0 * Math.cos(i * theta), -90.0 * Math.sin(i * theta));
+            System.out.println("theta = " + theta);
+            coordinates[2] = new Coordinate(-90.0 * Math.cos(theta), -90.0 * Math.sin(theta));
         }
         return geomFactory.createLineString(coordinates);
     }
