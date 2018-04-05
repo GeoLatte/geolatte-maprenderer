@@ -21,7 +21,7 @@
 
 package org.geolatte.maprenderer.util;
 
-import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
+import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.w3c.dom.svg.SVGDocument;
 
@@ -40,7 +40,7 @@ public class SVGDocumentIO {
 
     public static SVGDocument read(String uri, File file) throws IOException {
         String parser = XMLResourceDescriptor.getXMLParserClassName();
-        SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
+        SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory( parser);
         return (SVGDocument) factory.createDocument(uri, new FileInputStream(file));
     }
 

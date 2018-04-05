@@ -21,6 +21,7 @@
 
 package org.geolatte.maprenderer.java2D;
 
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.map.MapGraphics;
@@ -60,7 +61,7 @@ public class JAIMapGraphics extends MapGraphics {
     }
 
     public JAIMapGraphics(Dimension dimension, Envelope extent, ColorModel colorModel) {
-        this.spatialReference = extent.getCrsId();
+        this.spatialReference = extent.getCoordinateReferenceSystem().getCrsId();
         this.width = (int) dimension.getWidth();
         this.height = (int) dimension.getHeight();
         WritableRaster raster = colorModel.createCompatibleWritableRaster(this.width, this.height);
@@ -122,16 +123,18 @@ public class JAIMapGraphics extends MapGraphics {
         return hints;
     }
 
-    private void setToExtent(Envelope extent) {
-        if (extent.getCrsId().getCode() != getSpatialReference().getCode())
+    private void setToExtent(Envelope<C2D> extent) {
+        if (extent.getCoordinateReferenceSystem().getCrsId().getCode() != getSpatialReference().getCode())
             throw new IllegalArgumentException("Spatial Reference of extent object must be EPSG: " + getSpatialReference().getCode());
         AffineTransform atf = new AffineTransform();
-        double sx = width / extent.getWidth();
-        double sy = height / extent.getHeight();
+        C2D ll = extent.lowerLeft();
+        C2D ur = extent.upperRight();
+        double sx = width / (ur.getX() - ll.getX());
+        double sy = height / (ur.getY() - ll.getY());
         this.mapUnitsPerPixel = Math.max(1 / sx, 1 / sy);
         //we don't maintain aspect-ratio here!
         atf.scale(sx, -sy);
-        atf.translate(-extent.getMinX(), -extent.getMaxY());
+        atf.translate(-ll.getX(), -ur.getY());
         setTransform(atf);
     }
 

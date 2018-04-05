@@ -1,6 +1,6 @@
-[![Build Status](http://teamcity.geolatte.org/app/rest/builds/buildType:\(id:bt7\)/statusIcon)](http://teamcity.geolatte.org/viewType.html?buildTypeId=bt7&guest=1)
-
-geolatte-maprenderer
+Geolatte Maprenderer
 ====================
 
-A 2D graphics API that allows the use of geo-spatial coordinates.
+A 2D Graphics that allows drawing styled Geolatte-geom Geometries.
+
+
