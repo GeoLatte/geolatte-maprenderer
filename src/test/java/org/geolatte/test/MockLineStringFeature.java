@@ -24,6 +24,9 @@ package org.geolatte.test;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CrsId;
 
+import static org.geolatte.geom.builder.DSL.c;
+import static org.geolatte.geom.builder.DSL.linestring;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: May 23, 2010
@@ -35,33 +38,15 @@ public class MockLineStringFeature extends AbstractMockFeature {
         super(geom);
     }
 
+
+
     public MockLineStringFeature() {
-        super();
+        super( linestring(CRS, c(10, 10), c(20, 22),
+                          c(30, 10), c(40, 20)
+                          ) );
     }
 
-    protected Geometry generateGeom() {
-        double startx = 10;
-        double starty = 10;
-
-        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.d2D, CrsId.UNDEFINED);
-        sequenceBuilder.add(startx, starty);
-        sequenceBuilder.add(startx + 10.0, starty + 12.0);
-        sequenceBuilder.add(startx + 20.0, starty);
-        sequenceBuilder.add(startx + 30, starty + 10.0);
-        return new LineString(sequenceBuilder.toPointSequence());
-    }
-
-    public static MockLineStringFeature createLine(double startX, double startY, double endX, double endY) {
-        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D, CrsId.UNDEFINED);
-        sequenceBuilder.add(startX, startY);
-        sequenceBuilder.add(endX, endY);
-        Geometry geom = new LineString(sequenceBuilder.toPointSequence());
-        return new MockLineStringFeature(geom);
-    }
-
-
-    @Override
-    public String getGeometryName() {
-        return "geometry";
+    public static MockLineStringFeature createLine(double x1, double y1, double x2, double y2) {
+        return new MockLineStringFeature( linestring(CRS, c(x1,y1), c(x2,y2)));
     }
 }

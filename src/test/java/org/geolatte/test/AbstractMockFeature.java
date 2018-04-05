@@ -22,73 +22,37 @@
 package org.geolatte.test;
 
 import org.geolatte.common.Feature;
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.ProjectedCoordinateReferenceSystem;
+import org.geolatte.geom.crs.SingleCoordinateReferenceSystem;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: May 23, 2010
  */
-//TODO Replace by Mockito
-public abstract class AbstractMockFeature implements Feature {
-    protected Geometry geom;
-    protected Integer id;
+public abstract class AbstractMockFeature extends Feature {
     protected static AtomicInteger counter = new AtomicInteger(0);
 
+    public static final SingleCoordinateReferenceSystem<C2D> CRS = CoordinateReferenceSystems.PROJECTED_2D_METER;
+
+
+    static private String generateId() {
+        int i = counter.incrementAndGet();
+        return Integer.toString( i );
+    }
+
     public AbstractMockFeature(Geometry geom){
-        this.geom = geom;
-        this.id = counter.incrementAndGet();
+        super(generateId(), geom, new HashMap<String, Object>());
+
     }
 
-    public AbstractMockFeature() {
-        this.geom = generateGeom();
-        this.id = counter.incrementAndGet();
-    }
-
-    protected abstract Geometry generateGeom();
-
-    public boolean hasProperty(String s) {
-        return s.equals("geometry") || s.equals("id");
-    }
-
-    public Collection<String> getProperties() {
-        List<String> list = new ArrayList<String>(2);
-        list.add("geometry");
-        list.add("id");
-        return list;
-    }
-
-    public Object getProperty(String s) {
-        if (s.equals("id")) return this.id;
-        if (s.equals("geometry")) return this.geom;
-        return null;
-    }
-
-    public Object getId() {
-        return this.id;
-    }
-
-    public Geometry getGeometry() {
-        return this.geom;
-    }
-
-    public boolean hasProperty(String s, boolean b) {
-        if (!b) {
-            return b;
-        } else {
-            return hasProperty(s);
-        }
-    }
-
-    public boolean hasId() {
-        return this.id != null;
-    }
-
-    public boolean hasGeometry() {
-        return this.geom != null;
-    }
 }

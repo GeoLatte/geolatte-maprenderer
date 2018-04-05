@@ -21,9 +21,10 @@
 
 package org.geolatte.test;
 
-import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Point;
-import org.geolatte.geom.Points;
+
+import static org.geolatte.geom.builder.DSL.c;
+import static org.geolatte.geom.builder.DSL.point;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -35,24 +36,11 @@ public class MockPointFeature extends AbstractMockFeature {
         super(pnt);
     }
 
-    public MockPointFeature(){
-        super();
-    }
-
-    @Override
-    protected Geometry generateGeom() {
-        double x = Math.random() * 90;
-        double y = Math.random() * 90;
-        return Points.create2D(x, y);
-    }
 
     public static MockPointFeature createPoint(double x, double y){
-        Point pnt = Points.create2D(x, y);
+        Point pnt = point(CRS, c(x, y));
         return new MockPointFeature(pnt);
     }
 
-    @Override
-    public String getGeometryName() {
-        return "geometry";
-    }
+
 }

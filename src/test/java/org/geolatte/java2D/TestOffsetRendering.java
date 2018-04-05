@@ -25,8 +25,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.SingleCoordinateReferenceSystem;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.java2D.PerpendicularOffsetStroke;
 import org.geolatte.maprenderer.map.MapGraphics;
@@ -45,6 +48,7 @@ import java.io.IOException;
  */
 public class TestOffsetRendering {
 
+    public static final SingleCoordinateReferenceSystem<C2D> CRS = CoordinateReferenceSystems.PROJECTED_2D_METER;
     /*TODO -- add tests for these cases:
         1. linestring with very small linesegments (relative to offset)
         2. non-contiguous paths (i.e. with intermediate moveTo's
@@ -57,7 +61,7 @@ public class TestOffsetRendering {
     private static final float OFFSET_LINE_WIDTH = 2.0f;
     private static final int NUM_IMG = 250;
 
-    private Envelope extent;
+    private Envelope<C2D> extent;
     private java.awt.Dimension dim = new java.awt.Dimension(512, 512);
     private PerpendicularOffsetStroke stroke;
     private PerpendicularOffsetStroke offsetStroke;
@@ -66,7 +70,7 @@ public class TestOffsetRendering {
 
     @Before
     public void setUp() {
-        this.extent = new Envelope(-100, -100, 100, 100, new CrsId("EPSG", 4236));
+        this.extent = new Envelope<>(new C2D(-100, -100), new C2D(100, 100), CRS);
         this.stroke = new PerpendicularOffsetStroke(LINE_WIDTH); //e, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
         this.offsetStroke = new PerpendicularOffsetStroke(OFFSET_LINE_WIDTH, OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);
         this.negOffsetStroke = new PerpendicularOffsetStroke(OFFSET_LINE_WIDTH, NEG_OFFSET); //, BasicStroke.JOIN_BEVEL, BasicStroke.CAP_BUTT);

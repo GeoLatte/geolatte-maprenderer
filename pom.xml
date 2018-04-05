@@ -6,7 +6,7 @@
     <artifactId>geolatte-maprenderer</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    
+
     <name>Geolatte Maprenderer</name>
     <url>http://www.geolatte.org/confluence/display/mrend</url>
     <description>A renderer with a geo-centered API.</description>

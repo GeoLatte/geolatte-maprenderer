@@ -22,52 +22,59 @@
 package org.geolatte.test;
 
 
-import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.LinearRing;
+import org.geolatte.geom.Polygon;
+import org.geolatte.geom.PositionSequenceBuilder;
+import org.geolatte.geom.PositionSequenceBuilders;
+
+import static org.geolatte.geom.builder.DSL.c;
+import static org.geolatte.geom.builder.DSL.polygon;
+import static org.geolatte.geom.builder.DSL.ring;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: May 23, 2010
+ * creation-date: May 23, 2010
  */
 public class MockPolygonFeature extends AbstractMockFeature {
 
-    public MockPolygonFeature() {
-        super();
-    }
 
-    public MockPolygonFeature(Geometry geom) {
-        super(geom);
-    }
+	public MockPolygonFeature() {
+		super(
+				generateGeom()
+		);
+	}
 
-    protected Geometry generateGeom(){
-        double startx = Math.random() * 90;
-        double starty = Math.random() * 90;
-        double width = Math.random() * 90;
-        double height = Math.random() * 90;
+	public MockPolygonFeature(Geometry<C2D> geom) {
+		super( geom );
+	}
 
-        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D, CrsId.UNDEFINED);
-        sequenceBuilder.add(startx, starty);
-        sequenceBuilder.add(startx, starty + height);
-        sequenceBuilder.add(startx + width, starty + height);
-        sequenceBuilder.add(startx + width, starty);
-        sequenceBuilder.add(startx, starty);
-        LinearRing shell = new LinearRing(sequenceBuilder.toPointSequence());
-        return new Polygon(new LinearRing[] { shell });
-    }
+	private static Geometry<C2D> generateGeom() {
+		double startx = Math.random() * 90;
+		double starty = Math.random() * 90;
+		double width = Math.random() * 90;
+		double height = Math.random() * 90;
 
-    public static MockPolygonFeature createRect(double minX, double minY, double maxX, double maxY) {
-        PointSequenceBuilder sequenceBuilder = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D, CrsId.UNDEFINED);
-        sequenceBuilder.add(minX, minY);
-        sequenceBuilder.add(minX, maxY);
-        sequenceBuilder.add(maxX, maxY);
-        sequenceBuilder.add(maxX, minY);
-        sequenceBuilder.add(minX, minY);
-        LinearRing shell = new LinearRing(sequenceBuilder.toPointSequence());
-        return new MockPolygonFeature(new Polygon(new LinearRing[] { shell }));
-    }
+		return polygon( CRS, ring(
+				c( startx, starty ),
+				c( startx, starty + height ),
+				c( startx + width, starty + height ),
+				c( startx + width, starty ),
+				c( startx, starty )
+		) );
+	}
 
-    @Override
-    public String getGeometryName() {
-        return "geometry";
-    }
+	public static MockPolygonFeature createRect(double minX, double minY, double maxX, double maxY) {
+		PositionSequenceBuilder sequenceBuilder = PositionSequenceBuilders.fixedSized( 5, C2D.class );
+		sequenceBuilder.add( minX, minY );
+		sequenceBuilder.add( minX, maxY );
+		sequenceBuilder.add( maxX, maxY );
+		sequenceBuilder.add( maxX, minY );
+		sequenceBuilder.add( minX, minY );
+		LinearRing shell = new LinearRing( sequenceBuilder.toPositionSequence(), CRS );
+		return new MockPolygonFeature( new Polygon( new LinearRing[] {shell} ) );
+	}
+
+
 }

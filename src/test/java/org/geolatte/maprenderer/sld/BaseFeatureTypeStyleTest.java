@@ -21,16 +21,21 @@
 
 package org.geolatte.maprenderer.sld;
 
-import net.opengis.se.v_1_1_0.FeatureTypeStyleType;
-import org.geolatte.geom.Envelope;
-import org.geolatte.geom.crs.CrsId;
-import org.geolatte.maprenderer.java2D.JAIMapGraphics;
-import org.geolatte.maprenderer.map.MapGraphics;
-import org.junit.BeforeClass;
-
 import java.io.InputStream;
 
+import net.opengis.se.v_1_1_0.FeatureTypeStyleType;
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.SingleCoordinateReferenceSystem;
+import org.geolatte.maprenderer.java2D.JAIMapGraphics;
+import org.geolatte.maprenderer.map.MapGraphics;
+
+import org.junit.BeforeClass;
+
 public class BaseFeatureTypeStyleTest {
+
+    public static final SingleCoordinateReferenceSystem<C2D> CRS = CoordinateReferenceSystems.PROJECTED_2D_METER;
 
     static FeatureTypeStyleType sldRoot;
     FeatureTypeStyle featureTypeStyle;
@@ -40,7 +45,7 @@ public class BaseFeatureTypeStyleTest {
     }
 
     public MapGraphics createMapGraphics(int pixelSize, double extentSize) {
-        Envelope extent = new Envelope(0, 0, extentSize, extentSize, new CrsId("EPSG",31370));
+        Envelope<C2D> extent = new Envelope<>( new C2D(0, 0), new C2D(extentSize, extentSize), CRS);
         java.awt.Dimension dim = new java.awt.Dimension(pixelSize, pixelSize);
         MapGraphics mapGraphics =  new JAIMapGraphics(dim, extent);
         return mapGraphics;

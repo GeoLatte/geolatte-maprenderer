@@ -21,21 +21,24 @@
 
 package org.geolatte.java2D;
 
+import java.awt.image.RenderedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.geolatte.common.Feature;
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.SingleCoordinateReferenceSystem;
 import org.geolatte.maprenderer.java2D.JAIMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.test.MockLineStringFeature;
 import org.geolatte.test.TestSupport;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import java.awt.image.RenderedImage;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.geolatte.test.TestSupport.assertImageEquals;
 
@@ -45,16 +48,17 @@ import static org.geolatte.test.TestSupport.assertImageEquals;
  */
 public class TestSimpleOffsetPainter {
 
+    public static final SingleCoordinateReferenceSystem<C2D> CRS = CoordinateReferenceSystems.PROJECTED_2D_METER;
 
     private MapGraphics mapGraphics;
-    private Envelope extent;
+    private Envelope<C2D> extent;
 
     private List<Feature> features = new ArrayList<Feature>();
 
             
     @Before
     public void setUp() {
-        this.extent = new Envelope(5,5,40,40, new CrsId("EPSG",4236));
+        this.extent = new Envelope<>(new C2D(5,5), new C2D(40,40), CRS);
         java.awt.Dimension dim = new java.awt.Dimension(512, 512);
         this.mapGraphics = new JAIMapGraphics(dim, extent);
 

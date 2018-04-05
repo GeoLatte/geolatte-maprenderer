@@ -44,7 +44,7 @@ public class TestExternalGraphicsRepository {
     public static String LOCAL_GRAPHICS_PACKAGE = "graphics";
 
     //TODO can we link to a more stable graphics?
-    private static String EXT_GRAPHIC_IMAGE_URL = "http://www.google.com/intl/en_com/images/srpr/logo3w.png";
+    private static String EXT_GRAPHIC_IMAGE_URL = "https://upload.wikimedia.org/wikipedia/commons/f/f5/4_lmb.png";
     private static String EXT_GRAPHIC_SVG_URL = "http://upload.wikimedia.org/wikipedia/commons/e/e6/%22Bookmark%22.svg";
 
 
