@@ -166,13 +166,14 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-            <!--<plugin>-->
-                <!--<artifactId>maven-surefire-plugin</artifactId>-->
-                <!--&lt;!&ndash; Must be version > 2.7 because of issue http://jira.codehaus.org/browse/SUREFIRE-482 &ndash;&gt;-->
-                <!--<version>2.7</version>-->
-                <!--<configuration>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <!-- Must be version > 2.7 because of issue http://jira.codehaus.org/browse/SUREFIRE-482 -->
+                <version>2.7</version>
+                <configuration>
+                    <!--<argLine>-DWRITE_TEST_FILES=true</argLine>-->
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

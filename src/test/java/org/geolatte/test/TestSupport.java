@@ -74,7 +74,7 @@ public class TestSupport {
     public static void writeImageToDisk(RenderedImage img, String imageName, String type) throws IOException {
         if (TestSupport.writeTestImagesToDiskIsActive()){
             File file = new File(getTempDir(),imageName);
-            LOGGER.debug("Writing image to file: " + file.getCanonicalPath());
+            LOGGER.info("Writing image to file: " + file.getCanonicalPath());
             ImageIO.write(img, type, file);
         }
     }
