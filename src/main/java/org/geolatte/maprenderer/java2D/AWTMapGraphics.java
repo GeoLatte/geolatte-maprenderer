@@ -36,7 +36,7 @@ import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
-public class JAIMapGraphics extends MapGraphics {
+public class AWTMapGraphics extends MapGraphics {
 
     private static final boolean OPTIMIZE_FOR_QUALITY = true;
 
@@ -60,7 +60,7 @@ public class JAIMapGraphics extends MapGraphics {
         }
     }
 
-    public JAIMapGraphics(Dimension dimension, Envelope extent, ColorModel colorModel) {
+    public AWTMapGraphics(Dimension dimension, Envelope extent, ColorModel colorModel) {
         this.spatialReference = extent.getCoordinateReferenceSystem().getCrsId();
         this.width = (int) dimension.getWidth();
         this.height = (int) dimension.getHeight();
@@ -70,11 +70,11 @@ public class JAIMapGraphics extends MapGraphics {
         setToExtent(extent);
     }
 
-    public JAIMapGraphics(Dimension dimension, Envelope extent, boolean transparency) {
+    public AWTMapGraphics(Dimension dimension, Envelope extent, boolean transparency) {
         this(dimension, extent, makeColorModel(transparency));
     }
 
-    public JAIMapGraphics(Dimension dimension, Envelope extent) {
+    public AWTMapGraphics(Dimension dimension, Envelope extent) {
         this(dimension, extent, true);
     }
 

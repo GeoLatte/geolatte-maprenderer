@@ -31,8 +31,6 @@ import java.awt.image.RenderedImage;
  */
 public abstract class MapGraphics extends Graphics2D {
 
-//    TODO : change SpatialReference to geolatte-geom's CRS
-//    TODO : remove setToExtent() and have extent set in constructor
 //    TODO : add method to set a DPI "hint" == intended resolution
 
     abstract public Dimension getDimension();

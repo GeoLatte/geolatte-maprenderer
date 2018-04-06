@@ -30,7 +30,7 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.util.List;
 
-public class JaiMapCompositor implements MapCompositor {
+public class AWTMapCompositor implements MapCompositor {
 
     public RenderedImage overlay(List<RenderedImage> images) {
 

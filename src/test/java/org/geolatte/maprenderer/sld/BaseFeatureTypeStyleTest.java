@@ -28,7 +28,7 @@ import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.SingleCoordinateReferenceSystem;
-import org.geolatte.maprenderer.java2D.JAIMapGraphics;
+import org.geolatte.maprenderer.java2D.AWTMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;
 
 import org.junit.BeforeClass;
@@ -47,7 +47,7 @@ public class BaseFeatureTypeStyleTest {
     public MapGraphics createMapGraphics(int pixelSize, double extentSize) {
         Envelope<C2D> extent = new Envelope<>( new C2D(0, 0), new C2D(extentSize, extentSize), CRS);
         java.awt.Dimension dim = new java.awt.Dimension(pixelSize, pixelSize);
-        MapGraphics mapGraphics =  new JAIMapGraphics(dim, extent);
+        MapGraphics mapGraphics =  new AWTMapGraphics( dim, extent);
         return mapGraphics;
     }
 

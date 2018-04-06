@@ -31,7 +31,7 @@ import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.SingleCoordinateReferenceSystem;
-import org.geolatte.maprenderer.java2D.JAIMapGraphics;
+import org.geolatte.maprenderer.java2D.AWTMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.test.MockLineStringFeature;
@@ -60,7 +60,7 @@ public class TestSimpleOffsetPainter {
     public void setUp() {
         this.extent = new Envelope<>(new C2D(5,5), new C2D(40,40), CRS);
         java.awt.Dimension dim = new java.awt.Dimension(512, 512);
-        this.mapGraphics = new JAIMapGraphics(dim, extent);
+        this.mapGraphics = new AWTMapGraphics( dim, extent);
 
         this.features.add( new MockLineStringFeature());
 
