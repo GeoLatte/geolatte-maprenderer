@@ -21,8 +21,10 @@
 
 package org.geolatte.maprenderer.sld;
 
-import com.vividsolutions.jts.geom.Geometry;
+
 import net.opengis.se.v_1_1_0.*;
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Geometry;
 import org.geolatte.maprenderer.map.MapGraphics;
 
 import java.awt.*;
@@ -74,7 +76,7 @@ public class PolygonSymbolizer extends AbstractSymbolizer {
     }
 
     @Override
-    public void symbolize(MapGraphics graphics, Geometry geometry) {
+    public void symbolize(MapGraphics graphics, Geometry<C2D> geometry) {
         //TODO -- take into account offset, displacement
         Shape[] shapes = toShapes(graphics, geometry);
         fill(graphics, shapes);

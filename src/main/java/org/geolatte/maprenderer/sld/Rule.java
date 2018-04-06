@@ -21,8 +21,9 @@
 
 package org.geolatte.maprenderer.sld;
 
-import com.vividsolutions.jts.geom.Geometry;
 import org.geolatte.common.Feature;
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Geometry;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.sld.filter.SLDRuleFilter;
 
@@ -81,7 +82,7 @@ public class Rule  {
                 && standardScaleDenominator < getMaxScaleDenominator() + EPSILON;
     }
 
-    public void symbolize(MapGraphics graphics, Geometry geometry) {
+    public void symbolize(MapGraphics graphics, Geometry<C2D> geometry) {
         for (AbstractSymbolizer symbolizer : symbolizers) {
             symbolizer.symbolize(graphics, geometry);
         }

@@ -143,7 +143,7 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
         //a horizontal line in the middle of the image.
         ShapeAdapter adapter = new ShapeAdapter(g.getTransform());
         AffineTransform originalTransform = g.getTransform();
-        symbolizer.symbolize(g, JTS.to(feature.getGeometry()));
+        symbolizer.symbolize(g, feature.getGeometry());
         assertEquals("Test that symbolizer restores always the original transform", originalTransform, g.getTransform());
         RenderedImage img = g.createRendering();
         TestSupport.writeImageToDisk(img, testCaseName, "PNG");

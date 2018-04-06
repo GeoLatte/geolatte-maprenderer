@@ -21,55 +21,61 @@
 
 package org.geolatte.maprenderer.shape;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.Polygon;
-
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.LineString;
+import org.geolatte.geom.MultiLineString;
+import org.geolatte.geom.MultiPolygon;
+
+
 public class ShapeAdapter {
 
-    final private AffineTransform worldToImageTransform;
+	final private AffineTransform worldToImageTransform;
 
-    public ShapeAdapter(AffineTransform worldToImageTransform) {
-        this.worldToImageTransform = worldToImageTransform;
-    }
+	public ShapeAdapter(AffineTransform worldToImageTransform) {
+		this.worldToImageTransform = worldToImageTransform;
+	}
 
-    public Shape[] toShape(Geometry geometry) {
-        if (geometry == null) return new Shape[]{};
-        if (geometry instanceof Polygon) {
-            return new Shape[]{new PolygonWrapper((Polygon) geometry, worldToImageTransform)};
-        } else if (geometry instanceof MultiPolygon) {
-            MultiPolygon multiPolygon = (MultiPolygon) geometry;
-            Shape[] shapes = new Shape[multiPolygon.getNumGeometries()];
-            load(shapes, multiPolygon);
-            return shapes;
-        } else if (geometry instanceof LineString) {
-            return new Shape[]{new LineStringWrapper((LineString) geometry, worldToImageTransform)};
-        } else if (geometry instanceof MultiLineString) {
-            MultiLineString multiLineString = (MultiLineString) geometry;
-            Shape[] shapes = new Shape[multiLineString.getNumGeometries()];
-            loadShape(shapes, multiLineString);
-            return shapes;
-        }
-        throw new UnsupportedOperationException("Can't adapt shapes fo type " + geometry.getGeometryType());
-    }
+	public Shape[] toShape(Geometry<C2D> geometry) {
+		if ( geometry == null ) {
+			return new Shape[] {};
+		}
+		if ( geometry instanceof org.geolatte.geom.Polygon ) {
+			return new Shape[] {new PolygonWrapper( (org.geolatte.geom.Polygon<C2D>) geometry, worldToImageTransform )};
+		}
+		else if ( geometry instanceof MultiPolygon ) {
+			MultiPolygon<C2D> multiPolygon = (MultiPolygon<C2D>) geometry;
+			Shape[] shapes = new Shape[multiPolygon.getNumGeometries()];
+			load( shapes, multiPolygon );
+			return shapes;
+		}
+		else if ( geometry instanceof LineString ) {
+			return new Shape[] {new LineStringWrapper( (LineString<C2D>) geometry, worldToImageTransform )};
+		}
+		else if ( geometry instanceof MultiLineString ) {
+			MultiLineString<C2D> multiLineString = (MultiLineString<C2D>) geometry;
+			Shape[] shapes = new Shape[multiLineString.getNumGeometries()];
+			loadShape( shapes, multiLineString );
+			return shapes;
+		}
+		throw new UnsupportedOperationException( "Can't adapt shapes fo type " + geometry.getGeometryType() );
+	}
 
-    private void loadShape(Shape[] shapes, MultiLineString multiLineString) {
-        for (int i = 0; i < shapes.length; i++) {
-            LineString ls = (LineString) multiLineString.getGeometryN(i);
-            shapes[i] = new LineStringWrapper(ls, worldToImageTransform);
-        }
-    }
+	private void loadShape(Shape[] shapes, MultiLineString<C2D> multiLineString) {
+		for ( int i = 0; i < shapes.length; i++ ) {
+			LineString<C2D> ls = multiLineString.getGeometryN( i );
+			shapes[i] = new LineStringWrapper( ls, worldToImageTransform );
+		}
+	}
 
-    private void load(Shape[] shapes, MultiPolygon multiPolygon) {
-        for (int i = 0; i < shapes.length; i++) {
-            Polygon pg = (Polygon) multiPolygon.getGeometryN(i);
-            shapes[i] = new PolygonWrapper(pg, worldToImageTransform);
-        }
-    }
-
-    ;
-
+	private void load(Shape[] shapes, MultiPolygon<C2D> multiPolygon) {
+		for ( int i = 0; i < shapes.length; i++ ) {
+			org.geolatte.geom.Polygon<C2D> pg = multiPolygon.getGeometryN( i );
+			shapes[i] = new PolygonWrapper( pg, worldToImageTransform );
+		}
+	}
 
 }

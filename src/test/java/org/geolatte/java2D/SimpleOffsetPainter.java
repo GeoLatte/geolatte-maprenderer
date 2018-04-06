@@ -54,7 +54,7 @@ public class SimpleOffsetPainter implements Painter {
         PerpendicularOffsetStroke offsetStroke = new PerpendicularOffsetStroke(2.0f, OFFSET_IN_PIXELS);
 
         for(Feature feature : features) {
-            Shape[] shapes = shapeAdapter.toShape(JTS.to(feature.getGeometry()));
+            Shape[] shapes = shapeAdapter.toShape(feature.getGeometry());
             for (Shape shape : shapes) {
                 graphics.setColor(Color.RED);
                 graphics.setStroke(baseStroke);

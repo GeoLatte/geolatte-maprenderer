@@ -21,23 +21,24 @@
 
 package org.geolatte.maprenderer.shape;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
 
 import java.awt.geom.AffineTransform;
+
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.LineString;
 
 
 public class LineStringPathIterator extends GeometryPathIterator {
 
-    final private LineString lineString;
-    private Coordinate currentCoordinate;
+    final private LineString<C2D> lineString;
+    private C2D currentCoordinate;
     private int coordinateIndex = 0;
 
 
-    public LineStringPathIterator(LineString lineString, AffineTransform transform, AffineTransform imgToWorldTransform) {
+    public LineStringPathIterator(LineString<C2D> lineString, AffineTransform transform, AffineTransform imgToWorldTransform) {
         super(imgToWorldTransform, transform);
         this.lineString = lineString;
-        this.currentCoordinate = lineString.getCoordinateN(0);
+        this.currentCoordinate = lineString.getStartPosition();
     }
 
     @Override
@@ -52,20 +53,20 @@ public class LineStringPathIterator extends GeometryPathIterator {
             setIsDone();
             return;
         }
-        setCurrentCoordinate(this.lineString.getCoordinateN(coordinateIndex));
+        setCurrentCoordinate(this.lineString.getPositionN(coordinateIndex));
     }
 
     private boolean beyondCurrentLineString() {
-        return coordinateIndex >= this.lineString.getNumPoints();
+        return coordinateIndex >= this.lineString.getNumPositions();
     }
 
     @Override
-    void setCurrentCoordinate(Coordinate coordinate) {
+    void setCurrentCoordinate(C2D coordinate) {
         this.currentCoordinate = coordinate;
     }
 
     @Override
-    Coordinate getCurrentCoordinate() {
+    C2D getCurrentCoordinate() {
         return this.currentCoordinate;
     }
 

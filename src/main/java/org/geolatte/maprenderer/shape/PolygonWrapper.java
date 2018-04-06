@@ -21,9 +21,8 @@
 
 package org.geolatte.maprenderer.shape;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
-
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Polygon;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
@@ -31,10 +30,10 @@ import java.awt.geom.PathIterator;
 
 public class PolygonWrapper extends GeometryWrapper implements Shape {
 
-    private final Polygon polygon;
+    private final Polygon<C2D> polygon;
     private final AffineTransform worldToImageTransform;
 
-    PolygonWrapper(Polygon geometry, AffineTransform worldToImageTransform) {
+    PolygonWrapper(Polygon<C2D> geometry, AffineTransform worldToImageTransform) {
         this.polygon = geometry;
         this.worldToImageTransform = worldToImageTransform;
     }
@@ -48,7 +47,7 @@ public class PolygonWrapper extends GeometryWrapper implements Shape {
         return new PolygonPathIterator(this.polygon, at, worldToImageTransform);
     }
 
-    public Geometry getGeometry() {
+    public Polygon<C2D> getGeometry() {
         return this.polygon;
     }
 }

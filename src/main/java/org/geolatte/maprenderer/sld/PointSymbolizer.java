@@ -21,10 +21,13 @@
 
 package org.geolatte.maprenderer.sld;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 import net.opengis.se.v_1_1_0.GraphicType;
 import net.opengis.se.v_1_1_0.PointSymbolizerType;
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.JTSGeometryOperations;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.ProjectedGeometryOperations;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.sld.graphics.*;
 
@@ -61,8 +64,8 @@ public class PointSymbolizer extends AbstractSymbolizer {
     }
 
     @Override
-    public void symbolize(MapGraphics graphics, Geometry geometry) {
-        Point point = getPoint(geometry);
+    public void symbolize(MapGraphics graphics, Geometry<C2D> geometry) {
+        Point<C2D> point = getPoint(geometry);
         //TODO -- refinement: prefer the rendering of SVG images, then images, then marks
         for (MarkOrExternalGraphicHolder holder: graphic.getSources()){
             if (symbolize(graphics, point, holder)) return;
@@ -153,15 +156,17 @@ public class PointSymbolizer extends AbstractSymbolizer {
                 transform.getTranslateY() - displacement.getY());
     }
 
-    private Point2D applyTransform(Point point, AffineTransform transform)  {
-        return transform.transform(new Point2D.Double(point.getX(), point.getY()), null);
+    private Point2D applyTransform(Point<C2D> point, AffineTransform transform)  {
+        return transform.transform(new Point2D.Double(point.getPosition().getX(), point.getPosition().getY()), null);
     }
 
-    private Point getPoint(Geometry geometry) {
+    private Point<C2D> getPoint(Geometry<C2D> geometry) {
         if (geometry instanceof Point) {
-            return ((Point) geometry);
+            return ((Point<C2D>) geometry);
         }
-        return geometry.getCentroid();
+        //TODO -- if not point, calculate centroid, and use that
+        throw new UnsupportedOperationException("Can only symbolize points.");
+
     }
 
     public String getGeometryProperty() {

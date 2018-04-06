@@ -59,7 +59,7 @@ public class FeatureTypeStylePainter implements Painter {
         for (Feature feature : features){
             for (Rule rule : rules){
                 if (!rule.accepts(feature)) continue;
-                rule.symbolize(graphics, JTS.to(feature.getGeometry()));
+                rule.symbolize(graphics, feature.getGeometry());
             }
         }
 

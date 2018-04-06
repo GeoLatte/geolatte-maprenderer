@@ -21,7 +21,7 @@
 
 package org.geolatte.maprenderer.shape;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.geolatte.geom.C2D;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
@@ -34,7 +34,7 @@ abstract public class GeometryPathIterator implements PathIterator {
     private boolean done = false;
     private double[] coordinateBuffer = new double[2];
     private double[] pixelCoordinateBuffer = new double[2];
-    private Coordinate previousCoordinate = null;
+    private C2D previousCoordinate = null;
     private int[] previousPixelCoordinate = new int[2];
 
     public GeometryPathIterator(AffineTransform worldToImageTransform, AffineTransform transform) {
@@ -59,9 +59,9 @@ abstract public class GeometryPathIterator implements PathIterator {
 
     abstract protected void advance();
 
-    abstract void setCurrentCoordinate(Coordinate coordinate);
+    abstract void setCurrentCoordinate(C2D coordinate);
 
-    abstract Coordinate getCurrentCoordinate();
+    abstract C2D getCurrentCoordinate();
 
     protected void setIsDone() {
         this.done = true;
@@ -76,8 +76,8 @@ abstract public class GeometryPathIterator implements PathIterator {
         if (previousCoordinate == null) {
             return true;
         }
-        coordinateBuffer[0] = getCurrentCoordinate().x;
-        coordinateBuffer[1] = getCurrentCoordinate().y;
+        coordinateBuffer[0] = getCurrentCoordinate().getX();
+        coordinateBuffer[1] = getCurrentCoordinate().getY();
         worldToImageTransform.transform(coordinateBuffer, 0, pixelCoordinateBuffer, 0, 1);
         if (previousPixelCoordinate[0] != (int) pixelCoordinateBuffer[0] || previousPixelCoordinate[1] != (int) pixelCoordinateBuffer[1]) {
             previousPixelCoordinate[0] = (int) pixelCoordinateBuffer[0];
@@ -96,8 +96,8 @@ abstract public class GeometryPathIterator implements PathIterator {
 
     public int currentSegment(double[] coords) {
         previousCoordinate = getCurrentCoordinate();
-        coords[0] = previousCoordinate.x;
-        coords[1] = previousCoordinate.y;
+        coords[0] = previousCoordinate.getX();
+        coords[1] = previousCoordinate.getY();
         if (transform != null && !transform.isIdentity()) {
             transform.transform(coords, 0, coords, 0, 1);
         }

@@ -21,25 +21,25 @@
 
 package org.geolatte.maprenderer.shape;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.LineString;
+
 
 public class LineStringWrapper extends GeometryWrapper implements Shape {
 
-    private final LineString lineString;
+    private final LineString<C2D> lineString;
     private final AffineTransform worldToImageTransform;
 
-    public LineStringWrapper(LineString lineString, AffineTransform worldToImageTransform) {
+    public LineStringWrapper(LineString<C2D> lineString, AffineTransform worldToImageTransform) {
         this.lineString = lineString;
         this.worldToImageTransform = worldToImageTransform;
     }
 
-    public Geometry getGeometry() {
+    public LineString<C2D> getGeometry() {
         return this.lineString;
     }
 

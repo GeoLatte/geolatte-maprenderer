@@ -21,74 +21,88 @@
 
 package org.geolatte.maprenderer.shape;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.Polygon;
-
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.JTSGeometryOperations;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.ProjectedGeometryOperations;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+
+import static org.geolatte.geom.builder.DSL.c;
+import static org.geolatte.geom.builder.DSL.polygon;
+import static org.geolatte.geom.builder.DSL.ring;
+import static org.geolatte.maprenderer.shape.EnvelopeHelper.height;
+import static org.geolatte.maprenderer.shape.EnvelopeHelper.width;
+
 
 public abstract class GeometryWrapper {
 
-    public abstract Geometry getGeometry();
+	public abstract Geometry<C2D> getGeometry();
+
+	private final ProjectedGeometryOperations ops = new JTSGeometryOperations();
+
+	protected ProjectedGeometryOperations getOperations() {
+		return ops;
+	}
+
+	public Rectangle getBounds() {
+		Envelope<C2D> env = getGeometry().getEnvelope();
+		int minX = (int) Math.floor( env.lowerLeft().getX() );
+		int minY = (int) Math.floor( env.lowerLeft().getY() );
+		int width = (int) Math.ceil( width( env ) );
+		int height = (int) Math.ceil( height( env ) );
+		return new Rectangle( minX, minY, width, height );
+	}
 
 
-    public Rectangle getBounds() {
-        Envelope env = getGeometry().getEnvelopeInternal();
-        int minX = (int) Math.floor(env.getMinX());
-        int minY = (int) Math.floor(env.getMinY());
-        int width = (int) Math.ceil(env.getWidth());
-        int height = (int) Math.ceil(env.getHeight());
-        return new Rectangle(minX, minY, width, height);
-    }
+	public Rectangle2D getBounds2D() {
+		Envelope<C2D> env = getGeometry().getEnvelope();
+		C2D ll = env.lowerLeft();
+		return new Rectangle2D.Double( ll.getX(), ll.getY(), width( env ), height( env ) );
+	}
 
+	public boolean contains(double x, double y) {
+		Geometry<C2D> geom = getGeometry();
+		return getOperations().contains( geom, new Point<C2D>( new C2D( x, y ), geom.getCoordinateReferenceSystem() ) );
+	}
 
-    public Rectangle2D getBounds2D() {
-        Envelope env = getGeometry().getEnvelopeInternal();
-        return new Rectangle2D.Double(env.getMinX(), env.getMinY(), env.getWidth(), env.getHeight());
-    }
+	public boolean contains(Point2D p) {
+		return contains( p.getX(), p.getY() );
+	}
 
-    public boolean contains(double x, double y) {
-        Geometry geom = getGeometry();
-        GeometryFactory factory = geom.getFactory();
-        com.vividsolutions.jts.geom.Point pnt = factory.createPoint(new Coordinate(x, y));
-        pnt.setSRID(geom.getSRID());
-        return geom.contains(pnt);
-    }
+	public boolean intersects(double x, double y, double w, double h) {
+		Geometry<C2D> geom = getGeometry();
+		return getOperations().intersects( geom, toPolygon( x, y, w, h, geom.getCoordinateReferenceSystem() ) );
+	}
 
-    public boolean contains(Point2D p) {
-        return contains(p.getX(), p.getY());
-    }
+	public boolean intersects(Rectangle2D r) {
+		return intersects( r.getX(), r.getY(), r.getWidth(), r.getHeight() );
+	}
 
-    public boolean intersects(double x, double y, double w, double h) {
-        Polygon polygon = toPolygon(x, y, w, h);
-        return getGeometry().intersects(polygon);
-    }
+	public boolean contains(double x, double y, double w, double h) {
+		org.geolatte.geom.Polygon<C2D> polygon = toPolygon( x, y, w, h, getGeometry().getCoordinateReferenceSystem() );
+		return getOperations().contains( getGeometry(), polygon );
+	}
 
-    public boolean intersects(Rectangle2D r) {
-        return intersects(r.getX(), r.getY(), r.getWidth(), r.getHeight());
-    }
+	public boolean contains(Rectangle2D r) {
+		return contains( r.getX(), r.getY(), r.getWidth(), r.getHeight() );
+	}
 
-    public boolean contains(double x, double y, double w, double h) {
-        Polygon polygon = toPolygon(x, y, w, h);
-        return getGeometry().contains(polygon);
-    }
-
-    public boolean contains(Rectangle2D r) {
-        return contains(r.getX(), r.getY(), r.getWidth(), r.getHeight());
-    }
-
-    private Polygon toPolygon(double x, double y, double w, double h) {
-        GeometryFactory factory = getGeometry().getFactory();
-        Coordinate[] coordinates = new Coordinate[5];
-        coordinates[0] = new Coordinate(x, y);
-        coordinates[1] = new Coordinate(x + w, y);
-        coordinates[2] = new Coordinate(x + w, y + h);
-        coordinates[3] = new Coordinate(x, y + h);
-        coordinates[4] = new Coordinate(x, y);
-        LinearRing lr = factory.createLinearRing(coordinates);
-        Polygon polygon = factory.createPolygon(lr, new LinearRing[]{});
-        return polygon;
-    }
+	private org.geolatte.geom.Polygon<C2D> toPolygon(
+			double x,
+			double y,
+			double w,
+			double h,
+			CoordinateReferenceSystem<C2D> crs) {
+		return polygon( crs, ring( c( x, y ),
+								   c( x + w, y ),
+								   c( x + w, y + h ),
+								   c( x, y + h ),
+								   c( x, y ) ) );
+	}
 }
