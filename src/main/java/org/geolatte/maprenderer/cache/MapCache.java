@@ -21,69 +21,69 @@
 
 package org.geolatte.maprenderer.cache;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.Statistics;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.image.RenderedImage;
 import java.util.concurrent.atomic.AtomicLong;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class MapCache {
 
-    final private static Logger LOGGER = LoggerFactory.getLogger(MapCache.class);
+	final private static Logger LOGGER = LoggerFactory.getLogger( MapCache.class );
 
-    private final static int DEBUG_LOG_OUTPUT_EACH = 10;
+	static {
 
-    static {
-        CacheManager.create();
-        Cache ehcache = CacheManager.getInstance().getCache("mapCache");
-        instance = new MapCache(ehcache);
-    }
+		//TODO -- move to XML configuration!!
+		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+				.withCache(
+						"mapCache",
+						CacheConfigurationBuilder.newCacheConfigurationBuilder( MapCacheKey.class, RenderedImage.class,
+																				ResourcePoolsBuilder.heap( 100 )
+						)
+								.build()
+				)
+				.build( true );
 
-    final private static MapCache instance;
+		Cache<MapCacheKey, RenderedImage> ehcache = cacheManager.getCache(
+				"mapCache",
+				MapCacheKey.class,
+				RenderedImage.class
+		);
+		instance = new MapCache( ehcache );
+	}
 
-    final private Cache ehcache;
+	final private static MapCache instance;
 
-    private volatile AtomicLong counter = new AtomicLong();
+	final private Cache<MapCacheKey, RenderedImage> ehcache;
 
-    private MapCache(Cache ehcache) {
-        this.ehcache = ehcache;
-    }
+	private volatile AtomicLong counter = new AtomicLong();
 
-    public static MapCache getInstance() {
-        return instance;
-    }
+	private MapCache(Cache<MapCacheKey, RenderedImage> ehcache) {
+		this.ehcache = ehcache;
+	}
 
-    public void put(MapCacheKey key, RenderedImage image) {
-        Element element = new Element(key, image);
-        this.ehcache.put(element);
-    }
+	public static MapCache getInstance() {
+		return instance;
+	}
 
-    public RenderedImage get(MapCacheKey key) {
-        long count = counter.incrementAndGet();
-        Element element = this.ehcache.get(key);
-        if (count % DEBUG_LOG_OUTPUT_EACH == 0) LOGGER.debug(getInfoMessage());
-        if (element == null) {
-            return null;
-        }
-        return (RenderedImage) element.getObjectValue();
-    }
+	public void put(MapCacheKey key, RenderedImage image) {
+		this.ehcache.put( key, image );
+	}
 
-    public void clear() {
-        this.ehcache.removeAll();
-    }
+	public RenderedImage get(MapCacheKey key) {
+		long count = counter.incrementAndGet();
+		return this.ehcache.get( key );
+	}
+
+	public void clear() {
+		this.ehcache.clear();
+	}
 
 
-    public String getInfoMessage() {
-        Statistics statistics = this.ehcache.getStatistics();
-        long hits = statistics.getCacheHits();
-        long misses = statistics.getCacheMisses();
-        long size = this.ehcache.getSize();
-        long bytes = this.ehcache.getMemoryStoreSize();
-        return String.format("hits/misses: %d/%d, items: %d, size (Mbytes): %d", hits, misses, size, bytes / (1024 * 1024));
-    }
 }

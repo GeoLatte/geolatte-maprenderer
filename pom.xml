@@ -135,9 +135,9 @@
 
         <!-- dependencies for the ehcache -->
         <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache-core</artifactId>
-            <version>1.7.2</version>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>3.5.2</version>
         </dependency>
 
         <dependency>
