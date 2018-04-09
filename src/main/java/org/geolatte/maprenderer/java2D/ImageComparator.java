@@ -81,8 +81,7 @@ public class ImageComparator {
 
                     int s1 = raster1.getSample(x, y, band);
                     int s2 = raster2.getSample(x, y, band);
-                    int diff = Math.max(s1 , s2);
-                    if (diff > 0) System.out.println("Difference at " + x + ", " + y + ": " + diff);
+                    int diff = Math.abs(s1 - s2);
                     raster.setSample(x,y,band, diff);
                 }
 

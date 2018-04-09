@@ -96,12 +96,7 @@ public class TestSupport {
 
     public static void assertImageEquals(String expectedImageName, RenderedImage rendered) throws IOException {
         RenderedImage expected = ExpectedImages.getExpectedRenderedImage(expectedImageName);
-        File file = File.createTempFile("tmp", "png");
-        //we first write the rendered file to disk, because writing to disk and then reading might cause slight
-        //changes - presumably due to rounding to int pixels.
-        ImageIO.write(rendered, "PNG", file);
-        BufferedImage received = ImageIO.read(file);
-        assertImageEquals(expected, received);
+        assertImageEquals(expected, rendered);
 
     }
 
