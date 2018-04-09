@@ -149,7 +149,7 @@ public class TestOffsetRendering {
 			mapGraphics.setColor( red );
 			drawLineString( line, mapGraphics );
 
-			RenderedImage img = mapGraphics.createRendering();
+			RenderedImage img = mapGraphics.renderImage();
 			TestSupport.writeImageToDisk( img, path + i + ".png", "PNG" );
 		}
 	}

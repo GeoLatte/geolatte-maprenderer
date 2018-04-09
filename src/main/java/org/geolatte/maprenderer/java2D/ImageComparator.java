@@ -22,8 +22,7 @@
 package org.geolatte.maprenderer.java2D;
 
 import java.awt.*;
-import java.awt.image.Raster;
-import java.awt.image.RenderedImage;
+import java.awt.image.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -60,6 +59,39 @@ public class ImageComparator {
 //        return img1.getColorModel().equals(img2.getColorModel());
 //    }
 
+    public BufferedImage difference(RenderedImage img1, RenderedImage img2) {
+
+        ColorModel colorModel = img1.getColorModel();
+        int width = img1.getWidth();
+        int height = img1.getHeight();
+
+
+        WritableRaster raster = colorModel.createCompatibleWritableRaster(width, height);
+        BufferedImage outImg = new BufferedImage(colorModel, raster, false, null);
+
+        // Modified - Changed to int as pixels are ints
+
+        Raster raster1 = img1.getData();
+        Raster raster2 = img2.getData();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+
+                for(int band =0; band < raster.getNumBands(); band++){
+
+                    int s1 = raster1.getSample(x, y, band);
+                    int s2 = raster2.getSample(x, y, band);
+                    int diff = Math.max(s1 , s2);
+                    if (diff > 0) System.out.println("Difference at " + x + ", " + y + ": " + diff);
+                    raster.setSample(x,y,band, diff);
+                }
+
+            }
+        }
+        return outImg;
+    }
+
+
     private boolean sameBands(Raster r1, Raster r2) {
         return r1.getNumBands() == r2.getNumBands();
     }
@@ -80,8 +112,8 @@ public class ImageComparator {
     private boolean sameRasterBand(Raster r1, Raster r2, int band) {
         for (int xIdx = 0; xIdx < r1.getWidth(); xIdx++) {
             for (int yIdx = 0; yIdx < r1.getHeight(); yIdx++) {
-                if (r1.getSampleDouble(xIdx + r1.getMinX(), yIdx + r1.getMinY(), band) !=
-                    r2.getSampleDouble(xIdx + r2.getMinX(), yIdx + r2.getMinY(), band)) {
+                if (r1.getSample(xIdx + r1.getMinX(), yIdx + r1.getMinY(), band) !=
+                    r2.getSample(xIdx + r2.getMinX(), yIdx + r2.getMinY(), band)) {
                     return false;
                 }
             }

@@ -125,7 +125,7 @@ public class TestLineSymbolizer extends BaseFeatureTypeStyleTest {
 		MockLineStringFeature feature = MockLineStringFeature.createLine( 10000d, 50000d, 90000d, 50000d );
 		ShapeAdapter adapter = new ShapeAdapter( g.getTransform() );
 		lineSymbolizer.symbolize( g, feature.getGeometry() );
-		RenderedImage img = g.createRendering();
+		RenderedImage img = g.renderImage();
 		TestSupport.writeImageToDisk( img, "lineSymbolizer-1.png", "PNG" );
 		assertImageEquals( "expected-lineSymbolizer-1.png", img );
 	}

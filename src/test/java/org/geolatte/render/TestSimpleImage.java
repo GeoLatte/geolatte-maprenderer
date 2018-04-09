@@ -30,7 +30,8 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Created by IntelliJ IDEA.
+ * Test class to experiment with Java 2D graphics.
+ * <p>
  * User: adnsgis
  * Date: Dec 18, 2009
  * Time: 5:53:12 PM
@@ -75,7 +76,7 @@ public class TestSimpleImage {
         AffineTransform identity = new AffineTransform();
         identity.setToIdentity();
 //        RenderContext ctxt = new RenderContext(identity, hints);
-//        RenderedImage img = g2.createRendering(ctxt);
+//        RenderedImage img = g2.renderImage(ctxt);
         try {
             ImageIO.write(img, "PNG", new File("/tmp/img/test" + ".png"));
             ImageIO.write(img, "GIF", new File("/tmp/img/test" + ".gif"));

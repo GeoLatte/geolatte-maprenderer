@@ -55,4 +55,9 @@ public abstract class AbstractMockFeature extends Feature {
 
     }
 
+    public AbstractMockFeature(Geometry geom, Map<String, Object> properties){
+        super(generateId(), geom, properties);
+
+    }
+
 }

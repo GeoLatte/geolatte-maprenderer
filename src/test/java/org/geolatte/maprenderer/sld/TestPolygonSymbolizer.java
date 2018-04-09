@@ -110,7 +110,7 @@ public class TestPolygonSymbolizer extends BaseFeatureTypeStyleTest {
 		MockPolygonFeature feature = MockPolygonFeature.createRect( 3000, 3000, 6000, 6000 );
 		ShapeAdapter adapter = new ShapeAdapter( g.getTransform() );
 		symbolizer.symbolize( g, feature.getGeometry() );
-		RenderedImage img = g.createRendering();
+		RenderedImage img = g.renderImage();
 		TestSupport.writeImageToDisk( img, testCaseName, "PNG" );
 		assertImageEquals( "expected-" + testCaseName, img );
 	}

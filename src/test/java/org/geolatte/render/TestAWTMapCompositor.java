@@ -59,7 +59,7 @@ public class TestAWTMapCompositor {
                                               new Envelope<C2D>( new C2D(0, 0), new C2D(90, 90), CRS));
         map.setColor(new Color(0f, 1f, 0f, 0.5f));
         map.fillRect(10, 10, 50, 50);
-        RenderedImage img = map.createRendering();
+        RenderedImage img = map.renderImage();
         writeToFile(img, "in1");
         images.add(img);
 
@@ -73,7 +73,7 @@ public class TestAWTMapCompositor {
         map.fillRect(30, 30, 10, 10);
         map.setColor(new Color(0f, 0f, 1f, 0.8f));
         map.fillRect(70, 70, 10, 10);
-        img = map.createRendering();
+        img = map.renderImage();
         writeToFile(img, "in2");
         images.add(img);
 
@@ -85,7 +85,7 @@ public class TestAWTMapCompositor {
         map.drawOval(25, 25, 1, 1);
         map.drawOval(35, 35, 1, 1);
         map.drawOval(45, 45, 1, 1);
-        img = map.createRendering();
+        img = map.renderImage();
         writeToFile(img, "in3");
         images.add(img);
 

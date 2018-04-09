@@ -155,7 +155,7 @@ public class AWTMapGraphics extends MapGraphics {
     }
 
     @Override
-    public RenderedImage createRendering() {
+    public RenderedImage renderImage() {
         return this.image;
     }
 

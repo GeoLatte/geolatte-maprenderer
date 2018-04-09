@@ -22,7 +22,6 @@
 package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.PointSymbolizerType;
-import org.geolatte.geom.jts.JTS;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 import org.geolatte.maprenderer.sld.graphics.Graphic;
@@ -140,12 +139,10 @@ public class TestPointSymbolizer extends BaseFeatureTypeStyleTest {
     private void testCase(PointSymbolizer symbolizer, double x, double y, String testCaseName) throws IOException {
         MapGraphics g = createMapGraphics(100, 10000);
         MockPointFeature feature = MockPointFeature.createPoint(x, y);
-        //a horizontal line in the middle of the image.
-        ShapeAdapter adapter = new ShapeAdapter(g.getTransform());
         AffineTransform originalTransform = g.getTransform();
         symbolizer.symbolize(g, feature.getGeometry());
         assertEquals("Test that symbolizer restores always the original transform", originalTransform, g.getTransform());
-        RenderedImage img = g.createRendering();
+        RenderedImage img = g.renderImage();
         TestSupport.writeImageToDisk(img, testCaseName, "PNG");
         assertImageEquals("expected-" + testCaseName, img);
     }

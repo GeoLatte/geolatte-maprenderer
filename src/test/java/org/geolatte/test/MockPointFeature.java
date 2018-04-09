@@ -21,6 +21,8 @@
 
 package org.geolatte.test;
 
+import java.util.Map;
+
 import org.geolatte.geom.Point;
 
 import static org.geolatte.geom.builder.DSL.c;
@@ -34,6 +36,10 @@ public class MockPointFeature extends AbstractMockFeature {
 
     public MockPointFeature(Point pnt) {
         super(pnt);
+    }
+
+    public MockPointFeature(Point pnt, Map<String, Object> props) {
+        super( pnt, props );
     }
 
 

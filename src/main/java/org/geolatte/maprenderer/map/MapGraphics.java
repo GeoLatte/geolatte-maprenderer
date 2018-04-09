@@ -35,7 +35,7 @@ public abstract class MapGraphics extends Graphics2D {
 
     abstract public Dimension getDimension();
 
-    abstract public RenderedImage createRendering();
+    abstract public RenderedImage renderImage();
 
     abstract public CrsId getSpatialReference();
 

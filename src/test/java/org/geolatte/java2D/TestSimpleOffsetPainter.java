@@ -71,7 +71,7 @@ public class TestSimpleOffsetPainter {
     public void test_paint_lines_with_offset() throws IOException {
         Painter painter = new SimpleOffsetPainter(this.mapGraphics);
         painter.paint(features);
-        RenderedImage img = this.mapGraphics.createRendering();
+        RenderedImage img = this.mapGraphics.renderImage();
         TestSupport.writeImageToDisk(img, "simple-offset-painter.png", "PNG");
         assertImageEquals("expected-simple-offset-painter.png", img);
 
