@@ -63,26 +63,13 @@
     </repositories>
 
     <dependencies>
+
         <dependency>
             <groupId>org.geolatte</groupId>
             <artifactId>geolatte-geom</artifactId>
             <version>1.3.0</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.geolatte</groupId>-->
-            <!--<artifactId>geolatte-common</artifactId>-->
-            <!--<version>0.7-SNAPSHOT</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.geotools</groupId>-->
-            <!--<artifactId>gt-main</artifactId>-->
-            <!--<version>2.5.2</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.geotools</groupId>-->
-            <!--<artifactId>gt-epsg-hsql</artifactId>-->
-            <!--<version>2.5.2</version>-->
-        <!--</dependency>-->
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -145,6 +132,17 @@
             <artifactId>sld-v_1_1_0-schema</artifactId>
             <version>1.0.0</version>
         </dependency>
+
+
+        <!-- We add this dependency explicity because the one transitively resolved form sld schema is an
+        older version
+        -->
+        <dependency>
+            <groupId>org.jvnet.ogc</groupId>
+            <artifactId>wms-v_1_3_0-schema</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+
 
         <!-- Mockito Mocking framework -->
         <dependency>
