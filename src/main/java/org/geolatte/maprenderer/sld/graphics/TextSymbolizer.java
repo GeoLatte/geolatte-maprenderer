@@ -21,7 +21,8 @@
 
 package org.geolatte.maprenderer.sld.graphics;
 
-import org.geolatte.common.Feature;
+import org.geolatte.geom.Feature;
+import org.geolatte.geom.Position;
 import org.geolatte.maprenderer.map.MapGraphics;
 
 import java.awt.*;

@@ -8,11 +8,12 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.util.Optional;
 
-import org.geolatte.common.Feature;
 import org.geolatte.geom.C2D;
+import org.geolatte.geom.Feature;
 import org.geolatte.geom.Point;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
+import org.geolatte.maprenderer.map.PlanarFeature;
 import org.geolatte.maprenderer.sld.PaintFactory;
 
 import org.slf4j.Logger;
@@ -69,20 +70,12 @@ public class EmbeddedImagePainter implements Painter {
 
 	}
 
-	@Override
-	public void paint(Iterable<Feature> features) {
-		for ( Feature f : features ) {
-			paint( f );
-
-		}
-	}
-
 	/**
 	 * Paints the feature
 	 *
 	 * @param feature the feature to paint
 	 */
-	public void paint(Feature feature) {
+	public void paint(PlanarFeature feature) {
 		Point<C2D> point = (Point<C2D>) feature.getGeometry();
 		Optional<BufferedImage> imageOpt = imageExtractor.get( feature );
 		double rotationAngle = rotationExtractor.get( feature );

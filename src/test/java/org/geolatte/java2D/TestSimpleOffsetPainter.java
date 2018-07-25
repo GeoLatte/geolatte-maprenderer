@@ -26,14 +26,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geolatte.common.Feature;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Feature;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.SingleCoordinateReferenceSystem;
 import org.geolatte.maprenderer.java2D.AWTMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
+import org.geolatte.maprenderer.map.PlanarFeature;
 import org.geolatte.test.MockLineStringFeature;
 import org.geolatte.test.TestSupport;
 
@@ -53,7 +54,7 @@ public class TestSimpleOffsetPainter {
     private MapGraphics mapGraphics;
     private Envelope<C2D> extent;
 
-    private List<Feature> features = new ArrayList<Feature>();
+    private List<PlanarFeature> features = new ArrayList<>();
 
             
     @Before
@@ -62,7 +63,7 @@ public class TestSimpleOffsetPainter {
         java.awt.Dimension dim = new java.awt.Dimension(512, 512);
         this.mapGraphics = new AWTMapGraphics( dim, extent);
 
-        this.features.add( new MockLineStringFeature());
+        this.features.add( PlanarFeature.from(new MockLineStringFeature()));
 
     }
 

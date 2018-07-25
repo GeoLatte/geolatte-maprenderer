@@ -25,9 +25,7 @@ import net.opengis.se.v_1_1_0.GraphicType;
 import net.opengis.se.v_1_1_0.PointSymbolizerType;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.JTSGeometryOperations;
 import org.geolatte.geom.Point;
-import org.geolatte.geom.ProjectedGeometryOperations;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.sld.graphics.*;
 

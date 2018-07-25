@@ -21,7 +21,7 @@
 
 package org.geolatte.test;
 
-import org.geolatte.common.Feature;
+import org.geolatte.geom.Feature;
 
 import java.util.ArrayList;
 import java.util.Iterator;

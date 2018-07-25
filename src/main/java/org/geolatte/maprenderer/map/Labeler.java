@@ -21,7 +21,7 @@
 
 package org.geolatte.maprenderer.map;
 
-import org.geolatte.common.Feature;
+import org.geolatte.geom.Feature;
 
 public interface Labeler {
 

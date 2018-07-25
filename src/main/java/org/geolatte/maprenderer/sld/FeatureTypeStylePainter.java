@@ -22,10 +22,12 @@
 package org.geolatte.maprenderer.sld;
 
 
-import org.geolatte.common.Feature;
-import org.geolatte.geom.jts.JTS;
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Feature;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
+import org.geolatte.maprenderer.map.PlanarFeature;
 
 import java.util.List;
 
@@ -50,20 +52,15 @@ public class FeatureTypeStylePainter implements Painter {
         this.graphics = graphics;
     }
 
-
     //TODO -- this does not take into account the ElseFilters in Rules!!
     @Override
-    public void paint(Iterable<Feature> features) {
-        //Note: this order (iterate over feature, then iterate over rules is
-        // consistent with GeoTools/GeoServer renderers.
-        for (Feature feature : features){
-            for (Rule rule : rules){
-                if (!rule.accepts(feature)) continue;
-                rule.symbolize(graphics, feature.getGeometry());
-            }
+    public void paint(PlanarFeature feature) {
+        for (Rule rule : rules){
+            if (!rule.accepts(feature)) continue;
+            rule.symbolize(graphics, feature.getGeometry());
         }
-
     }
+
 
     /**
      * Returns the rules in the order defined by the SLD document.

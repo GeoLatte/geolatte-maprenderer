@@ -21,17 +21,14 @@
 
 package org.geolatte.test;
 
-import org.geolatte.common.Feature;
 import org.geolatte.geom.C2D;
+import org.geolatte.geom.Feature;
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
-import org.geolatte.geom.crs.ProjectedCoordinateReferenceSystem;
 import org.geolatte.geom.crs.SingleCoordinateReferenceSystem;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -39,8 +36,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: May 23, 2010
  */
-public abstract class AbstractMockFeature extends Feature {
+public abstract class AbstractMockFeature implements Feature<C2D, String> {
     protected static AtomicInteger counter = new AtomicInteger(0);
+
+    final private String id;
+    final private Map<String, Object> properties;
+    final private Geometry<C2D> geom;
 
     public static final SingleCoordinateReferenceSystem<C2D> CRS = CoordinateReferenceSystems.PROJECTED_2D_METER;
 
@@ -50,14 +51,32 @@ public abstract class AbstractMockFeature extends Feature {
         return Integer.toString( i );
     }
 
-    public AbstractMockFeature(Geometry geom){
-        super(generateId(), geom, new HashMap<String, Object>());
+    public AbstractMockFeature(String id, Geometry<C2D> geom, Map<String, Object> properties) {
+        this.id = id;
+        this.properties = properties;
+        this.geom = geom;
+    }
+
+    public AbstractMockFeature(Geometry<C2D> geom){
+        this(generateId(), geom, new HashMap<String, Object>());
+    }
+
+    public AbstractMockFeature(Geometry<C2D> geom, Map<String, Object> properties){
+        this(generateId(), geom, properties);
 
     }
 
-    public AbstractMockFeature(Geometry geom, Map<String, Object> properties){
-        super(generateId(), geom, properties);
-
+    @Override
+    public String getId() {
+        return id;
     }
 
+    @Override
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public Geometry<C2D> getGeometry() {
+        return geom;
+    }
 }

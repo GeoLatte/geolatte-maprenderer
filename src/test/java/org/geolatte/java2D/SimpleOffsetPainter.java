@@ -21,11 +21,11 @@
 
 package org.geolatte.java2D;
 
-import org.geolatte.common.Feature;
-import org.geolatte.geom.jts.JTS;
+import org.geolatte.geom.Feature;
 import org.geolatte.maprenderer.java2D.PerpendicularOffsetStroke;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
+import org.geolatte.maprenderer.map.PlanarFeature;
 import org.geolatte.maprenderer.shape.ShapeAdapter;
 
 import java.awt.*;
@@ -40,29 +40,28 @@ public class SimpleOffsetPainter implements Painter {
     private final static float WIDTH_IN_PIXELS = 6.0f;
     private final static float OFFSET_IN_PIXELS = 4.0f;
 
+
+    private final static PerpendicularOffsetStroke baseStroke = new PerpendicularOffsetStroke(WIDTH_IN_PIXELS,BasicStroke.JOIN_MITER, BasicStroke.CAP_SQUARE);
+    private final static PerpendicularOffsetStroke offsetStroke = new PerpendicularOffsetStroke(2.0f, OFFSET_IN_PIXELS);
+
     private final MapGraphics graphics;
+    final private ShapeAdapter shapeAdapter;
 
     public SimpleOffsetPainter(MapGraphics graphics){
+        this.shapeAdapter = new ShapeAdapter(graphics.getTransform());
         this.graphics = graphics;
+
     }
 
-    public void paint(Iterable<Feature> features) {
-        ShapeAdapter shapeAdapter = new ShapeAdapter(graphics.getTransform());
-
-        PerpendicularOffsetStroke baseStroke = new PerpendicularOffsetStroke(WIDTH_IN_PIXELS,BasicStroke.JOIN_MITER, BasicStroke.CAP_SQUARE);
-
-        PerpendicularOffsetStroke offsetStroke = new PerpendicularOffsetStroke(2.0f, OFFSET_IN_PIXELS);
-
-        for(Feature feature : features) {
-            Shape[] shapes = shapeAdapter.toShape(feature.getGeometry());
-            for (Shape shape : shapes) {
-                graphics.setColor(Color.RED);
-                graphics.setStroke(baseStroke);
-                graphics.draw(shape);
-                graphics.setColor(Color.BLACK);
-                graphics.setStroke(offsetStroke);
-                graphics.draw(shape);
-            }
+    public void paint(PlanarFeature feature) {
+        Shape[] shapes = shapeAdapter.toShape(feature.getGeometry());
+        for (Shape shape : shapes) {
+            graphics.setColor(Color.RED);
+            graphics.setStroke(baseStroke);
+            graphics.draw(shape);
+            graphics.setColor(Color.BLACK);
+            graphics.setStroke(offsetStroke);
+            graphics.draw(shape);
         }
 
     }

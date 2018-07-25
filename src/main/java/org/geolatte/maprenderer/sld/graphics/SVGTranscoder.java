@@ -26,7 +26,7 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
-import org.w3c.dom.svg.*;
+import org.w3c.dom.svg.SVGDocument;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

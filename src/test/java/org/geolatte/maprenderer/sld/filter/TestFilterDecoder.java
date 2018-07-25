@@ -22,7 +22,7 @@
 package org.geolatte.maprenderer.sld.filter;
 
 import net.opengis.filter.v_1_1_0.FilterType;
-import org.geolatte.common.Feature;
+import org.geolatte.geom.Feature;
 import org.geolatte.maprenderer.sld.SLD;
 import org.geolatte.maprenderer.util.ConversionException;
 import org.junit.Test;
@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
  */
 public class TestFilterDecoder {
 
-    FilterDecoder decoder;
+    private FilterDecoder decoder;
 
     @Test
     public void test_decoder_property_is_equal() {
@@ -50,11 +50,11 @@ public class TestFilterDecoder {
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
-        when(mockFeature.getProperty("size")).thenReturn(Integer.valueOf(100));
+        when(mockFeature.getProperty("size")).thenReturn(100);
         assertTrue(filter.evaluate(mockFeature));
 
         Feature mockFeature2 = mock(Feature.class);
-        when(mockFeature2.getProperty("size")).thenReturn(Integer.valueOf(-100));
+        when(mockFeature2.getProperty("size")).thenReturn(-100);
         assertFalse(filter.evaluate(mockFeature2));
     }
 
@@ -74,7 +74,7 @@ public class TestFilterDecoder {
         assertFalse(filter.evaluate(mockFeature2));
 
         Feature mockFeature3 = mock(Feature.class);
-        when(mockFeature3.getProperty("size")).thenReturn(Double.valueOf(100d));
+        when(mockFeature3.getProperty("size")).thenReturn(100d);
         try {
             assertFalse(filter.evaluate(mockFeature3));
             fail();
@@ -91,11 +91,11 @@ public class TestFilterDecoder {
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
-        when(mockFeature.getProperty("size")).thenReturn(Double.valueOf(10.254d));
+        when(mockFeature.getProperty("size")).thenReturn(10.254d);
         assertTrue(filter.evaluate(mockFeature));
 
         Feature mockFeature2 = mock(Feature.class);
-        when(mockFeature2.getProperty("size")).thenReturn(Double.valueOf(10d));
+        when(mockFeature2.getProperty("size")).thenReturn(10d);
         assertFalse(filter.evaluate(mockFeature2));
     }
 
@@ -141,11 +141,11 @@ public class TestFilterDecoder {
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
-        when(mockFeature.getProperty("size")).thenReturn(Integer.valueOf(100));
+        when(mockFeature.getProperty("size")).thenReturn(100);
         assertFalse(filter.evaluate(mockFeature));
 
         Feature mockFeature2 = mock(Feature.class);
-        when(mockFeature2.getProperty("size")).thenReturn(Integer.valueOf(-100));
+        when(mockFeature2.getProperty("size")).thenReturn(-100);
         assertTrue(filter.evaluate(mockFeature2));
     }
 
@@ -157,15 +157,15 @@ public class TestFilterDecoder {
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
-        when(mockFeature.getProperty("size")).thenReturn(Integer.valueOf(100));
+        when(mockFeature.getProperty("size")).thenReturn(100);
         assertFalse(filter.evaluate(mockFeature));
 
         Feature mockFeature2 = mock(Feature.class);
-        when(mockFeature2.getProperty("size")).thenReturn(Integer.valueOf(99));
+        when(mockFeature2.getProperty("size")).thenReturn(99);
         assertTrue(filter.evaluate(mockFeature2));
 
         Feature mockFeature3 = mock(Feature.class);
-        when(mockFeature3.getProperty("size")).thenReturn(Integer.valueOf(101));
+        when(mockFeature3.getProperty("size")).thenReturn(101);
         assertFalse(filter.evaluate(mockFeature3));
 
     }
@@ -178,15 +178,15 @@ public class TestFilterDecoder {
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
-        when(mockFeature.getProperty("size")).thenReturn(Integer.valueOf(101));
+        when(mockFeature.getProperty("size")).thenReturn(101);
         assertTrue(filter.evaluate(mockFeature));
 
         Feature mockFeature2 = mock(Feature.class);
-        when(mockFeature2.getProperty("size")).thenReturn(Integer.valueOf(90));
+        when(mockFeature2.getProperty("size")).thenReturn(90);
         assertFalse(filter.evaluate(mockFeature2));
 
         Feature mockFeature3 = mock(Feature.class);
-        when(mockFeature3.getProperty("size")).thenReturn(Integer.valueOf(100));
+        when(mockFeature3.getProperty("size")).thenReturn(100);
         assertFalse(filter.evaluate(mockFeature3));
     }
 
@@ -199,15 +199,15 @@ public class TestFilterDecoder {
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
-        when(mockFeature.getProperty("size")).thenReturn(Integer.valueOf(100));
+        when(mockFeature.getProperty("size")).thenReturn(100);
         assertTrue(filter.evaluate(mockFeature));
 
         Feature mockFeature2 = mock(Feature.class);
-        when(mockFeature2.getProperty("size")).thenReturn(Integer.valueOf(99));
+        when(mockFeature2.getProperty("size")).thenReturn(99);
         assertTrue(filter.evaluate(mockFeature2));
 
         Feature mockFeature3 = mock(Feature.class);
-        when(mockFeature3.getProperty("size")).thenReturn(Integer.valueOf(101));
+        when(mockFeature3.getProperty("size")).thenReturn(101);
         assertFalse(filter.evaluate(mockFeature3));
 
     }
@@ -220,15 +220,15 @@ public class TestFilterDecoder {
         assertNotNull(filter);
 
         Feature mockFeature = mock(Feature.class);
-        when(mockFeature.getProperty("size")).thenReturn(Integer.valueOf(101));
+        when(mockFeature.getProperty("size")).thenReturn(101);
         assertTrue(filter.evaluate(mockFeature));
 
         Feature mockFeature2 = mock(Feature.class);
-        when(mockFeature2.getProperty("size")).thenReturn(Integer.valueOf(90));
+        when(mockFeature2.getProperty("size")).thenReturn(90);
         assertFalse(filter.evaluate(mockFeature2));
 
         Feature mockFeature3 = mock(Feature.class);
-        when(mockFeature3.getProperty("size")).thenReturn(Integer.valueOf(100));
+        when(mockFeature3.getProperty("size")).thenReturn(100);
         assertTrue(filter.evaluate(mockFeature3));
     }
 
@@ -242,7 +242,7 @@ public class TestFilterDecoder {
         when(mockFeature.getProperty("size")).thenReturn("matching suba?");
         assertTrue(filter.evaluate(mockFeature));
 
-        Feature mockFeature2 = mock(Feature.class);
+//        Feature mockFeature2 = mock(Feature.class);
         when(mockFeature.getProperty("size")).thenReturn("nonmatching suba");
         assertFalse(filter.evaluate(mockFeature));
 
@@ -255,7 +255,7 @@ public class TestFilterDecoder {
         when(mockFeature.getProperty("size")).thenReturn("matching suba?");
         assertTrue(filter.evaluate(mockFeature));
 
-        mockFeature2 = mock(Feature.class);
+//        mockFeature2 = mock(Feature.class);
         when(mockFeature.getProperty("size")).thenReturn("nonmatching suba");
         assertFalse(filter.evaluate(mockFeature));
 
@@ -268,13 +268,13 @@ public class TestFilterDecoder {
         when(mockFeature.getProperty("size")).thenReturn("%matching suba%");
         assertTrue(filter.evaluate(mockFeature));
 
-        mockFeature2 = mock(Feature.class);
+//        mockFeature2 = mock(Feature.class);
         when(mockFeature.getProperty("size")).thenReturn(".nonmatching suba%");
         assertFalse(filter.evaluate(mockFeature));
     }
 
 
-    FilterType getFragment(String fragment) {
+    private FilterType getFragment(String fragment) {
         fragment = TestXML.FILTER_ELEMENT_OPEN + fragment + TestXML.FILTER_ELEMENT_CLOSE;
         return SLD.instance().read(fragment, FilterType.class);
     }

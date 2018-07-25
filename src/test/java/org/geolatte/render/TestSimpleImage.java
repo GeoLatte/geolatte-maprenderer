@@ -43,10 +43,8 @@ public class TestSimpleImage {
     public static void main(String[] args) {
 
         ColorModel colorModel = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), true, true, Transparency.BITMASK, DataBuffer.TYPE_BYTE);
-//        ColorModel colorModel = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
         WritableRaster raster = colorModel.createCompatibleWritableRaster(256, 256);
         BufferedImage img = new BufferedImage(colorModel, raster, false, null);
-//        BufferedImage img = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
 
         Graphics2D g2 = (Graphics2D) img.getGraphics();
         g2.setComposite(AlphaComposite.SrcOver);
@@ -67,16 +65,8 @@ public class TestSimpleImage {
         hints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 
-//        ColorModel colorModel = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), true, true, Transparency.BITMASK, DataBuffer.TYPE_USHORT);
-//
-//
-//        ImageLayout layout = new ImageLayout(0, 0, 256, 256, null, colorModel);
-//        hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
-
         AffineTransform identity = new AffineTransform();
         identity.setToIdentity();
-//        RenderContext ctxt = new RenderContext(identity, hints);
-//        RenderedImage img = g2.renderImage(ctxt);
         try {
             ImageIO.write(img, "PNG", new File("/tmp/img/test" + ".png"));
             ImageIO.write(img, "GIF", new File("/tmp/img/test" + ".gif"));

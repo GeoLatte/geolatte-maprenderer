@@ -21,8 +21,8 @@
 
 package org.geolatte.maprenderer.sld;
 
-import org.geolatte.common.Feature;
 import org.geolatte.geom.C2D;
+import org.geolatte.geom.Feature;
 import org.geolatte.geom.Geometry;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.sld.filter.SLDRuleFilter;

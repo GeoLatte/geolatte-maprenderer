@@ -1,14 +1,15 @@
 package org.geolatte.maprenderer.painters;
 
-import org.geolatte.common.Feature;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Feature;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.SingleCoordinateReferenceSystem;
 import org.geolatte.maprenderer.java2D.AWTMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
+import org.geolatte.maprenderer.map.PlanarFeature;
 import org.geolatte.maprenderer.util.ImageUtils;
 import org.geolatte.test.MockPointFeature;
 import org.geolatte.test.TestSupport;
@@ -39,7 +40,7 @@ public class EmbeddedImagePainterTest {
 
     Envelope<C2D> extent;
     MapGraphics mapGraphics;
-    List<Feature> features = new ArrayList<>();
+    List<PlanarFeature> features = new ArrayList<>();
 
     @Before
     public void setUp() {
@@ -48,10 +49,10 @@ public class EmbeddedImagePainterTest {
         this.mapGraphics = new AWTMapGraphics(dim, extent);
         Map<String, Object> props = new HashMap<>();
         props.put("image", imageData);
-        this.features.add(new MockPointFeature(
+        this.features.add(PlanarFeature.from(new MockPointFeature(
                 point(CRS, c(50, 50)),
                 props
-        ));
+        )));
     }
 
 
@@ -60,7 +61,7 @@ public class EmbeddedImagePainterTest {
 
 
         Painter painter = new EmbeddedImagePainter(mapGraphics,
-                (Feature f) -> ImageUtils.readImageFromBase64String((String) f.getProperty("image")),
+                (Feature f) -> ImageUtils.readImageFromBase64String((String) f.getProperties().get("image")),
                 (Feature f) -> addOffset((Point<C2D>) f.getGeometry(), 10, 10),
                 (Feature f) -> Math.PI / 4
         );

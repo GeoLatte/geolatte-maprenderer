@@ -21,7 +21,7 @@
 
 package org.geolatte.maprenderer.sld.filter;
 
-import org.geolatte.common.Feature;
+import org.geolatte.geom.Feature;
 
 
 public class SLDRuleFilter {
@@ -32,7 +32,7 @@ public class SLDRuleFilter {
         this.expression = expression;
     }
 
-    public Boolean evaluate(Feature feature) {
+    public Boolean  evaluate(Feature feature) {
         return this.expression.evaluate(feature);
     }
 

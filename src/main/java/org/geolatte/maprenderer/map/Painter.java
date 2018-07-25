@@ -21,7 +21,9 @@
 
 package org.geolatte.maprenderer.map;
 
-import org.geolatte.common.Feature;
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Feature;
 
 /**
  * Paints features  onto a <code>MapGraphics</code>.
@@ -33,7 +35,14 @@ import org.geolatte.common.Feature;
  */
 public interface Painter {
 
-    public void paint(Iterable<Feature> features);
+    void paint(PlanarFeature feature);
 
+    default void paint(Iterable<PlanarFeature> features) {
+        features.forEach( this::paint );
+    }
+
+    default Envelope<C2D> envelope(PlanarFeature f){
+        return f.getGeometry().getEnvelope();
+    }
 
 }
