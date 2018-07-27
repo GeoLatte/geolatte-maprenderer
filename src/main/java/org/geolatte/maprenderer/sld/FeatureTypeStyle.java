@@ -23,6 +23,7 @@ package org.geolatte.maprenderer.sld;
 
 import net.opengis.se.v_1_1_0.*;
 import org.geolatte.maprenderer.map.MapGraphics;
+import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.maprenderer.sld.filter.AlwaysTrueSLDRuleFilter;
 import org.geolatte.maprenderer.sld.filter.ElseSLDRuleFilter;
 import org.geolatte.maprenderer.sld.filter.FilterDecoder;
@@ -50,7 +51,7 @@ public class FeatureTypeStyle {
         this.rules = createRules(type);
     }
 
-    public FeatureTypeStylePainter createPainter(MapGraphics graphics) {
+    public Painter createPainter(MapGraphics graphics) {
         return new FeatureTypeStylePainter(graphics, getRules());
     }
 

@@ -35,6 +35,14 @@ import org.geolatte.geom.Feature;
  */
 public interface Painter {
 
+    /**
+     * Allows the Painter to signal that it will paint features
+     * @return
+     */
+    default boolean willPaint(){
+        return true;
+    }
+
     void paint(PlanarFeature feature);
 
     default void paint(Iterable<PlanarFeature> features) {

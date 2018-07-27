@@ -50,7 +50,6 @@ public class SimpleOffsetPainter implements Painter {
     public SimpleOffsetPainter(MapGraphics graphics){
         this.shapeAdapter = new ShapeAdapter(graphics.getTransform());
         this.graphics = graphics;
-
     }
 
     public void paint(PlanarFeature feature) {
