@@ -1,0 +1,2 @@
+Hier komen de application services en de process managers die de aggregate roots instantiëren en aansturen. Dit is een coördinerende
+laag die ook zaken opneemt als transactiebeheer, authenticatie en authorisatie.

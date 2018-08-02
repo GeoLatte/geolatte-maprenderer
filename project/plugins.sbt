@@ -1,0 +1,5 @@
+addSbtPlugin("com.typesafe.sbt"   % "sbt-native-packager" % "1.3.4")
+addSbtPlugin("com.typesafe.play"  % "sbt-plugin"          % "2.6.17")
+addSbtPlugin("com.lucidchart"     % "sbt-scalafmt"        % "1.15")
+addSbtPlugin("io.atomicbits"      % "scraml-sbt-plugin"   % "0.8.1")
+addSbtPlugin("com.eed3si9n"       % "sbt-buildinfo"       % "0.7.0")

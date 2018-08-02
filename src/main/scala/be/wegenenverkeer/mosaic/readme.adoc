@@ -1,0 +1,20 @@
+# De structuur van een Bounded Context package
+
+De code die gerelateerd is aan een bepaalde bounded context wordt samen in één package gezet met als top-level package naam de naam van
+de bounded context (de template package 'boundedcontext' moet dus hernoemd worden naar een specifieke bounded context. In een bounded
+context is de code opgedeeld in volgende packages:
+
+ 1. application
+    * Hier komen de application services en de process managers die de aggregate roots instantiëren en aansturen. Dit is een
+    coördinerende laag die ook zaken opneemt als transactiebeheer, authenticatie en authorisatie.
+ 2. domain.model
+    * Het (rijke) domain model is het hart van de business modellering. Het domain model is opgedeeld in aggregates waarbij elke
+    aggregate in een subpackage van domain.model gedefinieerd wordt.
+ 3. domain.service
+    * Het domain model wordt geholpen door de domain services die het deel van de business logica bevatten die niet rechtstreeks door
+    een aggregate op zich afgehandeld kan worden.
+ 4. infrastructure
+    * In het infrastructure package zitten zaken zoals persistence, repositories, caching, etc.
+ 5. rest
+    * De afhandeling van rest resources gebeurt in dit package. Dit is een dunne laag die enkel de REST-specifieke communicatie afhandeld
+    en dient als een doorgeefluik naar application services of process managers in de application package.

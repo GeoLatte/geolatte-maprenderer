@@ -1,0 +1,1 @@
+In het infrastructure package zitten zaken zoals persistence, repositories, caching, etc.
