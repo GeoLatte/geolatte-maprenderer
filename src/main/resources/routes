@@ -2,6 +2,9 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+# WMS
+GET     /wms                   be.wegenenverkeer.mosaic.api.WmsController.wms()
+
 
 # Home page
 GET     /ui                    controllers.Assets.at(path="/public", file = "index.html")
