@@ -94,18 +94,30 @@ public class EmbeddedImagePainter implements Painter {
 	/**
 	 * Draws a line from feature geometry to the anchor point
 	 *
-	 * @param pos
-	 * @param anchor
+	 * @param posPnt
+	 * @param anchorPnt
 	 */
-	private void drawLineToAnchor(C2D pos, C2D anchor) {
-		graphics.setPaint( new PaintFactory().create( Color.black, 1 ) );
-		graphics.setStroke( lineStroke );
-		graphics.drawLine( (int) pos.getX(), (int) pos.getY(), (int) anchor.getX(), (int) anchor.getY() );
+	private void drawLineToAnchor(C2D posPnt, C2D anchorPnt) {
+		AffineTransform currentTransform = graphics.getTransform();
+		try {
+			//to use
+			graphics.setTransform(new AffineTransform());
+			Point2D anchor = doTransform(anchorPnt, currentTransform);
+			Point2D pos = doTransform(posPnt, currentTransform);
+			graphics.setPaint( new PaintFactory().create( Color.black, 1 ) );
+			graphics.setStroke( lineStroke );
+			graphics.drawLine( (int) pos.getX(), (int) pos.getY(), (int) anchor.getX(), (int) anchor.getY() );
+		}
+		catch (Throwable t) {
+			logger.error( "Error painting feature", t );
+		}
+		finally {
+			// restore transform
+			graphics.setTransform( currentTransform );
+		}
 	}
 
 	private void drawImage(double rotationAngle, BufferedImage image, C2D anchorPnt) {
-
-
 		AffineTransform currentTransform = graphics.getTransform();
 		try {
 			//to use

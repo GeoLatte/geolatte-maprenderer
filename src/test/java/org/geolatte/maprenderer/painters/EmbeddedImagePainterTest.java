@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -63,7 +64,8 @@ public class EmbeddedImagePainterTest {
         Painter painter = new EmbeddedImagePainter(mapGraphics,
                 (Feature f) -> ImageUtils.readImageFromBase64String((String) f.getProperties().get("image")),
                 (Feature f) -> addOffset((Point<C2D>) f.getGeometry(), 10, 10),
-                (Feature f) -> Math.PI / 4
+                (Feature f) -> Math.PI / 4,
+                new BasicStroke(Math.round(1.0 / mapGraphics.getMapUnitsPerPixel()))
         );
         painter.paint(features);
         RenderedImage img = this.mapGraphics.renderImage();
