@@ -16,4 +16,16 @@ services:
     hostname: db-mosaic
     container_name: mosaic-postgres
     ports:
-    - "5432:5432"
+    - 5432:5432
+
+  geoserver-db:
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/geoserver-postgres
+    hostname: geoserver-db
+    container_name: mosaic-geoserver-db
+
+  geoserver:
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/geoserver
+    hostname: geoserver
+    container_name: mosaic-geoserver
+    links:
+    - geoserver-db:db
