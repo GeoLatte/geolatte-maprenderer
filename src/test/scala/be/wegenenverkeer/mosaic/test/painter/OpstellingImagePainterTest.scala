@@ -53,22 +53,33 @@ class OpstellingImagePainterTest extends FunSuite {
 
     bufferedSource.close
 
-    val tileSize = 256 * 6
-    val gridSize = 32
-    val extent = new Envelope[C2D](new C2D(152911.5, 209130.8125),
-                                   new C2D(153212.5, 209330.9375),
-                                   CRS.LAMBERT72)
-    val dim         = new Dimension(1536, 1536)
+    val aantalTiles = 5
 
-    def tekenOpstellingen(resolutie: Double): Unit = {
+    val tileSize = 256 * aantalTiles
+    val gridSize = 32
+
+    val originX = 152911.5
+    val originY = 209130.8125
+
+    val dim = new Dimension(tileSize, tileSize)
+
+    def tekenOpstellingen(gridSize: Double): Unit = {
+
+      val extent = new Envelope[C2D](
+        new C2D(originX, originY),
+        new C2D(originX + gridSize * aantalTiles, originY + gridSize * aantalTiles),
+        CRS.LAMBERT72
+      )
+
       val mapGraphics = new AWTMapGraphics(dim, extent)
-      val painter     = new OpstellingImagePainter(mapGraphics, resolutie)
+
+      val painter = new OpstellingImagePainter(mapGraphics)
       geoJsons.foreach(geoJson => painter.paint(geoJson.asPlanarFeature()))
       val img = mapGraphics.renderImage
-      ImageIO.write(img, "PNG", new File("/tmp", s"verkeersborden - resolutie $resolutie.png"))
+      ImageIO.write(img, "PNG", new File("/tmp", s"verkeersborden - resolutie ${gridSize * aantalTiles / tileSize}.png"))
     }
 
-    Seq(0.125, 0.25, 0.5, 1.0).foreach(tekenOpstellingen)
+    Seq(32, 64, 128, 256.0).foreach(tekenOpstellingen)
   }
 
   // https://wms2.apps.mow.vlaanderen.be/geowebcache/service/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&
@@ -89,9 +100,9 @@ class OpstellingImagePainterTest extends FunSuite {
 
     bufferedSource.close
 
-    val aantalMetaTiles = 4
-    val origin = Seq(152912, 209159.75)
-    val tileSize = 256
+    val aantalMetaTiles   = 4
+    val origin            = Seq(152912, 209159.75)
+    val tileSize          = 256
     val teTestenGridSizes = Seq(32.0, 64.0, 128.0, 256.0)
 
     for (gridSize <- teTestenGridSizes) {
@@ -117,8 +128,6 @@ class OpstellingImagePainterTest extends FunSuite {
     }
   }
 
-
-
   //  https://wms3.apps.mow.vlaanderen.be/geowebcache/service/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&LAYERS=dienstkaart-grijs&
   //  TILED=true&SRS=EPSG%3A31370&WIDTH=256&HEIGHT=256&STYLES=&BBOX=152944%2C209159.75%2C152976%2C209191.75
   private def generateTile(minX: Double,
@@ -131,7 +140,7 @@ class OpstellingImagePainterTest extends FunSuite {
     val extent      = new Envelope[C2D](new C2D(minX, maxY), new C2D(maxX, minY), CRS.LAMBERT72)
     val dim         = new Dimension(tileSize, tileSize)
     val mapGraphics = new AWTMapGraphics(dim, extent)
-    val painter     = new OpstellingImagePainter(mapGraphics, (maxX - minX) / tileSize)
+    val painter     = new OpstellingImagePainter(mapGraphics)
 
     geoJsons.foreach(geoJson => painter.paint(geoJson.asPlanarFeature()))
 

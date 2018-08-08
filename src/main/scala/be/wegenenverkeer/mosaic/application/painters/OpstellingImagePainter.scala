@@ -14,6 +14,8 @@ import org.geolatte.maprenderer.util.ImageUtils
   *
   *  Er worden dezelfde regels gevolgd als bij de frontend rendering van ng-kaart:
   *
+  *   resolution = graphics.getMapUnitsPerPixel
+  *
   *   if (resolution <= 0.125) {
   *       return geselecteerd ? opstellingMetAanzichten(feature, geselecteerd, false) : opstellingMetAanzichten(feature, geselecteerd, false);
   *     } else if (resolution <= 0.25) {
@@ -28,13 +30,13 @@ import org.geolatte.maprenderer.util.ImageUtils
   *   @param resolution resolutie die bepaalt welke soort voorstelling getekend wordt.
   *                       Vb: 1 van [1024.0, 512.0, 256.0, 128.0, 64.0, 32.0, 16.0, 8.0, 4.0, 2.0, 1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125]
   */
-class OpstellingImagePainter(graphics: MapGraphics, resolution: Double) extends Painter with Base64Conversion {
+class OpstellingImagePainter(graphics: MapGraphics) extends Painter with Base64Conversion {
 
   override def paint(geojsonPlanarFeature: PlanarFeature): Unit = {
     val opstelling   = geojsonPlanarFeature.getProperties.get("properties").asInstanceOf[Opstelling]
     val opstellingPF = PlanarFeature.from(new OpstellingFeature(opstelling))
 
-    resolution match {
+    graphics.getMapUnitsPerPixel match {
       case res if res <= 0.125 => renderOpstellingMetAanzichten(opstellingPF, opstelling, klein = false)
       case res if res <= 0.25  => renderOpstellingMetAanzichten(opstellingPF, opstelling, klein = true)
       case res if res <= 0.5   => renderOpstellingMetHoek(opstellingPF, opstelling)
