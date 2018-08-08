@@ -74,7 +74,7 @@ class OpstellingImagePainterTest extends FunSuite {
   // https://wms2.apps.mow.vlaanderen.be/geowebcache/service/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&
   // TRANSPARENT=true&LAYERS=dienstkaart-grijs&TILED=true&SRS=EPSG%3A31370&WIDTH=256&HEIGHT=256&STYLES=&BBOX=152976%2C209159.75%2C153008%2C209191.75
 
-  test("Tiles resolutie 0.125") {
+  test("Tiles alles resoluties") {
 
     val bufferedSource = Source.fromURL(getClass.getResource("/opstellingen.chunked.json"))
 
@@ -89,33 +89,35 @@ class OpstellingImagePainterTest extends FunSuite {
 
     bufferedSource.close
 
-    val aantalTiles = 4
-
+    val aantalMetaTiles = 4
     val origin = Seq(152912, 209159.75)
-
-    val gridSize = 32
-
     val tileSize = 256
+    val teTestenGridSizes = Seq(32.0, 64.0, 128.0, 256.0)
 
-    for (x <- origin.head to (origin.head + gridSize * aantalTiles) by gridSize) {
-      for (y <- origin.last to (origin.last + gridSize * aantalTiles) by gridSize) {
-        val (minX, minY, maxX, maxY) = (x, y, x + gridSize, y + gridSize)
+    for (gridSize <- teTestenGridSizes) {
+      for (x <- origin.head to (origin.head + gridSize * aantalMetaTiles) by gridSize) {
+        for (y <- origin.last to (origin.last + gridSize * aantalMetaTiles) by gridSize) {
+          val resolution = gridSize / tileSize
 
-        val img = generateTile(minX, minY, maxX, maxY, geoJsons, tileSize)
+          val (minX, minY, maxX, maxY) = (x, y, x + gridSize, y + gridSize)
 
-        // ImageIO.write(img, "PNG", new File("/tmp", s"tile-$minX-$minY-$maxX-$maxY.png"))
+          val img = generateTile(minX, minY, maxX, maxY, geoJsons, tileSize)
 
-        // TODO -- why is this necessary here?
-        // we first write the rendered file to disk, because writing to disk and then reading might cause slight
-        // changes - presumably due to rounding to int pixels.
-        val tmpFile = File.createTempFile("tmp", "png")
-        ImageIO.write(img, "PNG", tmpFile)
-        val received = ImageIO.read(tmpFile)
+          // ImageIO.write(img, "PNG", new File("/tmp", s"tile-$minX-$minY-$maxX-$maxY.png"))
 
-        assertImageEquals(s"tile-$minX-$minY-$maxX-$maxY-expected.png", received)
+          // we first write the rendered file to disk, because writing to disk and then reading might cause slight
+          // changes - presumably due to rounding to int pixels.
+          val tmpFile = File.createTempFile("tmp", "png")
+          ImageIO.write(img, "PNG", tmpFile)
+          val received = ImageIO.read(tmpFile)
+
+          assertImageEquals(s"resolutie/$resolution/tile-$minX-$minY-$maxX-$maxY-expected.png", received)
+        }
       }
     }
   }
+
+
 
   //  https://wms3.apps.mow.vlaanderen.be/geowebcache/service/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&LAYERS=dienstkaart-grijs&
   //  TILED=true&SRS=EPSG%3A31370&WIDTH=256&HEIGHT=256&STYLES=&BBOX=152944%2C209159.75%2C152976%2C209191.75
