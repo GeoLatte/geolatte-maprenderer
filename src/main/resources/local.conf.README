@@ -14,3 +14,8 @@ poauth.dangerous.mockProvider.enabled=false
 play.evolutions.enabled=true
 play.evolutions.db.default.autoApply=true
 play.evolutions.db.default.autoApplyDowns=true
+
+# gebruik deze config om via management tunnel naar de featureserver te gaan
+geolatte-mapserver {
+  layers.vkb.source.host = "http://apigateway.dev.awv.internal:5100/geolatte-nosqlfs/api/databases/featureserver/verkeersborden/"
+}

@@ -4,17 +4,12 @@ ENV PGPASSWORD docker
 
 USER root
 
-ADD mosaic.sql.gz /tmp/app.sql.gz
-
-ENV PGPASSWORD docker
-
 RUN /etc/init.d/postgresql start 9.6 &&\
     psql -U docker -d postgres -h 0.0.0.0 --command "CREATE USER mosaic WITH SUPERUSER PASSWORD 'mosaic';" &&\
     createdb -E UTF8 -U docker -h 0.0.0.0 -O mosaic mosaic --template template0  &&\
     psql -U docker -d mosaic -h 0.0.0.0 --command "create extension hstore; create extension postgis;" &&\
     createdb -E UTF8 -U docker -h 0.0.0.0 -O mosaic mosaic-test --template template0 &&\
     psql -U docker -d mosaic-test -h 0.0.0.0 --command "create extension hstore; create extension postgis;" &&\
-    zcat /tmp/app.sql.gz | gunzip | psql -U docker -h 0.0.0.0 mosaic && \
     /etc/init.d/postgresql stop &&\
     rm -f /tmp/*gz
 

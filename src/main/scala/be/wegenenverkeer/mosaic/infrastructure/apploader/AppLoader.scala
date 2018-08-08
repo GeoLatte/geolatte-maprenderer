@@ -8,7 +8,7 @@ import be.wegenenverkeer.metrics.controller.MetricsController
 import be.wegenenverkeer.metrics.filter.MetricFilter
 import be.wegenenverkeer.mosaic.AppMachtigingen
 import be.wegenenverkeer.mosaic.AppMachtigingen._
-import be.wegenenverkeer.mosaic.api.{AppPoAuth, WebApplicationController}
+import be.wegenenverkeer.mosaic.api.{AppPoAuth, WebApplicationController, WmsController}
 import be.wegenenverkeer.mosaic.infrastructure.AppAkkaModule
 import be.wegenenverkeer.playevolutions._
 import be.wegenenverkeer.poauth.domain.model._
@@ -76,6 +76,7 @@ trait AppComponents
   }
 
   lazy val webApplicationController = wire[WebApplicationController]
+  lazy val wmsController = wire[WmsController]
 
   lazy val poProvider = if (configuration.getOptional[Boolean]("poauth.dangerous.mockProvider.enabled").getOrElse(false)) {
     new MockPoProvider(Map(applicatieUser -> GebruikerMachtigingen(
