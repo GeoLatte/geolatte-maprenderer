@@ -35,6 +35,8 @@ class OpstellingImagePainter(graphics: MapGraphics) extends Painter with Base64C
 
   private val logger = LoggerFactory.getLogger(classOf[OpstellingImagePainter])
 
+  override def willPaint(): Boolean = graphics.getMapUnitsPerPixel <= 2.0
+
   override def paint(geojsonPlanarFeature: PlanarFeature): Unit = {
 
     Option(geojsonPlanarFeature.getProperties.get("properties").asInstanceOf[Opstelling]) match {
