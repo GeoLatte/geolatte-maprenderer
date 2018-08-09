@@ -1,4 +1,5 @@
 package be.wegenenverkeer.mosaic.test.painter
+
 import java.awt.Dimension
 import java.awt.image.RenderedImage
 import java.io.File
@@ -37,18 +38,16 @@ class OpstellingImagePainterTest extends FunSuite {
     val aantalTiles = 5
 
     val tileSize = 256 * aantalTiles
-    val gridSize = 32
 
-    val originX = 152911.5
-    val originY = 209130.8125
+    val origin = new C2D(152911.5, 209130.8125)
 
     val dim = new Dimension(tileSize, tileSize)
 
     def tekenOpstellingen(gridSize: Double): Unit = {
 
       val extent = new Envelope[C2D](
-        new C2D(originX, originY),
-        new C2D(originX + gridSize * aantalTiles, originY + gridSize * aantalTiles),
+        new C2D(origin.getX, origin.getY),
+        new C2D(origin.getX + gridSize * aantalTiles, origin.getY + gridSize * aantalTiles),
         CRS.LAMBERT72
       )
 
@@ -81,14 +80,14 @@ class OpstellingImagePainterTest extends FunSuite {
 
     bufferedSource.close
 
-    val aantalMetaTiles   = 4
-    val origin            = Seq(152912, 209159.75)
+    val aantalTiles       = 4
+    val origin            = new C2D(152912, 209159.75)
     val tileSize          = 256
     val teTestenGridSizes = Seq(32.0, 64.0, 128.0, 256.0)
 
     for (gridSize <- teTestenGridSizes) {
-      for (x <- origin.head to (origin.head + gridSize * aantalMetaTiles) by gridSize) {
-        for (y <- origin.last to (origin.last + gridSize * aantalMetaTiles) by gridSize) {
+      for (x <- origin.getX to (origin.getX + gridSize * aantalTiles) by gridSize) {
+        for (y <- origin.getY to (origin.getY + gridSize * aantalTiles) by gridSize) {
           val resolution = gridSize / tileSize
 
           val (minX, minY, maxX, maxY) = (x, y, x + gridSize, y + gridSize)
@@ -99,7 +98,7 @@ class OpstellingImagePainterTest extends FunSuite {
 
           // we first write the rendered file to disk, because writing to disk and then reading might cause slight
           // changes - presumably due to rounding to int pixels.
-          val tmpFile = File.createTempFile("tmp", "png")
+          val tmpFile = File.createTempFile("tmp", ".png")
           ImageIO.write(img, "PNG", tmpFile)
           val received = ImageIO.read(tmpFile)
 

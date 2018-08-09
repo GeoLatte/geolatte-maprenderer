@@ -1,6 +1,7 @@
 package be.wegenenverkeer.mosaic.application.painters
+
 import java.awt.geom.{ AffineTransform, Ellipse2D }
-import java.awt.{ Color, Stroke }
+import java.awt.{ BasicStroke, Color }
 
 import org.geolatte.geom.{ C2D, Point }
 import org.geolatte.maprenderer.map.{ MapGraphics, Painter, PlanarFeature }
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory
 /**
   * Tekent een gecentreerde image (ipv top left) voor opstelling hoek
   */
-class PointPainter(val graphics: MapGraphics, val stroke: Stroke, val radius: Double) extends Painter with Transformer {
+class PointPainter(val graphics: MapGraphics, val radius: Double) extends Painter with Transformer {
 
   private final val logger = LoggerFactory.getLogger(classOf[PointPainter])
 
@@ -20,12 +21,12 @@ class PointPainter(val graphics: MapGraphics, val stroke: Stroke, val radius: Do
     val currentTransform = graphics.getTransform
     try {
       graphics.setTransform(new AffineTransform)
-      val anchor = doTransform(pos, mkTransform(currentTransform, radius))
+      val anchor = doTransform(pos, currentTransform)
 
-      // {"circle": {"stroke": {"color": "black", "width": 1.5}, "fill": {"color": "black"}, "radius": 3}}
+      // {"circle": {"fill": {"color": "black"}, "radius": 3}}
       graphics.setPaint(new PaintFactory().create(Color.black, 1))
-      graphics.setStroke(stroke)
-      graphics.fill(new Ellipse2D.Double(anchor.getX, anchor.getY, radius * 2, radius * 2))
+      graphics.setStroke(new BasicStroke(0))
+      graphics.fill(new Ellipse2D.Double(anchor.getX - radius, anchor.getY - radius, radius * 2, radius * 2))
 
     } catch {
       case t: Throwable =>
@@ -36,10 +37,4 @@ class PointPainter(val graphics: MapGraphics, val stroke: Stroke, val radius: Do
     }
   }
 
-  private def mkTransform(currentTransform: AffineTransform, radius: Double) = {
-    val shiftLowerCenter = new AffineTransform
-    shiftLowerCenter.setToTranslation(-radius / 2, -radius)
-    shiftLowerCenter.concatenate(currentTransform)
-    shiftLowerCenter
-  }
 }

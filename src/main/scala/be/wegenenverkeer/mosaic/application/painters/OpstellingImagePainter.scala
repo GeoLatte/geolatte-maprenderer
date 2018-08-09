@@ -56,11 +56,7 @@ class OpstellingImagePainter(graphics: MapGraphics) extends Painter with Base64C
   }
 
   private def renderOpstellingAlsPunt(planarFeature: PlanarFeature): Unit = {
-    val painter = new PointPainter(
-      graphics,
-      new BasicStroke(Math.round(1.5 / graphics.getMapUnitsPerPixel)),
-      3
-    )
+    val painter = new PointPainter(graphics, 3)
     painter.paint(planarFeature)
   }
 
@@ -70,11 +66,10 @@ class OpstellingImagePainter(graphics: MapGraphics) extends Painter with Base64C
   }
 
   private def renderOpstellingMetHoek(planarFeature: PlanarFeature, opstelling: Opstelling): Unit = {
-    val painter = new ImagePainter(
-      graphics,
-      feature => readImageFromBase64String(opstelling.binaireData.kaartvoorstelling.data)
-    )
-    painter.paint(planarFeature)
+    readImageFromBase64String(opstelling.binaireData.kaartvoorstelling.data).foreach { image =>
+      val painter = new ImagePainter(graphics, image)
+      painter.paint(planarFeature)
+    }
   }
 
   private def renderAanzicht(aanzicht: Aanzicht, opstelling: Opstelling, klein: Boolean): Unit = {

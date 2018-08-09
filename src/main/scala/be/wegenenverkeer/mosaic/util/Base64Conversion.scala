@@ -1,4 +1,5 @@
 package be.wegenenverkeer.mosaic.util
+
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.util.Base64
