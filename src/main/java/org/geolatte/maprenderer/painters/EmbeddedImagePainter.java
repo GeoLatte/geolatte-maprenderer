@@ -106,7 +106,12 @@ public class EmbeddedImagePainter implements Painter {
 			Point2D pos = doTransform(posPnt, currentTransform);
 			graphics.setPaint( new PaintFactory().create( Color.black, 1 ) );
 			graphics.setStroke( lineStroke );
-			graphics.drawLine( (int) pos.getX(), (int) pos.getY(), (int) anchor.getX(), (int) anchor.getY() );
+			graphics.drawLine(
+					(int) Math.round(pos.getX()),
+					(int) Math.round(pos.getY()),
+					(int) Math.round(anchor.getX()),
+					(int) Math.round(anchor.getY())
+			);
 		}
 		catch (Throwable t) {
 			logger.error( "Error painting feature", t );
@@ -123,9 +128,8 @@ public class EmbeddedImagePainter implements Painter {
 			//to use
 			graphics.setTransform( new AffineTransform() );
 			Point2D anchor = doTransform( anchorPnt, mkTransform( currentTransform, image ) );
-			graphics.rotate( rotationAngle, anchor.getX() + image.getWidth() / 2, anchor.getY() + image.getHeight() );
-			graphics.drawImage( image, (int) anchor.getX(), (int) anchor.getY(), (ImageObserver) null );
-//			graphics.drawRect( (int) anchor.getX(), (int) anchor.getY(), image.getWidth(), image.getHeight() );
+			graphics.rotate( rotationAngle, anchor.getX() + image.getWidth() / 2.0, anchor.getY() + image.getHeight() );
+			graphics.drawImage( image, (int) Math.round(anchor.getX()), (int) Math.round(anchor.getY()), (ImageObserver) null );
 		}
 		catch (Throwable t) {
 			logger.error( "Error painting feature", t );
@@ -139,7 +143,7 @@ public class EmbeddedImagePainter implements Painter {
 	private void markPosition(C2D point) {
 		graphics.setPaint( new PaintFactory().create( Color.black, 1 ) );
 		Point2D dstPnt = new java.awt.Point.Double( point.getX(), point.getY() );
-		graphics.fillRect( (int) dstPnt.getX(), (int) dstPnt.getY(), 1, 1 );
+		graphics.fillRect( (int) Math.round(dstPnt.getX()), (int) Math.round(dstPnt.getY()), 1, 1 );
 	}
 
 	private Point2D doTransform(C2D point, AffineTransform transform) {
@@ -148,7 +152,7 @@ public class EmbeddedImagePainter implements Painter {
 
 	private AffineTransform mkTransform(AffineTransform currentTransform, BufferedImage image) {
 		AffineTransform shiftLowerCenter = new AffineTransform();
-		shiftLowerCenter.setToTranslation( -image.getWidth() / 2, -image.getHeight() );
+		shiftLowerCenter.setToTranslation( -image.getWidth() / 2.0, -image.getHeight() );
 		shiftLowerCenter.concatenate( currentTransform );
 		return shiftLowerCenter;
 	}
