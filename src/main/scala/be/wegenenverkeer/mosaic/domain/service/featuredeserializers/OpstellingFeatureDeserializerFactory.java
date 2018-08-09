@@ -1,4 +1,4 @@
-package be.wegenenverkeer.mosaic.application.featuredeserializers;
+package be.wegenenverkeer.mosaic.domain.service.featuredeserializers;
 
 import org.geolatte.mapserver.features.FeatureDeserializer;
 import org.geolatte.mapserver.rxhttp.FeatureDeserializerFactory;

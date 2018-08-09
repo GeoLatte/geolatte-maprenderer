@@ -1,4 +1,4 @@
-package be.wegenenverkeer.mosaic.application.featuredeserializers
+package be.wegenenverkeer.mosaic.domain.service.featuredeserializers
 
 import be.wegenenverkeer.mosaic.domain.model.GeoJson
 import org.geolatte.maprenderer.map.PlanarFeature

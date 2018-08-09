@@ -4,18 +4,17 @@ import java.awt.Dimension
 import java.awt.image.RenderedImage
 import java.io.File
 
-import be.wegenenverkeer.mosaic.application.painters.OpstellingImagePainter
-import be.wegenenverkeer.mosaic.domain.model.{CRS, GeoJson}
-import javax.imageio.ImageIO
-import org.geolatte.geom.{C2D, Envelope}
-import org.geolatte.maprenderer.java2D.AWTMapGraphics
+import be.wegenenverkeer.mosaic.domain.model.VerkeersbordenFormatters._
+import be.wegenenverkeer.mosaic.domain.model.{ CRS, GeoJson }
+import be.wegenenverkeer.mosaic.domain.service.painters.OpstellingImagePainter
 import be.wegenenverkeer.mosaic.test.TestSupport.assertImageEquals
+import javax.imageio.ImageIO
+import org.geolatte.geom.{ C2D, Envelope }
+import org.geolatte.maprenderer.java2D.AWTMapGraphics
 import org.scalatest.FunSuite
 import play.api.libs.json._
 
 import scala.io.Source
-
-import be.wegenenverkeer.mosaic.domain.model.VerkeersbordenFormatters._
 
 class OpstellingImagePainterTest extends FunSuite {
 
@@ -94,7 +93,10 @@ class OpstellingImagePainterTest extends FunSuite {
 
           val img = generateTile(minX, minY, maxX, maxY, geoJsons, tileSize)
 
-          // ImageIO.write(img, "PNG", new File("/tmp", s"tile-$minX-$minY-$maxX-$maxY.png"))
+          // gebruik onderstaande code om nieuwe expected images te genereren in /tmp
+//          val resolutieDir = new File(s"/tmp/resolutie/$resolution")
+//          Files.createDirectories(resolutieDir.toPath)
+//          ImageIO.write(img, "PNG", new File(resolutieDir, s"tile-$minX-$minY-$maxX-$maxY-expected.png"))
 
           // we first write the rendered file to disk, because writing to disk and then reading might cause slight
           // changes - presumably due to rounding to int pixels.

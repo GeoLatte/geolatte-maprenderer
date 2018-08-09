@@ -1,4 +1,4 @@
-package be.wegenenverkeer.mosaic.application.painters
+package be.wegenenverkeer.mosaic.domain.service.painters
 
 import java.awt.geom.{ AffineTransform, Ellipse2D }
 import java.awt.{ BasicStroke, Color }
