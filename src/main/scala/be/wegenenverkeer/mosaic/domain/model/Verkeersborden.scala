@@ -2,12 +2,26 @@ package be.wegenenverkeer.mosaic.domain.model
 
 import java.util
 
-import org.geolatte.geom.crs.{CrsRegistry, ProjectedCoordinateReferenceSystem}
-import org.geolatte.geom.{C2D, Feature, Geometry, Point => GeolattePoint}
+import org.geolatte.geom.crs.{ CrsRegistry, ProjectedCoordinateReferenceSystem }
+import org.geolatte.geom.{ C2D, Feature, Geometry, Point => GeolattePoint }
 
 import collection.JavaConverters._
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{ Format, Json }
 import org.geolatte.geom
+import org.geolatte.maprenderer.map.PlanarFeature
+
+case class GeoJson(id: String, geometry: Point, properties: Opstelling) {
+  def asPlanarFeature(): PlanarFeature = PlanarFeature.from(new GeojsonFeature(this))
+}
+
+class GeojsonFeature(geoJson: GeoJson) extends Feature[C2D, String] {
+
+  override def getGeometry: Geometry[C2D] = {
+    new GeolattePoint[C2D](new C2D(geoJson.geometry.coordinates.head, geoJson.geometry.coordinates.last), CRS.LAMBERT72)
+  }
+  override def getId: String                           = geoJson.id
+  override def getProperties: util.Map[String, AnyRef] = Map("properties" -> geoJson.properties.asInstanceOf[AnyRef]).asJava
+}
 
 case class Opstelling(id: Long, aanzichten: Seq[Aanzicht], delta: Option[Float], binaireData: BinaireOpstellingData, locatie: Point)
 case class Aanzicht(id: Long, anker: Point, hoek: Float, binaireData: BinaireAanzichtData)
@@ -16,12 +30,13 @@ case class BinaireAanzichtData(platgeslagenvoorstelling: ImageData, platgeslagen
 case class ImageData(properties: ImageDimensie, mime: String, data: String)
 case class ImageDimensie(breedte: String, hoogte: String)
 case class Point(coordinates: Seq[Double]) {
- def asGeolattePoint(): GeolattePoint[C2D] = {
-   new GeolattePoint(new C2D(coordinates.head, coordinates.last), CRS.LAMBERT72)
+  def asGeolattePoint(): GeolattePoint[C2D] = {
+    new GeolattePoint(new C2D(coordinates.head, coordinates.last), CRS.LAMBERT72)
   }
 }
 
 object VerkeersbordenFormatters {
+  implicit lazy val geojsonFormat: Format[GeoJson]                             = Json.format[GeoJson]
   implicit lazy val opstellingFormat: Format[Opstelling]                       = Json.format[Opstelling]
   implicit lazy val aanzichtFormat: Format[Aanzicht]                           = Json.format[Aanzicht]
   implicit lazy val binaireOpstellingDataFormat: Format[BinaireOpstellingData] = Json.format[BinaireOpstellingData]

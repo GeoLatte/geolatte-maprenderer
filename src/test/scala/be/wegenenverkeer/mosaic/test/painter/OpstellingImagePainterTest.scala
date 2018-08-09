@@ -4,38 +4,19 @@ import java.awt.image.RenderedImage
 import java.io.File
 
 import be.wegenenverkeer.mosaic.application.painters.OpstellingImagePainter
-import be.wegenenverkeer.mosaic.domain.model.{ CRS, Opstelling, Point }
-import org.geolatte.geom.Envelope
+import be.wegenenverkeer.mosaic.domain.model.{CRS, GeoJson}
+import javax.imageio.ImageIO
+import org.geolatte.geom.{C2D, Envelope}
+import org.geolatte.maprenderer.java2D.AWTMapGraphics
+import be.wegenenverkeer.mosaic.test.TestSupport.assertImageEquals
 import org.scalatest.FunSuite
 import play.api.libs.json._
-import java.util
 
-import javax.imageio.ImageIO
-import org.geolatte.geom.{ C2D, Feature, Geometry, Point => GeolattePoint }
-import org.geolatte.maprenderer.java2D.AWTMapGraphics
-import org.geolatte.maprenderer.map.PlanarFeature
-import org.geolatte.test.TestSupport.assertImageEquals
-
-import collection.JavaConverters._
 import scala.io.Source
 
+import be.wegenenverkeer.mosaic.domain.model.VerkeersbordenFormatters._
+
 class OpstellingImagePainterTest extends FunSuite {
-
-  case class GeoJson(id: String, geometry: Point, properties: Opstelling) {
-    def asPlanarFeature(): PlanarFeature = PlanarFeature.from(new GeojsonFeature(this))
-  }
-
-  import be.wegenenverkeer.mosaic.domain.model.VerkeersbordenFormatters._
-  implicit val geojsonFormatter: Format[GeoJson] = Json.format[GeoJson]
-
-  class GeojsonFeature(geoJson: GeoJson) extends Feature[C2D, String] {
-
-    override def getGeometry: Geometry[C2D] = {
-      new GeolattePoint[C2D](new C2D(geoJson.geometry.coordinates.head, geoJson.geometry.coordinates.last), CRS.LAMBERT72)
-    }
-    override def getId: String                           = geoJson.id
-    override def getProperties: util.Map[String, AnyRef] = Map("properties" -> geoJson.properties.asInstanceOf[AnyRef]).asJava
-  }
 
   // https://apps.mow.vlaanderen.be/geolatte-nosqlfs/api/databases/featureserver/verkeersborden/query?bbox=152911.5,209130.8125,153212.5,209330.9375
   test("Visuele verificatie opstelling verschillende resoluties - zie /tmp") {

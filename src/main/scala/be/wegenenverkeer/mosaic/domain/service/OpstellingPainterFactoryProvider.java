@@ -1,5 +1,6 @@
 package be.wegenenverkeer.mosaic.domain.service;
 
+import be.wegenenverkeer.mosaic.application.painters.OpstellingImagePainter;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Geometry;
@@ -26,8 +27,7 @@ import static java.util.Arrays.asList;
 /**
  * Created by Karel Maesen, Geovise BVBA on 27/07/2018.
  */
-public class TestPainterFactoryProvider implements PainterFactoryProvider {
-
+public class OpstellingPainterFactoryProvider implements PainterFactoryProvider {
 
 
     @Override
@@ -36,42 +36,13 @@ public class TestPainterFactoryProvider implements PainterFactoryProvider {
         return new PainterFactory() {
             @Override
             public boolean canCreate(String ref) {
-                return "testPainter".equals(ref);
+                return "opstellingPainter".equals(ref);
             }
 
             @Override
             public Painter mkPainter(String ref, MapGraphics mapGraphics) {
-                return new TestPainter(mapGraphics) ;
+                return new OpstellingImagePainter(mapGraphics) ;
             }
         };
     }
-}
-
-class TestPainter implements Painter {
-
-    final private static Logger logger = LoggerFactory.getLogger(TestPainter.class);
-
-    MapGraphics mapGraphics;
-
-    public TestPainter(MapGraphics mapGraphics) {
-        this.mapGraphics = mapGraphics;
-    }
-
-    @Override
-    public void paint(PlanarFeature planarFeature) {
-        Geometry<C2D> geometry = planarFeature.getGeometry();
-        if (geometry instanceof Point) {
-            C2D co = ((Point<C2D>)geometry).getPosition();
-            logger.info(format("Painting %d, %d", (int)co.getX(), (int)co.getY()));
-            mapGraphics.setColor(Color.GREEN);
-            int size = (int)(mapGraphics.getMapUnitsPerPixel() * 5);
-            mapGraphics.drawRect( (int)co.getX(), (int)co.getY(), size, size);
-        } else {
-            ShapeAdapter sa = new ShapeAdapter(mapGraphics.getTransform());
-            Shape[] shapes = sa.toShape(geometry);
-            asList(shapes).forEach(mapGraphics::draw);
-        }
-
-    }
-
 }
