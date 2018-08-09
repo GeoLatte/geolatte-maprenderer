@@ -43,13 +43,10 @@ class WmsController(val controllerComponents: ControllerComponents)(implicit exe
 }
 
 case class PlayRequestToGeolatteHttpRequestWrapper(request: Request[_]) extends HttpRequest {
-  private val wms111CompatibleQueryString =
-    request.queryString.get("SRS").map(srs => request.queryString.updated("CRS", srs)).getOrElse(request.queryString)
-
   override def uri(): URI                    = new URI(request.uri)
   override def method(): String              = request.method
   override def headers(): HttpHeaders        = PlayRequestHeadersToGeolatteHttpHeadersWrapper(request.headers)
-  override def parseQuery(): HttpQueryParams = PlayRequestQueryStringToGeolatteHttpQueryParamsWrapper(wms111CompatibleQueryString)
+  override def parseQuery(): HttpQueryParams = PlayRequestQueryStringToGeolatteHttpQueryParamsWrapper(request.queryString)
 }
 
 case class PlayRequestHeadersToGeolatteHttpHeadersWrapper(headers: Headers) extends HttpHeaders {
