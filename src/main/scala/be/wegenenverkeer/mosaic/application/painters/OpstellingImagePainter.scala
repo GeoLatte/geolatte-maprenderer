@@ -7,6 +7,7 @@ import be.wegenenverkeer.mosaic.util.Base64Conversion
 import org.geolatte.maprenderer.map.{ MapGraphics, Painter, PlanarFeature }
 import org.geolatte.maprenderer.painters.EmbeddedImagePainter
 import org.geolatte.maprenderer.util.ImageUtils
+import org.slf4j.LoggerFactory
 
 /**
   *  Tekent een volledige opstelling naar een MapGraphics
@@ -32,17 +33,24 @@ import org.geolatte.maprenderer.util.ImageUtils
   */
 class OpstellingImagePainter(graphics: MapGraphics) extends Painter with Base64Conversion {
 
+  private val logger = LoggerFactory.getLogger(classOf[OpstellingImagePainter])
+
   override def paint(geojsonPlanarFeature: PlanarFeature): Unit = {
-    val opstelling   = geojsonPlanarFeature.getProperties.get("properties").asInstanceOf[Opstelling]
-    val opstellingPF = PlanarFeature.from(new OpstellingFeature(opstelling))
 
-    graphics.getMapUnitsPerPixel match {
-      case res if res <= 0.125 => renderOpstellingMetAanzichten(opstellingPF, opstelling, klein = false)
-      case res if res <= 0.25  => renderOpstellingMetAanzichten(opstellingPF, opstelling, klein = true)
-      case res if res <= 0.5   => renderOpstellingMetHoek(opstellingPF, opstelling)
-      case res                 => renderOpstellingAlsPunt(opstellingPF)
+    Option(geojsonPlanarFeature.getProperties.get("properties").asInstanceOf[Opstelling]) match {
+      case Some(opstelling) =>
+        val opstellingPF = PlanarFeature.from(new OpstellingFeature(opstelling))
+
+        graphics.getMapUnitsPerPixel match {
+          case res if res <= 0.125 => renderOpstellingMetAanzichten(opstellingPF, opstelling, klein = false)
+          case res if res <= 0.25  => renderOpstellingMetAanzichten(opstellingPF, opstelling, klein = true)
+          case res if res <= 0.5   => renderOpstellingMetHoek(opstellingPF, opstelling)
+          case res                 => renderOpstellingAlsPunt(opstellingPF)
+        }
+
+      case None =>
+        logger.error("Geen opstelling object gevonden in properties van GeoJson")
     }
-
   }
 
   private def renderOpstellingAlsPunt(planarFeature: PlanarFeature): Unit = {
