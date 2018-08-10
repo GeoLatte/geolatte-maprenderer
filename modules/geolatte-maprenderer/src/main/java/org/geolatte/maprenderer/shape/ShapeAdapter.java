@@ -61,7 +61,7 @@ public class ShapeAdapter {
 			loadShape( shapes, multiLineString );
 			return shapes;
 		}
-		throw new UnsupportedOperationException( "Can't adapt shapes fo type " + geometry.getGeometryType() );
+		throw new UnsupportedOperationException( "Can't adapt shapes for type " + geometry.getGeometryType() );
 	}
 
 	private void loadShape(Shape[] shapes, MultiLineString<C2D> multiLineString) {
