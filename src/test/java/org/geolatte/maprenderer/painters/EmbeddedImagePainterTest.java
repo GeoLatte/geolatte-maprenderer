@@ -74,7 +74,7 @@ public class EmbeddedImagePainterTest {
         //TODO -- why is this necessary here?
         //we first write the rendered file to disk, because writing to disk and then reading might cause slight
         //changes - presumably due to rounding to int pixels.
-        File file = File.createTempFile("tmp", "png");
+        File file = File.createTempFile("tmp", ".png");
         ImageIO.write(img, "PNG", file);
         BufferedImage received = ImageIO.read(file);
         assertImageEquals("expected-embedded-image-painter-1.png", received);
