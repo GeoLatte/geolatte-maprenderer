@@ -3,10 +3,10 @@
         <encoder>
             <pattern>*** \(%logger{30}\) %msg%n</pattern>
         </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
     </appender>
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-        <level>INFO</level>
-    </filter>
     <root level="${log.root:-info}">
         <appender-ref ref="STDOUT"/>
     </root>
