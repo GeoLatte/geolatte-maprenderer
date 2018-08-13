@@ -69,7 +69,7 @@ object Dependencies {
   // AWV Play extensions
   val awvDeps = {
 
-    val appStatusVersion = "3.0.0"
+    val appStatusVersion = "3.0.4-SNAPSHOT"
     val hateoasVersion   = "2.0.2"
 
     Seq(
@@ -138,7 +138,7 @@ object Dependencies {
   // Atomium
   val atomiumDeps = {
     val version        = "1.2.0"
-    val jacksonVersion = "2.8.0"
+    val jacksonVersion = "2.9.0"
 
     Seq(
       "be.wegenenverkeer"          %% "atomium-common-play26"           % version,

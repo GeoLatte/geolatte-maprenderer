@@ -1,0 +1,15 @@
+#%RAML 0.8
+---
+title: Mosaic
+version: v1
+
+schemas:
+  - syncstatus:                        !include model/syncstatus.json
+  - feedreaderstatus:                  !include model/feedreaderstatus.json
+  - jobstatus:                         !include model/jobstatus.json
+
+traits:
+  - acceptjson:                        !include traits/acceptjson.yaml
+
+/job:
+  !include job.raml

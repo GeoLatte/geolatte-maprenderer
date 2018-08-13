@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://wegenenverkeer.be/api/dataloader/model/jobstatus.json",
+  "type": "object",
+  "typeDiscriminator": "status",
+  "title": "Job status",
+  "description": "Schema voor een job status.",
+  "properties": {
+    "naam": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "target": {
+      "type": "string"
+    }
+  },
+  "oneOf": [
+    {
+      "id": "failedstatus",
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "failed"
+          ]
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "error"
+      ]
+    },
+    {
+      "id": "initializingstatus",
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "initializing"
+          ]
+        }
+      }
+    },
+    {
+      "id": "configuredstatus",
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "configured"
+          ]
+        },
+        "feedReaders": {
+          "type": "array",
+          "items": {
+            "$ref": "feedreaderstatus.json"
+          }
+        }
+      },
+      "required": ["feedReaders"]
+    }
+  ],
+  "required": [
+    "naam",
+    "type",
+    "target"
+  ]
+}

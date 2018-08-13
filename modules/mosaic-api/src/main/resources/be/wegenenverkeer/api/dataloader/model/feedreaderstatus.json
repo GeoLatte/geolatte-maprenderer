@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://wegenenverkeer.be/api/dataloader/model/feedreaderstatus.json",
+  "type": "object",
+  "title": "Feed Reader status",
+  "description": "Schema voor een feed reader status.",
+  "properties": {
+    "feedNaam": {
+      "type": "string"
+    },
+    "lastUpdate": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "created",
+        "running",
+        "waiting",
+        "idle",
+        "error"
+      ]
+    },
+    "lastSuccess": {
+      "object": "syncstatus",
+      "$ref": "syncstatus.json"
+    }
+  },
+  "required": [
+    "feedNaam",
+    "lastUpdate",
+    "status"
+  ]
+}

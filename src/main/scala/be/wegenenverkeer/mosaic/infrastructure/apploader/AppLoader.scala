@@ -22,6 +22,7 @@ import be.wegenenverkeer.playfilters.accesslog.PlayLoggingFilter
 import be.wegenenverkeer.slick3._
 import com.softwaremill.macwire._
 import controllers.{Assets, AssetsConfigurationProvider, AssetsMetadataProvider}
+import org.webjars.play.WebJarAssets
 import play.api.ApplicationLoader.Context
 import play.api.db.slick.{DatabaseConfigProvider, DbName, SlickComponents, SlickModule}
 import play.api.inject.ApplicationLifecycle
@@ -29,6 +30,7 @@ import play.api.libs.logback.LogbackLoggerConfigurator
 import play.api.mvc.{ControllerComponents, DefaultControllerComponents, EssentialFilter}
 import play.api.routing.Router
 import play.api.{Application, ApplicationLoader, BuiltInComponents, BuiltInComponentsFromContext}
+import play.filters.gzip.GzipFilter
 import router.Routes
 
 import scala.concurrent.Future
@@ -68,6 +70,7 @@ trait AppComponents
   lazy val assetsConfiguration = wire[AssetsConfigurationProvider].get
   lazy val assetsMetadata = wire[AssetsMetadataProvider].get
   lazy val assets: Assets = new controllers.Assets(httpErrorHandler,assetsMetadata)
+  lazy val webjarAssetsController = wire[WebJarAssets]
 
   lazy val router: Router = {
     val dummyOmRoutesTeDoenWerken: String = "dummyOmRoutesTeDoenWerken"
@@ -126,6 +129,8 @@ trait AppComponents
   // Vergeet niet om de ACCESSFILE logback appender toe te voegen in logback.xml voor de 'requests' logger.
   lazy val accessLogFilter: EssentialFilter = wire[PlayLoggingFilter]
 
-  override lazy val httpFilters = List[EssentialFilter](metricFilter, accessLogFilter)
+  lazy val gzipFilter = new GzipFilter()
+
+  override lazy val httpFilters = List[EssentialFilter](metricFilter, accessLogFilter, gzipFilter)
 
 }

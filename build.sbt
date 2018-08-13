@@ -21,6 +21,7 @@ lazy val root = Project(
   .enablePlugins(PlayScala, SbtWeb, JavaServerAppPackaging, SystemdPlugin, BuildInfoPlugin)
   .dependsOn(
     mosaicApiScala,
+    dataloaderApiScala,
     geolatteGeom,
     geolatteGeojson,
     geolatteMaprenderer,
@@ -33,6 +34,7 @@ lazy val root = Project(
   .aggregate(
     mosaicApi,
     mosaicApiScala,
+    dataloaderApiScala,
     mosaicApiJava,
     geolatteGeom,
     geolatteGeojson,
@@ -54,6 +56,11 @@ buildInfoOptions += BuildInfoOption.ToJson
 lazy val ramlSettings = Seq(
   scramlBaseDir in scraml in Compile := file("modules/mosaic-api/src/main/resources").absolutePath,
   scramlRamlApi in scraml in Compile := "be/wegenenverkeer/api/mosaic/mosaic-api.raml"
+)
+
+lazy val dataloaderRamlSettings = Seq(
+  scramlBaseDir in scraml in Compile := file("modules/mosaic-api/src/main/resources").absolutePath,
+  scramlRamlApi in scraml in Compile := "be/wegenenverkeer/api/dataloader/dataloader-api.raml"
 )
 
 lazy val mosaicApi = Project(
@@ -83,6 +90,16 @@ lazy val mosaicApiJava = Project(
     Seq(
       crossPaths := false,
       autoScalaLibrary := false,
+    ))
+
+lazy val dataloaderApiScala = Project(
+  id   = "dataloader-api-scala",
+  base = file("modules/dataloader-api-scala")
+).settings(
+  dataloaderRamlSettings ++ projSettings() ++
+    Seq(
+      scramlLanguage in scraml in Compile := "scala",
+      libraryDependencies ++= scramlDependencies
     ))
 
 lazy val geolatteGeom = Project(

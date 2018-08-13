@@ -1,0 +1,11 @@
+# job
+
+/{jobNaam}:
+  description: Vraag job status op
+  get:
+    is: [acceptjson]
+    responses:
+      200:
+        body:
+          application/json:
+            schema: jobstatus
