@@ -1,9 +1,9 @@
 package be.wegenenverkeer.mosaic.infrastructure
 
 import _root_.slick.jdbc.JdbcBackend.DatabaseDef
+import be.wegenenverkeer.atomium.extension.feedconsumer.FeedPositionRepo
 import be.wegenenverkeer.mosaic.api.AppPoAuth
 import be.wegenenverkeer.slick3._
-import io.funcqrs.config.Api.projection
 import io.funcqrs.config.api._
 import play.api.Configuration
 
@@ -37,5 +37,7 @@ trait AppModule extends AppDomainModule with AppAkkaModule {
   def appPoAuth: AppPoAuth
 
   def configuration: Configuration
+
+  lazy val feedPositionRepo: FeedPositionRepo = new FeedPositionRepo(dbRunner)
 
 }

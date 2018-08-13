@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://wegenenverkeer.be/api/topomorf/error-response.json",
+  "type": "object",
+  "description": "Een error response body",
+  "properties": {
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": ["message"]
+}

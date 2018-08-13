@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 import akka.actor.ActorSystem
 import akka.util.Timeout
 import be.wegenenverkeer.api.dataloader.DataloaderApi
+import be.wegenenverkeer.api.verkeersborden.VerkeersbordenApi
 import be.wegenenverkeer.appstatus.info.providers.{ GitInfoProvider, JvmInfoProvider }
 import be.wegenenverkeer.appstatus.info.{ InfoDetails, InfoRegistry }
 import be.wegenenverkeer.appstatus.rood.FeedPointersComponent
@@ -54,6 +55,21 @@ class HappyRegistrar(
         override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
           val url = configuration.get[String]("dataloader.url")
           DataloaderApi(new URL(url)).job.jobNaam("verkeersborden").get().map { r =>
+            status.ComponentValue(
+              status = OkStatus,
+              value  = r.jsonBody.map(Json.prettyPrint).getOrElse(s"$url: ${r.status}: ${r.stringBody.map(_.take(200)).getOrElse("")}")
+            )
+          }
+        }
+      }
+    )
+
+    componentRegistry.register(
+      ComponentInfo("verkeersborden", "Verkeersborden status", ""),
+      new Component {
+        override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
+          val url = configuration.get[String]("verkeersborden.url")
+          VerkeersbordenApi(new URL(url)).rest.zi.verkeersborden.id(0).get().map { r =>
             status.ComponentValue(
               status = OkStatus,
               value  = r.jsonBody.map(Json.prettyPrint).getOrElse(s"$url: ${r.status}: ${r.stringBody.map(_.take(200)).getOrElse("")}")

@@ -22,6 +22,7 @@ lazy val root = Project(
   .dependsOn(
     mosaicApiScala,
     dataloaderApiScala,
+    verkeersbordenApiScala,
     geolatteGeom,
     geolatteGeojson,
     geolatteMaprenderer,
@@ -35,6 +36,7 @@ lazy val root = Project(
     mosaicApi,
     mosaicApiScala,
     dataloaderApiScala,
+    verkeersbordenApiScala,
     mosaicApiJava,
     geolatteGeom,
     geolatteGeojson,
@@ -61,6 +63,11 @@ lazy val ramlSettings = Seq(
 lazy val dataloaderRamlSettings = Seq(
   scramlBaseDir in scraml in Compile := file("modules/mosaic-api/src/main/resources").absolutePath,
   scramlRamlApi in scraml in Compile := "be/wegenenverkeer/api/dataloader/dataloader-api.raml"
+)
+
+lazy val verkeersbordenRamlSettings = Seq(
+  scramlBaseDir in scraml in Compile := file("modules/mosaic-api/src/main/resources").absolutePath,
+  scramlRamlApi in scraml in Compile := "be/wegenenverkeer/api/verkeersborden/verkeersborden-api.raml"
 )
 
 lazy val mosaicApi = Project(
@@ -101,6 +108,17 @@ lazy val dataloaderApiScala = Project(
       scramlLanguage in scraml in Compile := "scala",
       libraryDependencies ++= scramlDependencies
     ))
+
+lazy val verkeersbordenApiScala = Project(
+  id   = "verkeersborden-api-scala",
+  base = file("modules/verkeersborden-api-scala")
+).settings(
+  verkeersbordenRamlSettings ++ projSettings() ++
+    Seq(
+      scramlLanguage in scraml in Compile := "scala",
+      libraryDependencies ++= scramlDependencies
+    ))
+  .dependsOn(geolatteGeom)
 
 lazy val geolatteGeom = Project(
   id   = "geolatte-geom",

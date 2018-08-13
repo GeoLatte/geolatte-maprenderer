@@ -63,7 +63,8 @@ trait AppComponents
     with AtomFeedModule
     with SlickComponents
     with HappyModule
-    with AppAkkaModule {
+    with AppAkkaModule
+    with AppAtomium {
 
   def controllerComponents: ControllerComponents
 
