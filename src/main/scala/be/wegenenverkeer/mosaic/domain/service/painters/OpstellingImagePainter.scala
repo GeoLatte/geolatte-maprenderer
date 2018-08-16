@@ -4,6 +4,9 @@ import java.awt.BasicStroke
 
 import be.wegenenverkeer.mosaic.domain.model._
 import be.wegenenverkeer.mosaic.util.Base64Conversion
+import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.math.Vector2D
+import org.geolatte.geom.{ C2D, JTSGeometryOperations, Point }
 import org.geolatte.maprenderer.map.{ MapGraphics, Painter, PlanarFeature }
 import org.geolatte.maprenderer.painters.EmbeddedImagePainter
 import org.geolatte.maprenderer.util.ImageUtils
@@ -35,7 +38,11 @@ class OpstellingImagePainter(graphics: MapGraphics) extends Painter with Base64C
 
   private val logger = LoggerFactory.getLogger(classOf[OpstellingImagePainter])
 
-  override def willPaint(): Boolean = graphics.getMapUnitsPerPixel <= 2.0
+  def MAX_AFSTAND_ANKERPUNT = 100.0 // maximum afstand tussen opstelling en ankerpunt. Aanzicht wordt dichter gebracht indien groter.
+
+  override def willPaint(): Boolean = {
+    graphics.getMapUnitsPerPixel <= 2.0
+  }
 
   override def paint(geojsonPlanarFeature: PlanarFeature): Unit = {
 
@@ -79,11 +86,30 @@ class OpstellingImagePainter(graphics: MapGraphics) extends Painter with Base64C
         ImageUtils.readImageFromBase64String(
           if (klein) aanzicht.binaireData.platgeslagenvoorstellingklein.data else aanzicht.binaireData.platgeslagenvoorstelling.data
       ),
-      feature => aanzicht.anker.asGeolattePoint(),
+      feature => verzekerMaxAfstandAnkerpunt(opstelling.locatie.asGeolattePoint(), aanzicht.anker.asGeolattePoint()),
       feature => aanzicht.hoek * -1,
       new BasicStroke(Math.round(2 / graphics.getMapUnitsPerPixel))
     )
     painter.paint(PlanarFeature.from(new AanzichtFeature(opstelling, aanzicht)))
+  }
+
+  private def verzekerMaxAfstandAnkerpunt(opstelling: Point[C2D], ankerpunt: Point[C2D]): Point[C2D] = {
+
+    if (new JTSGeometryOperations().distance(opstelling, ankerpunt) > MAX_AFSTAND_ANKERPUNT) {
+
+      // https://stackoverflow.com/questions/2353268/java-2d-moving-a-point-p-a-certain-distance-closer-to-another-point
+
+      val opstellingJts = new Coordinate(opstelling.getPosition.getX, opstelling.getPosition.getY)
+      val aanzichtJts   = new Coordinate(ankerpunt.getPosition.getX, ankerpunt.getPosition.getY)
+
+      val vectorOpMaxAfstand = Vector2D.create(opstellingJts, aanzichtJts).normalize().multiply(MAX_AFSTAND_ANKERPUNT)
+      val puntOpMaxAfstand = Vector2D.create(opstellingJts).add(vectorOpMaxAfstand)
+
+      new Point(new C2D(puntOpMaxAfstand.getX, puntOpMaxAfstand.getY), CRS.LAMBERT72)
+
+    } else {
+      ankerpunt
+    }
   }
 
 }
