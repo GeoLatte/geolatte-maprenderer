@@ -29,3 +29,51 @@ services:
     container_name: mosaic-geoserver
     links:
     - geoserver-db:db
+    
+  verkeersborden-db:
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/verkeersborden-postgres
+    hostname: verkeersborden-db
+    container_name: mosaic-verkeersborden-db
+
+  verkeersborden:
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/verkeersborden
+    hostname: verkeersborden
+    container_name: mosaic-verkeersborden
+    links:
+    - verkeersborden-db:db
+
+  geolatte-nosqlfs-db:
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/geolatte-nosqlfs-postgres
+    hostname: geolatte-nosqlfs-db
+    container_name: mosaic-geolatte-nosqlfs-db
+
+  geolatte-nosqlfs:
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/geolatte-nosqlfs
+    hostname: geolatte-nosqlfs
+    container_name: mosaic-geolatte-nosqlfs
+    links:
+    - geolatte-nosqlfs-db:db
+
+  dataloader-db:
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/dataloader-postgres
+    hostname: dataloader-db
+    container_name: mosaic-dataloader-db
+
+  dataloader:
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/dataloader
+    hostname: dataloader
+    container_name: mosaic-dataloader
+    links:
+    - dataloader-db:db
+
+  thor-db:
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/thor-postgres
+    hostname: thor-db
+    container_name: mosaic-thor-db
+
+  thor:
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/thor
+    hostname: thor
+    container_name: mosaic-thor
+    links:
+    - thor-db:db

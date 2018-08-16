@@ -149,7 +149,7 @@ lazy val geolatteMaprenderer = Project(
     "org.apache.xmlgraphics"    % "batik-transcoder" % "1.9.1",
     "org.apache.xmlgraphics"    % "batik-codec"      % "1.9.1",
     "org.apache.xmlgraphics"    % "batik-svg-dom"    % "1.9.1",
-    "org.ehcache"               % "ehcache"          % "3.5.2",
+    ehCache,
     sldSchemaDep,
     wmsSchemaDep
   ) ++ maprendererTestDeps))

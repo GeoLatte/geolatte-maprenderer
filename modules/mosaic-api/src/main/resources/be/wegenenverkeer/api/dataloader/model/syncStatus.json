@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "http://wegenenverkeer.be/api/dataloader/model/syncstatus.json",
+  "id": "http://wegenenverkeer.be/api/dataloader/model/syncStatus.json",
   "type": "object",
   "title": "Sync status",
   "description": "Schema voor een sync status.",

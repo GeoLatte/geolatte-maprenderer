@@ -1,60 +1,37 @@
 package be.wegenenverkeer.mosaic.domain.service.atomium
 
-import akka.util.Timeout
-import be.wegenenverkeer.api.verkeersborden.model.OpstellingPropertiesStatus._
+import java.io.{File, FileWriter}
+
 import be.wegenenverkeer.atomium.extension.feedconsumer.FeedEntryConsumer
 import be.wegenenverkeer.mosaic.domain.model.verkeersbord.VerkeersbordenChangeFeedEvents
 import be.wegenenverkeer.mosaic.domain.model.verkeersbord.VerkeersbordenChangeFeedEvents._
-import be.wegenenverkeer.mosaic.domain.service.VerkeersbordenService
 import be.wegenenverkeer.mosaic.util.Logging
-import io.funcqrs.akka.backend.AkkaBackend
 import play.api.libs.json.JsValue
-import slick.dbio.DBIO
+import slick.dbio.{DBIO, DBIOAction, Effect, NoStream}
 
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
-class VerkeersbordenChangeEventConsumer(
-    verkeersbordenService: VerkeersbordenService,
-    akkaBackend: AkkaBackend
-)(implicit ec: ExecutionContext)
-    extends FeedEntryConsumer
-    with Logging {
+class VerkeersbordenChangeEventConsumer()(implicit ec: ExecutionContext) extends FeedEntryConsumer with Logging {
 
-  implicit val timeout = Timeout(10.seconds)
-
-  override def consume(changeEvent: JsValue) = {
+  override def consume(changeEvent: JsValue): DBIOAction[Unit, NoStream, Effect] = {
     DBIO.from(consumeChangeEvent(VerkeersbordenChangeFeedEvents.fromJsValue(changeEvent).get))
   }
 
-  // Consumes the change event in a blocking manner
-  private def consumeChangeEvent(verkeersbordenChangeFeedEvent: VerkeersbordenChangeFeedEvent): Future[Unit] = {
+  private def consumeChangeEvent(evt: VerkeersbordenChangeFeedEvent): Future[Unit] = {
+    logger.debug(s"event in ChangeEventConsumer $evt")
 
-    verkeersbordenChangeFeedEvent match {
-      case event: UpsertFeedEvent => behandelUpsertEvent(event)
-      case event: DeleteFeedEvent => behandelDeleteEvent(event)
-
-      case otherEvent =>
-        logger.error(s"Unrecognised event: $otherEvent")
-        Future.successful(())
-    }
-
-  }
-
-  private def behandelUpsertEvent(evt: UpsertFeedEvent): Future[Unit] = {
-    logger.debug(s"behandelUpsertEvent in ChangeEventConsumer $evt")
-
-    verkeersbordenService.getOpstelling(evt.entityId).map { opstelling =>
-      opstelling
-        .filter { op =>
-          op.properties.status == ACTUEEL || op.properties.status == VIRTUEEL
-        }
+    Future {
+      writeToFile(evt.envelope)
+      writeToFile(evt.vorigeEnvelope)
     }
   }
 
-  private def behandelDeleteEvent(evt: DeleteFeedEvent): Future[Unit] = {
-    logger.info(s"behandelDeleteEvent in ChangeEventConsumer  $evt")
-    Future.successful(Unit)
+  def writeToFile(envelope: Option[List[Double]]): Unit = {
+    envelope.foreach { env =>
+      val fileWriter = new FileWriter(File.createTempFile("tmp", ".json"))
+      fileWriter.write(env.mkString("[", ",", "]"))
+      fileWriter.close()
+    }
   }
 
 }

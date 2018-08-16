@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "http://wegenenverkeer.be/api/dataloader/model/jobstatus.json",
+  "id": "http://wegenenverkeer.be/api/dataloader/model/jobStatus.json",
   "type": "object",
   "typeDiscriminator": "status",
   "title": "Job status",
@@ -18,7 +18,7 @@
   },
   "oneOf": [
     {
-      "id": "failedstatus",
+      "id": "failedStatus",
       "type": "object",
       "properties": {
         "status": {
@@ -35,7 +35,7 @@
       ]
     },
     {
-      "id": "initializingstatus",
+      "id": "initializingStatus",
       "type": "object",
       "properties": {
         "status": {
@@ -46,7 +46,7 @@
       }
     },
     {
-      "id": "configuredstatus",
+      "id": "configuredStatus",
       "type": "object",
       "properties": {
         "status": {
@@ -57,7 +57,7 @@
         "feedReaders": {
           "type": "array",
           "items": {
-            "$ref": "feedreaderstatus.json"
+            "$ref": "feedReaderStatus.json"
           }
         }
       },

@@ -3,9 +3,11 @@ package be.wegenenverkeer.mosaic.infrastructure
 import _root_.slick.jdbc.JdbcBackend.DatabaseDef
 import be.wegenenverkeer.atomium.extension.feedconsumer.FeedPositionRepo
 import be.wegenenverkeer.mosaic.api.AppPoAuth
+import be.wegenenverkeer.mosaic.domain.service.DataloaderService
 import be.wegenenverkeer.slick3._
 import io.funcqrs.config.api._
 import play.api.Configuration
+import com.softwaremill.macwire._
 
 /**
  * In de domain module mogen enkel "pure" domain deps komen
@@ -39,5 +41,8 @@ trait AppModule extends AppDomainModule with AppAkkaModule {
   def configuration: Configuration
 
   lazy val feedPositionRepo: FeedPositionRepo = new FeedPositionRepo(dbRunner)
+
+  lazy val dataloaderService = wire[DataloaderService]
+
 
 }

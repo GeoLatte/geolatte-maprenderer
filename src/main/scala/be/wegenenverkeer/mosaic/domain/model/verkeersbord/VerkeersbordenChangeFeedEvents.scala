@@ -19,6 +19,10 @@ object VerkeersbordenChangeFeedEvents {
 
     def ident8: Option[String]
 
+    def envelope: Option[List[Double]]
+
+    def vorigeEnvelope: Option[List[Double]]
+
     def occurred: OffsetDateTime
 
     def recorded: OffsetDateTime
@@ -30,6 +34,8 @@ object VerkeersbordenChangeFeedEvents {
       uuid: Option[UUID],
       entityRef: String,
       ident8: Option[String],
+      envelope: Option[List[Double]],
+      vorigeEnvelope: Option[List[Double]],
       occurred: OffsetDateTime,
       recorded: OffsetDateTime
   ) extends VerkeersbordenChangeFeedEvent
@@ -39,6 +45,8 @@ object VerkeersbordenChangeFeedEvents {
       uuid: Option[UUID],
       entityRef: String,
       ident8: Option[String],
+      envelope: Option[List[Double]],
+      vorigeEnvelope: Option[List[Double]],
       occurred: OffsetDateTime,
       recorded: OffsetDateTime
   ) extends VerkeersbordenChangeFeedEvent

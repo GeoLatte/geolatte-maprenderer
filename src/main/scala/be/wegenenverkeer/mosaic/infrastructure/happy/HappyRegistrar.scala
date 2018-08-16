@@ -1,28 +1,25 @@
 package be.wegenenverkeer.mosaic.infrastructure.happy
 
 import java.io.File
-import java.net.URL
 import java.time.LocalDateTime
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
-import be.wegenenverkeer.api.dataloader.DataloaderApi
-import be.wegenenverkeer.api.verkeersborden.VerkeersbordenApi
-import be.wegenenverkeer.appstatus.info.providers.{ GitInfoProvider, JvmInfoProvider }
-import be.wegenenverkeer.appstatus.info.{ InfoDetails, InfoRegistry }
+import be.wegenenverkeer.appstatus.info.providers.{GitInfoProvider, JvmInfoProvider}
+import be.wegenenverkeer.appstatus.info.{InfoDetails, InfoRegistry}
 import be.wegenenverkeer.appstatus.rood.FeedPointersComponent
 import be.wegenenverkeer.appstatus.status
 import be.wegenenverkeer.appstatus.status.ComponentStatus.OkStatus
 import be.wegenenverkeer.appstatus.status.components.JdbcComponent
-import be.wegenenverkeer.appstatus.status.{ Component, ComponentInfo, ComponentRegistry, ComponentValue }
+import be.wegenenverkeer.appstatus.status.{Component, ComponentInfo, ComponentRegistry, ComponentValue}
 import be.wegenenverkeer.appstatus.support.PlaySupport._
 import be.wegenenverkeer.mosaic.BuildInfo
-import play.api.libs.json.Json
-import play.api.{ Application, Configuration }
+import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, VerkeersbordenService}
+import play.api.{Application, Configuration}
 import slick.jdbc.JdbcBackend.DatabaseDef
 
 import scala.concurrent.duration._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 class HappyRegistrar(
     db: DatabaseDef,
@@ -30,7 +27,9 @@ class HappyRegistrar(
     configuration: Configuration,
     application: Application,
     infoRegistry: InfoRegistry,
-    componentRegistry: ComponentRegistry
+    componentRegistry: ComponentRegistry,
+    dataloaderService: DataloaderService,
+    verkeersbordenService: VerkeersbordenService
 ) {
 
   val timeout: FiniteDuration   = 5.seconds
@@ -50,14 +49,13 @@ class HappyRegistrar(
     componentRegistry.register(FeedPointersComponent.defaultInfo, new FeedPointersComponent(() => db.createSession().conn))
 
     componentRegistry.register(
-      ComponentInfo("dataloader", "Dataloader status", ""),
+      ComponentInfo("dataloader", "Dataloader verkeersborden feed positie", ""),
       new Component {
         override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
-          val url = configuration.get[String]("dataloader.url")
-          DataloaderApi(new URL(url)).job.jobNaam("verkeersborden").get().map { r =>
+          dataloaderService.getVerkeersbordenFeedPosition("/rest/events/zi/verkeersborden/feed").map { r =>
             status.ComponentValue(
               status = OkStatus,
-              value  = r.jsonBody.map(Json.prettyPrint).getOrElse(s"$url: ${r.status}: ${r.stringBody.map(_.take(200)).getOrElse("")}")
+              value  = r.toString
             )
           }
         }
@@ -68,11 +66,10 @@ class HappyRegistrar(
       ComponentInfo("verkeersborden", "Verkeersborden status", ""),
       new Component {
         override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
-          val url = configuration.get[String]("verkeersborden.url")
-          VerkeersbordenApi(new URL(url)).rest.zi.verkeersborden.id(0).get().map { r =>
+          verkeersbordenService.getOpstelling(0).map { r =>
             status.ComponentValue(
               status = OkStatus,
-              value  = r.jsonBody.map(Json.prettyPrint).getOrElse(s"$url: ${r.status}: ${r.stringBody.map(_.take(200)).getOrElse("")}")
+              value  = "ok"
             )
           }
         }

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "http://wegenenverkeer.be/api/dataloader/model/feedreaderstatus.json",
+  "id": "http://wegenenverkeer.be/api/dataloader/model/feedReaderStatus.json",
   "type": "object",
   "title": "Feed Reader status",
   "description": "Schema voor een feed reader status.",
@@ -17,12 +17,15 @@
         "running",
         "waiting",
         "idle",
-        "error"
+        "failing on source",
+        "failing on target",
+        "failing on database",
+        "consumer busy with other feeds"
       ]
     },
     "lastSuccess": {
-      "object": "syncstatus",
-      "$ref": "syncstatus.json"
+      "object": "syncStatus",
+      "$ref": "syncStatus.json"
     }
   },
   "required": [

@@ -20,6 +20,9 @@
     "wegsegmentid" : {
       "type": "number"
     },
+    "anker" : {
+      "$ref": "http://wegenenverkeer.be/api/verkeersborden/model/geojson/geometry.json"
+    },
     "borden": {
       "type": "array",
       "items": {
@@ -28,6 +31,6 @@
     }
   },
   "required": [
-    "id", "hoek", "type", "borden"
+    "id", "hoek", "type", "anker", "borden"
   ]
 }
