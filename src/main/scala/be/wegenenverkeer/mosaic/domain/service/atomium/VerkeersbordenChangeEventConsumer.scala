@@ -35,7 +35,7 @@ class VerkeersbordenChangeEventConsumer(envelopeStorage: EnvelopeStorage)(implic
   def write(envelope: Option[List[Double]]): Future[Unit] = {
     envelope match {
       case Some(minX :: minY :: maxX :: maxY :: Nil) =>
-        envelopeStorage.write(new Envelope[C2D](minX, minY, maxX, maxY, CRS.LAMBERT72))
+        envelopeStorage.schrijf(new Envelope[C2D](minX, minY, maxX, maxY, CRS.LAMBERT72))
 
       case Some(list) =>
         logger.warn(s"Kon geen envelope maken van $list")

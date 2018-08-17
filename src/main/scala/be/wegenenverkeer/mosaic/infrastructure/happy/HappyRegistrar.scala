@@ -14,7 +14,7 @@ import be.wegenenverkeer.appstatus.status.components.JdbcComponent
 import be.wegenenverkeer.appstatus.status.{Component, ComponentInfo, ComponentRegistry, ComponentValue}
 import be.wegenenverkeer.appstatus.support.PlaySupport._
 import be.wegenenverkeer.mosaic.BuildInfo
-import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, VerkeersbordenService}
+import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, EnvelopeStorage, VerkeersbordenService}
 import play.api.{Application, Configuration}
 import slick.jdbc.JdbcBackend.DatabaseDef
 
@@ -29,7 +29,8 @@ class HappyRegistrar(
     infoRegistry: InfoRegistry,
     componentRegistry: ComponentRegistry,
     dataloaderService: DataloaderService,
-    verkeersbordenService: VerkeersbordenService
+    verkeersbordenService: VerkeersbordenService,
+    envelopeStorage: EnvelopeStorage
 ) {
 
   val timeout: FiniteDuration   = 5.seconds
@@ -70,6 +71,20 @@ class HappyRegistrar(
             status.ComponentValue(
               status = OkStatus,
               value  = "ok"
+            )
+          }
+        }
+      }
+    )
+
+    componentRegistry.register(
+      ComponentInfo("envelopes", "Aantal envelopes te verwerken", ""),
+      new Component {
+        override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
+          envelopeStorage.aantalItemsBeschikbaar().map { aantal =>
+            status.ComponentValue(
+              status = OkStatus,
+              value  = aantal.toString
             )
           }
         }

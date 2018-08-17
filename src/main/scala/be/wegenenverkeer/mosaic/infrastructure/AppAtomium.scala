@@ -45,7 +45,7 @@ trait AppAtomium {
 
   def verkeersbordenService: VerkeersbordenService
 
-  lazy val envelopeStorage: EnvelopeStorage = wire[FileEnvelopeStorage]
+  def envelopeStorage: EnvelopeStorage
 
   lazy val verkeersbordenChangeEventConsumer: VerkeersbordenChangeEventConsumer = wire[VerkeersbordenChangeEventConsumer]
 
