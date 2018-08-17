@@ -58,6 +58,8 @@ services:
     image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/dataloader-postgres
     hostname: dataloader-db
     container_name: mosaic-dataloader-db
+    ports:
+    - 5436:5432
 
   dataloader:
     image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/dataloader

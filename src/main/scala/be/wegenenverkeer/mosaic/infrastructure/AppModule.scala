@@ -1,13 +1,16 @@
 package be.wegenenverkeer.mosaic.infrastructure
 
+import java.time.{Duration => JavaDuration}
+
 import _root_.slick.jdbc.JdbcBackend.DatabaseDef
-import be.wegenenverkeer.atomium.extension.feedconsumer.FeedPositionRepo
+import be.wegenenverkeer.atomium.extension.feedconsumer.{FeedPosition, FeedPositionRepo}
 import be.wegenenverkeer.mosaic.api.AppPoAuth
-import be.wegenenverkeer.mosaic.domain.service.DataloaderService
+import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, VerkeersbordenService}
 import be.wegenenverkeer.slick3._
-import io.funcqrs.config.api._
-import play.api.Configuration
 import com.softwaremill.macwire._
+import org.ehcache.CacheManager
+import org.ehcache.config.builders.{CacheConfigurationBuilder, CacheManagerBuilder, ExpiryPolicyBuilder, ResourcePoolsBuilder}
+import play.api.Configuration
 
 /**
  * In de domain module mogen enkel "pure" domain deps komen
@@ -42,7 +45,26 @@ trait AppModule extends AppDomainModule with AppAkkaModule {
 
   lazy val feedPositionRepo: FeedPositionRepo = new FeedPositionRepo(dbRunner)
 
-  lazy val dataloaderService = wire[DataloaderService]
+  // we zijn genoodzaakt om dezelfde eh cache versie te gebruiken als geolatte, anders krijgen we conflicten
+  lazy val cacheManager: CacheManager = CacheManagerBuilder.newCacheManagerBuilder
+    .withCache(
+      "verkeersbordenFeedPage",
+      CacheConfigurationBuilder
+        .newCacheConfigurationBuilder(classOf[String], classOf[String], ResourcePoolsBuilder.heap(2))
+        .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(JavaDuration.ofSeconds(10)))
+        .build
+    )
+    .withCache(
+      "dataloaderFeedPosition",
+      CacheConfigurationBuilder
+        .newCacheConfigurationBuilder(classOf[String], classOf[FeedPosition], ResourcePoolsBuilder.heap(1))
+        .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(JavaDuration.ofSeconds(5)))
+        .build
+    )
+    .build(true)
+
+  lazy val dataloaderService: DataloaderService = wire[DataloaderService]
+  lazy val verkeersbordenService: VerkeersbordenService = wire[VerkeersbordenService]
 
 
 }

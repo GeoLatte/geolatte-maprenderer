@@ -6,21 +6,42 @@ import be.wegenenverkeer.api.verkeersborden.dsl.scalaplay.Response
 import be.wegenenverkeer.api.verkeersborden.dsl.scalaplay.client.ClientConfig
 import be.wegenenverkeer.api.verkeersborden.model.Opstelling
 import be.wegenenverkeer.mosaic.util.Logging
-import be.wegenenverkeer.restfailure.{ ErrorMessage, RestException, RestFailure, _ }
+import be.wegenenverkeer.restfailure.{ErrorMessage, RestException, RestFailure, _}
+import org.ehcache.{Cache, CacheManager}
 import play.api.Configuration
 import play.api.libs.json.Json
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class VerkeersbordenService(configuration: Configuration) extends Logging {
+class VerkeersbordenService(cacheManager: CacheManager, configuration: Configuration) extends Logging {
 
-  val baseUrl = configuration.getOptional[String]("verkeersborden.url").getOrElse(sys.error("Heb een waarde nodig voor verkeersborden.url"))
+  val baseUrl: String =
+    configuration.getOptional[String]("verkeersborden.url").getOrElse(sys.error("Heb een waarde nodig voor verkeersborden.url"))
 
   val vkbApi = be.wegenenverkeer.api.verkeersborden.VerkeersbordenApi(
     url    = new URL(baseUrl),
     config = ClientConfig(requestTimeout = 10000)
   )
+
+  val vkbFeedCache: Cache[String, String] = cacheManager.getCache("verkeersbordenFeedPage", classOf[String], classOf[String])
+
+  def getFeedPageCached(page: String)(implicit context: ExecutionContext): Future[String] = {
+    Option(vkbFeedCache.get(page)) match {
+      case Some(body) =>
+        Future.successful(body)
+      case None =>
+        vkbApi.rest.events.zi.verkeersborden.feed.page(page).get().flatMap { response =>
+          response.stringBody match {
+            case Some(body) =>
+              vkbFeedCache.put(page, body)
+              Future.successful(body)
+            case None =>
+              Future.failed(new Exception("Lege feed page"))
+          }
+        }
+    }
+  }
 
   def getOpstelling(id: Long)(implicit context: ExecutionContext): Future[Option[Opstelling]] = {
     vkbApi.rest.zi.verkeersborden.id(id).get(binaryData = Some(false)).map {

@@ -3,15 +3,16 @@ package be.wegenenverkeer.mosaic.domain.service
 import java.net.URL
 
 import be.wegenenverkeer.api.dataloader.dsl.scalaplay.client.ClientConfig
-import be.wegenenverkeer.api.dataloader.model.{ ConfiguredStatus, JobStatus, SyncStatus }
+import be.wegenenverkeer.api.dataloader.model.{ConfiguredStatus, JobStatus, SyncStatus}
 import be.wegenenverkeer.atomium.extension.feedconsumer.FeedPosition
 import be.wegenenverkeer.mosaic.util.Logging
-import be.wegenenverkeer.restfailure.{ RestException, RestFailure, _ }
+import be.wegenenverkeer.restfailure.{RestException, RestFailure, _}
+import org.ehcache.{Cache, CacheManager}
 import play.api.Configuration
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
-class DataloaderService(configuration: Configuration) extends Logging {
+class DataloaderService(cacheManager: CacheManager, configuration: Configuration) extends Logging {
 
   private val baseUrl = configuration.getOptional[String]("dataloader.url").getOrElse(sys.error("Heb een waarde nodig voor dataloader.url"))
 
@@ -19,6 +20,20 @@ class DataloaderService(configuration: Configuration) extends Logging {
     url    = new URL(baseUrl),
     config = ClientConfig(requestTimeout = 10000)
   )
+
+  val dlFeedPosCache: Cache[String, FeedPosition] = cacheManager.getCache("dataloaderFeedPosition", classOf[String], classOf[FeedPosition])
+
+  def getDataloaderFeedPageCached(feedUrl: String)(implicit context: ExecutionContext): Future[FeedPosition] = {
+    Option(dlFeedPosCache.get(feedUrl)) match {
+      case Some(feedPosition) =>
+        Future.successful(feedPosition)
+      case None =>
+        getVerkeersbordenFeedPosition(feedUrl).map { feedPosition =>
+          dlFeedPosCache.put(feedUrl, feedPosition)
+          feedPosition
+        }
+    }
+  }
 
   def getVerkeersbordenJobStatus()(implicit context: ExecutionContext): Future[Option[JobStatus]] = {
     dataloaderApi.job.jobNaam("verkeersborden").get().map {

@@ -1,14 +1,11 @@
 package be.wegenenverkeer.mosaic.infrastructure
-import java.time.{ Duration => JavaDuration }
 
 import be.wegenenverkeer.atomium.extension.feedconsumer.ProgressLimiter
 import be.wegenenverkeer.atomium.japi.client.FeedEntry
 import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, VerkeersbordenService}
+import be.wegenenverkeer.mosaic.infrastructure.SlickPgProfile.api._
 import com.fasterxml.jackson.databind.JsonNode
 import rx.lang.scala.{Observable, Subject}
-import SlickPgProfile.api._
-import org.ehcache.{Cache, CacheManager}
-import org.ehcache.config.builders.{CacheConfigurationBuilder, CacheManagerBuilder, ExpiryPolicyBuilder, ResourcePoolsBuilder}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise, blocking}
@@ -20,33 +17,6 @@ class DataloaderProgressLimiter(dataloaderService: DataloaderService,
                                 maxRetries: Int         = 60)(implicit exc: ExecutionContext)
     extends ProgressLimiter {
 
-  // we zijn genoodzaakt om dezelfde eh cache versie te gebruiken als geolatte, anders krijgen we conflicten
-  val cacheManager: CacheManager = CacheManagerBuilder.newCacheManagerBuilder
-    .withCache(
-      "verkeersbordenFeedPage",
-      CacheConfigurationBuilder
-        .newCacheConfigurationBuilder(classOf[String], classOf[String], ResourcePoolsBuilder.heap(2))
-        .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(JavaDuration.ofSeconds(10)))
-        .build)
-    .build(true)
-
-  val cache: Cache[String, String] = cacheManager.getCache("verkeersbordenFeedPage", classOf[String], classOf[String])
-
-  def getFeedPageCached(page: String): Future[String] = {
-    Option(cache.get(page)) match {
-      case Some(body) => Future.successful(body)
-      case None =>
-        verkeersbordenService.vkbApi.rest.events.zi.verkeersborden.feed.page(page).get().flatMap { response =>
-          response.stringBody match {
-            case Some(body) =>
-              cache.put(page, body)
-              Future.successful(body)
-            case None =>
-              Future.failed(new Exception("Lege feed page"))
-          }
-        }
-    }
-  }
 
   def parseFeedPageNumber(feedPage: String): Int = {
     feedPage.split("/").filterNot(_.isEmpty).filter(_.forall(_.isDigit)).head.toInt
@@ -55,7 +25,7 @@ class DataloaderProgressLimiter(dataloaderService: DataloaderService,
   override def canMoveForward(entry: FeedEntry[JsonNode]): DBIO[Unit] = {
 
     def magVerderGaan(): Future[Boolean] = {
-      dataloaderService.getVerkeersbordenFeedPosition(feedUrl).flatMap { feedPosition =>
+      dataloaderService.getDataloaderFeedPageCached(feedUrl).flatMap { feedPosition =>
         val entryPage      = parseFeedPageNumber(entry.getSelfHref)
         val dataloaderPage = parseFeedPageNumber(feedPosition.pageUrl)
 
@@ -70,7 +40,7 @@ class DataloaderProgressLimiter(dataloaderService: DataloaderService,
 
           val feedPage = feedPosition.pageUrl.split("/").filterNot(_.isEmpty).mkString("/")
 
-          getFeedPageCached(feedPage).flatMap { feedPageContent =>
+          verkeersbordenService.getFeedPageCached(feedPage).flatMap { feedPageContent =>
             val entryPos      = feedPageContent.indexOf(entryId)
             val dataloaderPos = feedPageContent.indexOf(dataloaderId)
 
