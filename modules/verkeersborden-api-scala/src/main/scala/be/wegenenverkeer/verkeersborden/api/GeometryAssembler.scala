@@ -23,28 +23,28 @@ object GeometryAssembler {
   def toTransferObject(point: geom.Point[C2D]): geojson.Point = {
     geojson.Point(
       coordinates = getPoints(point).head,
-      crs         = Some(geojson.Crs(type$ = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${point.getSRID}")))
+      crs         = Some(geojson.Crs(`type` = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${point.getSRID}")))
     )
   }
 
   def toTransferObject(lineString: geom.LineString[C2D]): geojson.LineString = {
     geojson.LineString(
       coordinates = getPoints(lineString),
-      crs         = Some(geojson.Crs(type$ = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${lineString.getSRID}")))
+      crs         = Some(geojson.Crs(`type` = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${lineString.getSRID}")))
     )
   }
 
   def toTransferObject(multiPoint: geom.MultiPoint[C2D]): geojson.MultiPoint = {
     geojson.MultiPoint(
       coordinates = getPoints(multiPoint),
-      crs         = Some(geojson.Crs(type$ = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${multiPoint.getSRID}")))
+      crs         = Some(geojson.Crs(`type` = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${multiPoint.getSRID}")))
     )
   }
 
   def toTransferObject(multiLineString: geom.MultiLineString[C2D]): geojson.MultiLineString = {
     geojson.MultiLineString(
       coordinates = (0 until multiLineString.getNumGeometries).toList.map(multiLineString.getGeometryN).map(getPoints),
-      crs         = Some(geojson.Crs(type$ = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${multiLineString.getSRID}")))
+      crs         = Some(geojson.Crs(`type` = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${multiLineString.getSRID}")))
     )
   }
 
@@ -55,21 +55,21 @@ object GeometryAssembler {
 
     geojson.Polygon(
       coordinates = exteriorRing :: interiorRings,
-      crs         = Some(geojson.Crs(type$ = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${polygon.getSRID}")))
+      crs         = Some(geojson.Crs(`type` = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${polygon.getSRID}")))
     )
   }
 
   def toTransferObject(multiPolygon: geom.MultiPolygon[C2D]): geojson.MultiPolygon = {
     geojson.MultiPolygon(
       coordinates = (0 until multiPolygon.getNumGeometries).toList.map(multiPolygon.getGeometryN).map(toTransferObject).map(_.coordinates),
-      crs         = Some(geojson.Crs(type$ = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${multiPolygon.getSRID}")))
+      crs         = Some(geojson.Crs(`type` = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${multiPolygon.getSRID}")))
     )
   }
 
   def toTransferObject(geometryCollection: geom.GeometryCollection[C2D, Geometry[C2D]]): geojson.GeometryCollection = {
     geojson.GeometryCollection(
       geometries = (0 until geometryCollection.getNumGeometries).toList.map(geometryCollection.getGeometryN).map(toTransferObject),
-      crs        = Some(geojson.Crs(type$ = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${geometryCollection.getSRID}")))
+      crs        = Some(geojson.Crs(`type` = "name", properties = geojson.NamedCrsProperty(name = s"EPSG:${geometryCollection.getSRID}")))
     )
   }
 
@@ -143,7 +143,7 @@ object GeometryAssembler {
   protected def getCrsId(to: geojson.Geometry): geom.crs.CrsId = {
 
     to.crs map { crs =>
-      if (crs.type$ != "name") throw new IllegalArgumentException("Geometry zonder 'name' CRS")
+      if (crs.`type` != "name") throw new IllegalArgumentException("Geometry zonder 'name' CRS")
       val sridString: String = crs.properties.name
       if (sridString.startsWith("EPSG:")) {
         val srid = sridString.substring(5).toInt

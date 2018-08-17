@@ -7,7 +7,7 @@ import akka.pattern.BackoffSupervisor
 import be.wegenenverkeer.atomium.extension.feedconsumer.{FeedPosition, FeedPositionRepo}
 import be.wegenenverkeer.mosaic.api.AppPoAuth
 import be.wegenenverkeer.mosaic.domain.service.geowebcache.GWCInvalidatorActor
-import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, EnvelopeStorage, FileEnvelopeStorage, VerkeersbordenService}
+import be.wegenenverkeer.mosaic.domain.service._
 import be.wegenenverkeer.slick3._
 import com.softwaremill.macwire._
 import org.ehcache.CacheManager
@@ -59,12 +59,13 @@ trait AppModule extends AppDomainModule with AppAkkaModule {
 
   lazy val dataloaderService: DataloaderService         = wire[DataloaderService]
   lazy val verkeersbordenService: VerkeersbordenService = wire[VerkeersbordenService]
+  lazy val geowebcacheService: GeowebcacheService       = wire[GeowebcacheService]
   lazy val envelopeStorage: EnvelopeStorage             = wire[FileEnvelopeStorage]
 
   {
     val gwcInvalidatorActorSupervisorProps =
       BackoffSupervisor.props(
-        childProps   = GWCInvalidatorActor.props(envelopeStorage),
+        childProps   = GWCInvalidatorActor.props(envelopeStorage, geowebcacheService),
         childName    = "gwcInvalidatorActor",
         minBackoff   = 5.seconds, //wacht minstens X om opnieuw te proberen
         maxBackoff   = 5.minutes, //wacht max X om opnieuw te proberen
@@ -73,6 +74,5 @@ trait AppModule extends AppDomainModule with AppAkkaModule {
 
     actorSystem.actorOf(gwcInvalidatorActorSupervisorProps, "gwcInvalidatorActorSupervisor")
   }
-
 
 }

@@ -19,3 +19,7 @@ play.evolutions.db.default.autoApplyDowns=true
 geolatte-mapserver {
   layers.verkeersborden.source.host = "http://apigateway.dev.awv.internal:5100/geolatte-nosqlfs/api/databases/featureserver/verkeersborden/"
 }
+
+dataloader.url = "http://apigateway.dev.awv.internal:5100/dataloader"
+verkeersborden.url = "http://apigateway.dev.awv.internal:5100/verkeersborden"
+geowebcache.url = "http://apigateway.dev.awv.internal:5100/geoserver/gwc"
