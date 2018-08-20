@@ -4,7 +4,8 @@ import _root_.slick.jdbc.JdbcBackend.DatabaseDef
 import akka.actor.ActorSystem
 import be.wegenenverkeer.mosaic.infrastructure.happy.HappyRegistrar
 import be.wegenenverkeer.metrics.MetricsHolder
-import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, EnvelopeStorage, VerkeersbordenService}
+import be.wegenenverkeer.mosaic.domain.service.storage.EnvelopeStorage
+import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, VerkeersbordenService}
 import com.codahale.metrics.MetricRegistry
 import com.softwaremill.macwire.wire
 import play.api.Application

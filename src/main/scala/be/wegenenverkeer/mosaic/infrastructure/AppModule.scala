@@ -6,9 +6,11 @@ import _root_.slick.jdbc.JdbcBackend.DatabaseDef
 import akka.pattern.BackoffSupervisor
 import be.wegenenverkeer.atomium.extension.feedconsumer.{FeedPosition, FeedPositionRepo}
 import be.wegenenverkeer.mosaic.api.AppPoAuth
-import be.wegenenverkeer.mosaic.domain.service.geowebcache.GWCInvalidatorActor
 import be.wegenenverkeer.mosaic.domain.service._
+import be.wegenenverkeer.mosaic.domain.service.geowebcache.{GWCInvalidatorActor, GeowebcacheService}
+import be.wegenenverkeer.mosaic.domain.service.storage.{EnvelopeStorage, S3Bucket, S3EnvelopeStorage}
 import be.wegenenverkeer.slick3._
+import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.softwaremill.macwire._
 import org.ehcache.CacheManager
 import org.ehcache.config.builders.{CacheConfigurationBuilder, CacheManagerBuilder, ExpiryPolicyBuilder, ResourcePoolsBuilder}
@@ -60,7 +62,19 @@ trait AppModule extends AppDomainModule with AppAkkaModule {
   lazy val dataloaderService: DataloaderService         = wire[DataloaderService]
   lazy val verkeersbordenService: VerkeersbordenService = wire[VerkeersbordenService]
   lazy val geowebcacheService: GeowebcacheService       = wire[GeowebcacheService]
-  lazy val envelopeStorage: EnvelopeStorage             = wire[FileEnvelopeStorage]
+
+  lazy val awsCredentialsProvider: AWSCredentialsProvider = new DefaultAWSCredentialsProviderChain()
+
+  lazy val envelopeStorage: EnvelopeStorage = {
+    val s3bucket = S3Bucket(
+      configuration
+        .getOptional[String]("aws.s3.files.bucket.name")
+        .getOrElse(sys.error("aws.s3.files.bucket.name required")),
+      configuration.getOptional[String]("aws.s3.files.bucket.object-prefix")
+        .getOrElse(sys.error("aws.s3.files.bucket.object-prefix required")),
+    )
+    new S3EnvelopeStorage(s3bucket, awsCredentialsProvider)(executionContext, materializer)
+  }
 
   {
     val gwcInvalidatorActorSupervisorProps =

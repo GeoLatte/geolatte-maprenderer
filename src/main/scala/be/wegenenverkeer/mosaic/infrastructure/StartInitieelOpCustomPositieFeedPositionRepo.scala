@@ -1,4 +1,5 @@
 package be.wegenenverkeer.mosaic.infrastructure
+
 import be.wegenenverkeer.atomium.extension.feedconsumer.{ FeedPosition, FeedPositionRepo }
 import be.wegenenverkeer.slick3.DbRunner
 

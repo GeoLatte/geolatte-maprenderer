@@ -14,7 +14,8 @@ import be.wegenenverkeer.appstatus.status.components.JdbcComponent
 import be.wegenenverkeer.appstatus.status.{Component, ComponentInfo, ComponentRegistry, ComponentValue}
 import be.wegenenverkeer.appstatus.support.PlaySupport._
 import be.wegenenverkeer.mosaic.BuildInfo
-import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, EnvelopeStorage, VerkeersbordenService}
+import be.wegenenverkeer.mosaic.domain.service.storage.EnvelopeStorage
+import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, VerkeersbordenService}
 import play.api.{Application, Configuration}
 import slick.jdbc.JdbcBackend.DatabaseDef
 

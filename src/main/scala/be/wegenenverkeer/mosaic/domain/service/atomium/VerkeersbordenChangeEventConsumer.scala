@@ -4,11 +4,11 @@ import be.wegenenverkeer.atomium.extension.feedconsumer.FeedEntryConsumer
 import be.wegenenverkeer.mosaic.domain.model.CRS
 import be.wegenenverkeer.mosaic.domain.model.verkeersbord.VerkeersbordenChangeFeedEvents
 import be.wegenenverkeer.mosaic.domain.model.verkeersbord.VerkeersbordenChangeFeedEvents._
-import be.wegenenverkeer.mosaic.domain.service.EnvelopeStorage
+import be.wegenenverkeer.mosaic.domain.service.storage.EnvelopeStorage
 import be.wegenenverkeer.mosaic.util.Logging
 import org.geolatte.geom.{C2D, Envelope}
 import play.api.libs.json.JsValue
-import slick.dbio.{DBIO, DBIOAction, Effect, NoStream}
+import slick.dbio.DBIO
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -16,7 +16,7 @@ class VerkeersbordenChangeEventConsumer(envelopeStorage: EnvelopeStorage)(implic
     extends FeedEntryConsumer
     with Logging {
 
-  override def consume(changeEvent: JsValue): DBIOAction[Unit, NoStream, Effect] = {
+  override def consume(changeEvent: JsValue): DBIO[Unit] = {
     DBIO.from(consumeChangeEvent(VerkeersbordenChangeFeedEvents.fromJsValue(changeEvent).get))
   }
 

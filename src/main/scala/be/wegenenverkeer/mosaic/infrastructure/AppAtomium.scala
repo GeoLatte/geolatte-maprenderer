@@ -5,7 +5,8 @@ import be.wegenenverkeer.atomium.client.ImplicitConversions._
 import be.wegenenverkeer.atomium.extension.feedconsumer._
 import be.wegenenverkeer.atomium.japi.client.{AtomiumClient, FeedEntry}
 import be.wegenenverkeer.mosaic.domain.service.atomium.VerkeersbordenChangeEventConsumer
-import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, EnvelopeStorage, FileEnvelopeStorage, VerkeersbordenService}
+import be.wegenenverkeer.mosaic.domain.service.storage.EnvelopeStorage
+import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, VerkeersbordenService}
 import be.wegenenverkeer.mosaic.util.Logging
 import be.wegenenverkeer.slick3.DbRunner
 import com.fasterxml.jackson.databind.JsonNode
@@ -51,7 +52,7 @@ trait AppAtomium {
 
   def feedPositionRepo: FeedPositionRepo
 
-  {
+  val verkeersbordenFeedConsumer: FeedConsumer = {
     val feedUrl = "/rest/events/zi/verkeersborden/feed"
 
     def startInitieelOpDataloaderPositieFeedPositionRepo = {
@@ -70,7 +71,7 @@ trait AppAtomium {
       pollInterval        = 30.seconds,
       maxConsumeTime      = maxConsumeTime,
       changeEventConsumer = verkeersbordenChangeEventConsumer
-    )(dbRunner, actorSystem.dispatcher)
+    )(dbRunner, executionContext)
 
     val retryInterval = 10.seconds
 
@@ -96,6 +97,8 @@ trait AppAtomium {
     }
 
     verkeersbordenFeedConsumer.start(feedConsumerListener, progressLimiter)
+
+    verkeersbordenFeedConsumer
   }
 
 }

@@ -3,7 +3,7 @@ package be.wegenenverkeer.mosaic.domain.service.geowebcache
 import akka.actor.{Actor, PoisonPill, Props, Status}
 import akka.pattern.pipe
 import be.wegenenverkeer.mosaic.domain.service.geowebcache.GWCInvalidatorActor._
-import be.wegenenverkeer.mosaic.domain.service.{EnvelopeFile, EnvelopeStorage, GeowebcacheService}
+import be.wegenenverkeer.mosaic.domain.service.storage.{EnvelopeFile, EnvelopeStorage}
 import be.wegenenverkeer.mosaic.util.Logging
 
 import scala.collection.mutable

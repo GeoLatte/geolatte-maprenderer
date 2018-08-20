@@ -1,4 +1,4 @@
-package be.wegenenverkeer.mosaic.domain.service
+package be.wegenenverkeer.mosaic.domain.service.geowebcache
 
 import java.net.URL
 
