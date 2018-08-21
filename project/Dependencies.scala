@@ -6,7 +6,7 @@ object Dependencies {
     funCqrsDeps ++ macwireDeps ++ slickDeps ++
       awvDeps ++ atomiumDeps ++
       testDeps ++
-      loggingDeps ++ otherDeps ++ mosaicApiDeps ++ metricsDependencies
+      loggingDeps ++ otherDeps ++ mosaicApiDeps ++ metricsDependencies ++ Seq(ehCache)
 
   // ----------------------------------------------------
   // versie van libs die voorkomen in meer dan één group
@@ -16,6 +16,7 @@ object Dependencies {
   val logbackVersion      = "0.2.3"
   val scalaExtVersion     = "1.0.0"
   val scalaMetricsVersion = "3.5.9"
+  val awsVersion          = "1.11.347"
   // ----------------------------------------------------
 
   val mosaicApiDeps = Seq(
@@ -34,17 +35,19 @@ object Dependencies {
 
   val otherDeps = {
     Seq(
-      "com.jsuereth" %% "scala-arm"     % "2.0",
-      "nl.grons"     %% "metrics-scala" % scalaMetricsVersion
+      "com.jsuereth" %% "scala-arm"       % "2.0",
+      "nl.grons"     %% "metrics-scala"   % scalaMetricsVersion,
+      "com.amazonaws" % "aws-java-sdk-s3" % awsVersion
     )
   }
 
-  val sldSchemaDep        = "org.jvnet.ogc"              % "sld-v_1_1_0-schema"  % "1.0.0"
+  val sldSchemaDep        = "org.jvnet.ogc"              % "sld-v_1_1_0-schema"  % "1.0.3"
   val wmsSchemaDep        = "org.jvnet.ogc"              % "wms-v_1_3_0-schema"  % "1.0.3"
   val wmtsSchemaDep       = "org.jvnet.ogc"              % "wmts-v_1_0_0-schema" % "1.1.0"
   val jacksonDatabindDep  = "com.fasterxml.jackson.core" % "jackson-databind"    % "2.9.0"
   val rxhttpclientJavaDep = "be.wegenenverkeer"          % "rxhttpclient-java"   % rxHttpClientVersion
   val typesafeConfigDep   = "com.typesafe"               % "config"              % "1.3.2"
+  val ehCache             = "org.ehcache"                % "ehcache"             % "3.5.2"
 
   val scramlDependencies = Seq(
     "com.ning" % "async-http-client" % "1.9.40",
@@ -69,7 +72,7 @@ object Dependencies {
   // AWV Play extensions
   val awvDeps = {
 
-    val appStatusVersion = "3.0.0"
+    val appStatusVersion = "3.0.4-SNAPSHOT"
     val hateoasVersion   = "2.0.2"
 
     Seq(
@@ -137,18 +140,17 @@ object Dependencies {
   //------------------------------------------------------------------------------------------------
   // Atomium
   val atomiumDeps = {
-    val version        = "1.2.0"
-    val jacksonVersion = "2.8.0"
+    val version        = "1.3.0"
+    val jacksonVersion = "2.9.0"
 
     Seq(
-      "be.wegenenverkeer"          %% "atomium-common-play26"           % version,
-      "be.wegenenverkeer"          %% "atomium-client-scala"            % version,
-      "io.reactivex"               %% "rxscala"                         % "0.26.5",
-      "be.wegenenverkeer"          %% "atomium-extension-feed-consumer" % "1.0.0",
-      "be.wegenenverkeer"          %% "atomium-server-play26"           % version,
-      "com.fasterxml.jackson.core" % "jackson-core"                     % jacksonVersion,
-      "com.fasterxml.jackson.core" % "jackson-databind"                 % jacksonVersion,
-      "com.fasterxml.jackson.core" % "jackson-annotations"              % jacksonVersion
+      "be.wegenenverkeer"          %% "atomium-play26"                    % version,
+      "be.wegenenverkeer"          %% "atomium-client-scala"              % version,
+      "io.reactivex"               %% "rxscala"                           % "0.26.5",
+      "be.wegenenverkeer"          %% "atomium-extension-feed-consumer26" % "1.0.3-SNAPSHOT",
+      "com.fasterxml.jackson.core" % "jackson-core"                       % jacksonVersion,
+      "com.fasterxml.jackson.core" % "jackson-databind"                   % jacksonVersion,
+      "com.fasterxml.jackson.core" % "jackson-annotations"                % jacksonVersion
     )
   }
 

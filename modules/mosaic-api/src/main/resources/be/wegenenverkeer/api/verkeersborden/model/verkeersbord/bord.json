@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://wegenenverkeer.be/api/verkeersborden/model/bord.json",
+  "type": "object",
+  "description": "Gegevens van bord",
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "uuid": {
+      "type": "string"
+    },
+    "bibBordId": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string"
+    },
+    "datumPlaatsing": {
+      "type": "string"
+    },
+    "fabricageType": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "integer"
+        },
+        "naam": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "naam"
+      ]
+    },
+    "y": {
+      "type": "number"
+    },
+    "parameters": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "uuid",
+    "code",
+    "y",
+    "parameters"
+  ]
+}

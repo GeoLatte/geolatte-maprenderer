@@ -18,9 +18,9 @@ trait AtomFeedModule {
 
   def feedBaseUrl: Url
 
-  implicit val dbRunner: DbRunner
+  implicit def dbRunner: DbRunner
 
-  implicit val executionContext: ExecutionContext
+  implicit def executionContext: ExecutionContext
 
   def actorSystem: ActorSystem
 
