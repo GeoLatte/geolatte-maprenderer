@@ -9,7 +9,7 @@ import be.wegenenverkeer.atomium.extension.feedconsumer.{FeedPosition, FeedPosit
 import be.wegenenverkeer.mosaic.api.AppPoAuth
 import be.wegenenverkeer.mosaic.domain.service._
 import be.wegenenverkeer.mosaic.domain.service.geowebcache.{GWCInvalidatorActor, GeowebcacheService}
-import be.wegenenverkeer.mosaic.domain.service.storage.{EnvelopeStorage, S3Bucket, S3EnvelopeStorage}
+import be.wegenenverkeer.mosaic.domain.service.storage.{EnvelopeStorage, MultipleWritersEnvelopeStorage, S3Bucket, S3EnvelopeStorage}
 import be.wegenenverkeer.slick3._
 import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.softwaremill.macwire._
@@ -68,15 +68,27 @@ trait AppModule extends AppDomainModule with AppAkkaModule {
   lazy val awsCredentialsProvider: AWSCredentialsProvider = new DefaultAWSCredentialsProviderChain()
 
   lazy val envelopeStorage: EnvelopeStorage = {
-    val s3bucket = S3Bucket(
-      configuration
-        .getOptional[String]("aws.s3.files.bucket.name")
-        .getOrElse(sys.error("aws.s3.files.bucket.name required")),
-      configuration
-        .getOptional[String]("aws.s3.files.bucket.object-prefix")
-        .getOrElse(sys.error("aws.s3.files.bucket.object-prefix required")),
-    )
-    new S3EnvelopeStorage(s3bucket, awsCredentialsProvider)(executionContext, materializer)
+    val bucketName = configuration
+      .getOptional[String]("aws.s3.files.bucket.name")
+      .getOrElse(sys.error("aws.s3.files.bucket.name required"))
+
+    val readerPrefix = configuration
+      .getOptional[String]("aws.s3.files.bucket.object-prefix.reader")
+      .getOrElse(sys.error("aws.s3.files.bucket.object-prefix.reader required"))
+    val writerPrefixes = configuration
+      .getOptional[Seq[String]]("aws.s3.files.bucket.object-prefix.writers")
+      .getOrElse(sys.error("aws.s3.files.bucket.object-prefix.writers required"))
+
+    def s3bucket(prefix: String) = S3Bucket(bucketName, prefix)
+
+    val reader = new S3EnvelopeStorage(s3bucket(readerPrefix), awsCredentialsProvider)(executionContext, materializer)
+
+    val writers =
+      writerPrefixes.map { writerPrefix =>
+        new S3EnvelopeStorage(s3bucket(writerPrefix), awsCredentialsProvider)(executionContext, materializer)
+      }
+
+    new MultipleWritersEnvelopeStorage(reader, writers)
   }
 
   val gwcInvalidatorActorSupervisor: ActorRef @@ GWCInvalidatorActor = {

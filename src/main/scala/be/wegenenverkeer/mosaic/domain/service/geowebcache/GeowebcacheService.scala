@@ -20,6 +20,8 @@ class GeowebcacheService(configuration: Configuration) extends Logging with Base
     configuration.getOptional[String]("geowebcache.user").getOrElse(sys.error("Heb een waarde nodig voor geowebcache.user"))
   private val password =
     configuration.getOptional[String]("geowebcache.password").getOrElse(sys.error("Heb een waarde nodig voor geowebcache.password"))
+  private val layer =
+    configuration.getOptional[String]("geowebcache.layer").getOrElse(sys.error("Heb een waarde nodig voor geowebcache.layer"))
 
   val geowebcacheApi = GeowebcacheApi(
     url    = new URL(baseUrl),
@@ -30,11 +32,11 @@ class GeowebcacheService(configuration: Configuration) extends Logging with Base
   def invalidate(envelope: Envelope[C2D])(implicit exc: ExecutionContext): Future[Unit] = {
 
     geowebcacheApi.rest.seed
-      .layer("mosaic")
+      .layer(layer)
       .post(
         `type`      = truncate,
         format      = "image/png",
-        gridSetId   = "EPSG:31370",
+        gridSetId   = "AWV-gridset-Lambert72",
         minX        = envelope.lowerLeft.getX,
         minY        = envelope.lowerLeft.getY,
         maxX        = envelope.upperRight.getX,
