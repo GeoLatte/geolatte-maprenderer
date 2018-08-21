@@ -118,6 +118,7 @@ class S3EnvelopeStorage(s3Bucket: S3Bucket, awsCredentialsProvider: AWSCredentia
       val result = s3Client.listObjectsV2(request)
 
       fileSummaries ++= result.getObjectSummaries.asScala
+        .filterNot(summary => summary.getKey.endsWith("/")) // directory!
         .filterNot(summary => uitgezonderd.contains(summary.getKey))
         .sortBy(_.getLastModified)
         .take(limit)
