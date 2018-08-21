@@ -3,19 +3,24 @@ package be.wegenenverkeer.mosaic.infrastructure.happy
 import java.io.File
 import java.time.LocalDateTime
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
+import akka.pattern.ask
 import akka.util.Timeout
 import be.wegenenverkeer.appstatus.info.providers.{GitInfoProvider, JvmInfoProvider}
 import be.wegenenverkeer.appstatus.info.{InfoDetails, InfoRegistry}
 import be.wegenenverkeer.appstatus.rood.FeedPointersComponent
 import be.wegenenverkeer.appstatus.status
-import be.wegenenverkeer.appstatus.status.ComponentStatus.OkStatus
+import be.wegenenverkeer.appstatus.status.ComponentStatus.{OkStatus, WarningStatus}
 import be.wegenenverkeer.appstatus.status.components.JdbcComponent
 import be.wegenenverkeer.appstatus.status.{Component, ComponentInfo, ComponentRegistry, ComponentValue}
 import be.wegenenverkeer.appstatus.support.PlaySupport._
 import be.wegenenverkeer.mosaic.BuildInfo
+import be.wegenenverkeer.mosaic.domain.service.geowebcache.GWCInvalidatorActor
+import be.wegenenverkeer.mosaic.domain.service.geowebcache.GWCInvalidatorActor.InvalidatorActorStatus
 import be.wegenenverkeer.mosaic.domain.service.storage.EnvelopeStorage
 import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, VerkeersbordenService}
+import com.softwaremill.tagging.@@
+import play.api.libs.json.Json
 import play.api.{Application, Configuration}
 import slick.jdbc.JdbcBackend.DatabaseDef
 
@@ -31,7 +36,8 @@ class HappyRegistrar(
     componentRegistry: ComponentRegistry,
     dataloaderService: DataloaderService,
     verkeersbordenService: VerkeersbordenService,
-    envelopeStorage: EnvelopeStorage
+    envelopeStorage: EnvelopeStorage,
+    gwcInvalidatorActorSupervisor: ActorRef @@ GWCInvalidatorActor
 ) {
 
   val timeout: FiniteDuration   = 5.seconds
@@ -51,7 +57,7 @@ class HappyRegistrar(
     componentRegistry.register(FeedPointersComponent.defaultInfo, new FeedPointersComponent(() => db.createSession().conn))
 
     componentRegistry.register(
-      ComponentInfo("dataloader", "Dataloader verkeersborden feed positie", ""),
+      ComponentInfo("dataloader", "Dataloader feed positie", ""),
       new Component {
         override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
           dataloaderService.getVerkeersbordenFeedPosition("/rest/events/zi/verkeersborden/feed").map { r =>
@@ -65,13 +71,13 @@ class HappyRegistrar(
     )
 
     componentRegistry.register(
-      ComponentInfo("verkeersborden", "Verkeersborden status", ""),
+      ComponentInfo("verkeersborden", "Verkeersborden feed", ""),
       new Component {
         override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
-          verkeersbordenService.getOpstelling(0).map { r =>
+          verkeersbordenService.getFeedPage("").map { body =>
             status.ComponentValue(
               status = OkStatus,
-              value  = "ok"
+              value  = body.take(100) + Some("...").filter(_ => body.length > 100).getOrElse("")
             )
           }
         }
@@ -86,6 +92,21 @@ class HappyRegistrar(
             status.ComponentValue(
               status = OkStatus,
               value  = aantal.toString
+            )
+          }
+        }
+      }
+    )
+
+    componentRegistry.register(
+      ComponentInfo("GWCInvalidatorActorStatus", "GWCInvalidatorActor status", ""),
+      new Component {
+        override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
+          gwcInvalidatorActorSupervisor.ask(GWCInvalidatorActor.GetStatus).map { s =>
+            val actorStatus: InvalidatorActorStatus = s.asInstanceOf[InvalidatorActorStatus]
+            status.ComponentValue(
+              status = if (actorStatus.okStatus) { OkStatus } else { WarningStatus("") },
+              value  = Json.prettyPrint(Json.toJson(actorStatus)(Json.format[InvalidatorActorStatus]))
             )
           }
         }

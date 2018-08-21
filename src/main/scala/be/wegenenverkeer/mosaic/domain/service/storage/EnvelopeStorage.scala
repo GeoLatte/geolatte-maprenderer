@@ -25,7 +25,7 @@ trait EnvelopeStorage {
 
   def schrijf(envelope: Envelope[C2D]): Future[Unit]
 
-  def lees(limit: Int = 10, uitgezonderd: Set[String]): Future[List[EnvelopeFile]]
+  def lees(limit: Int, uitgezonderd: Set[String]): Future[List[EnvelopeFile]]
 
   def verwijder(fileRef: String): Future[Unit]
 

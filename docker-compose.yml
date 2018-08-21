@@ -30,6 +30,11 @@ services:
     links:
     - geoserver-db:db
     
+  opendata-geowebcache:
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/opendata-geowebcache
+    hostname: opendata-geowebcache
+    container_name: mosaic-opendata-geowebcache
+
   verkeersborden-db:
     image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/verkeersborden-postgres
     hostname: verkeersborden-db

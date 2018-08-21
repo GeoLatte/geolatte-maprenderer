@@ -17,9 +17,13 @@ class DataloaderProgressLimiter(dataloaderService: DataloaderService,
                                 maxRetries: Int         = 60)(implicit exc: ExecutionContext)
     extends ProgressLimiter {
 
-
   def parseFeedPageNumber(feedPage: String): Int = {
-    feedPage.split("/").filterNot(_.isEmpty).filter(_.forall(_.isDigit)).head.toInt
+    feedPage
+      .split("/")
+      .filterNot(_.isEmpty) // indien feedPage met '/' begint, filteren we de zo bekomen lege string hier uit
+      .find(_.forall(_.isDigit)) // de eerste string die uit enkel getallen bestaat is de pagina nummer
+      .map(_.toInt)
+      .getOrElse(throw new Exception(s"Kon feedPage $feedPage niet parsen!"))
   }
 
   override def canMoveForward(entry: FeedEntry[JsonNode]): DBIO[Unit] = {

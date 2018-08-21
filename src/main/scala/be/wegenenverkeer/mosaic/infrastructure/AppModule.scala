@@ -3,6 +3,7 @@ package be.wegenenverkeer.mosaic.infrastructure
 import java.time.{Duration => JavaDuration}
 
 import _root_.slick.jdbc.JdbcBackend.DatabaseDef
+import akka.actor.ActorRef
 import akka.pattern.BackoffSupervisor
 import be.wegenenverkeer.atomium.extension.feedconsumer.{FeedPosition, FeedPositionRepo}
 import be.wegenenverkeer.mosaic.api.AppPoAuth
@@ -12,6 +13,7 @@ import be.wegenenverkeer.mosaic.domain.service.storage.{EnvelopeStorage, S3Bucke
 import be.wegenenverkeer.slick3._
 import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.softwaremill.macwire._
+import com.softwaremill.tagging._
 import org.ehcache.CacheManager
 import org.ehcache.config.builders.{CacheConfigurationBuilder, CacheManagerBuilder, ExpiryPolicyBuilder, ResourcePoolsBuilder}
 import play.api.Configuration
@@ -70,13 +72,14 @@ trait AppModule extends AppDomainModule with AppAkkaModule {
       configuration
         .getOptional[String]("aws.s3.files.bucket.name")
         .getOrElse(sys.error("aws.s3.files.bucket.name required")),
-      configuration.getOptional[String]("aws.s3.files.bucket.object-prefix")
+      configuration
+        .getOptional[String]("aws.s3.files.bucket.object-prefix")
         .getOrElse(sys.error("aws.s3.files.bucket.object-prefix required")),
     )
     new S3EnvelopeStorage(s3bucket, awsCredentialsProvider)(executionContext, materializer)
   }
 
-  {
+  val gwcInvalidatorActorSupervisor: ActorRef @@ GWCInvalidatorActor = {
     val gwcInvalidatorActorSupervisorProps =
       BackoffSupervisor.props(
         childProps   = GWCInvalidatorActor.props(envelopeStorage, geowebcacheService),
@@ -86,7 +89,7 @@ trait AppModule extends AppDomainModule with AppAkkaModule {
         randomFactor = 0 // geen random delay nodig om niet allemaal op hetzelfde moment terug te starten
       )
 
-    actorSystem.actorOf(gwcInvalidatorActorSupervisorProps, "gwcInvalidatorActorSupervisor")
+    actorSystem.actorOf(gwcInvalidatorActorSupervisorProps, "gwcInvalidatorActorSupervisor").taggedWith[GWCInvalidatorActor]
   }
 
 }

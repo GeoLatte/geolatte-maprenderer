@@ -22,4 +22,4 @@ geolatte-mapserver {
 
 dataloader.url = "http://apigateway.dev.awv.internal:5100/dataloader"
 verkeersborden.url = "http://apigateway.dev.awv.internal:5100/verkeersborden"
-geowebcache.url = "http://apigateway.dev.awv.internal:5100/geoserver/gwc"
+geowebcache.url = "http://apigateway.dev.awv.internal:5100/opendata-geowebcache"

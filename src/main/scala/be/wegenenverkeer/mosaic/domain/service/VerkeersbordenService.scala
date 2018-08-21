@@ -26,19 +26,28 @@ class VerkeersbordenService(cacheManager: CacheManager, configuration: Configura
 
   val vkbFeedCache: Cache[String, String] = cacheManager.getCache("verkeersbordenFeedPage", classOf[String], classOf[String])
 
+  def getFeedPage(page: String)(implicit context: ExecutionContext): Future[String] = {
+    vkbApi.rest.events.zi.verkeersborden.feed
+      .page(page)
+      .get()
+      .flatMap { response =>
+        response.stringBody match {
+          case Some(body) =>
+            Future.successful(body)
+          case None =>
+            Future.failed(new Exception("Lege feed page"))
+        }
+      }
+  }
+
   def getFeedPageCached(page: String)(implicit context: ExecutionContext): Future[String] = {
     Option(vkbFeedCache.get(page)) match {
       case Some(body) =>
         Future.successful(body)
       case None =>
-        vkbApi.rest.events.zi.verkeersborden.feed.page(page).get().flatMap { response =>
-          response.stringBody match {
-            case Some(body) =>
-              vkbFeedCache.put(page, body)
-              Future.successful(body)
-            case None =>
-              Future.failed(new Exception("Lege feed page"))
-          }
+        getFeedPage(page).map { body =>
+          vkbFeedCache.put(page, body)
+          body
         }
     }
   }

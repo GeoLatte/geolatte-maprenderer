@@ -20,8 +20,6 @@ class GWCInvalidatorActor(envelopeStorage: EnvelopeStorage, geowebcacheService: 
   val envelopesTeVerwijderen: mutable.Queue[String]       = mutable.Queue[String]()
   val fileRefsInVerwerking: mutable.Set[String]           = mutable.Set[String]()
 
-  val leesInterval: FiniteDuration = 5.seconds
-
   // start lees 'loop'
   context.system.scheduler.scheduleOnce(0.seconds, self, LeesIndienNodig)
 
@@ -34,21 +32,28 @@ class GWCInvalidatorActor(envelopeStorage: EnvelopeStorage, geowebcacheService: 
   context.system.scheduler.scheduleOnce(7.seconds, self, Verwijder)
 
   override def receive: Receive = {
+    case GetStatus =>
+      sender ! InvalidatorActorStatus(
+        envelopesTeInvalideren = envelopesTeInvalideren.size,
+        envelopesTeVerwijderen = envelopesTeVerwijderen.size,
+        fileRefsInVerwerking   = fileRefsInVerwerking.size
+      )
+
     case LeesIndienNodig =>
-      if (envelopesTeInvalideren.size <= 1000) {
-        if (envelopesTeVerwijderen.size <= 1000) {
+      if (envelopesTeInvalideren.size <= maxQueueSize) {
+        if (envelopesTeVerwijderen.size <= maxQueueSize) {
           self ! Lees
         } else {
-          logger.debug(s"Niet lezen, want verwijderen kan niet volgen (${envelopesTeVerwijderen.size})")
-          context.system.scheduler.scheduleOnce(leesInterval, self, LeesIndienNodig)
+          logger.warn(s"Niet lezen, want verwijderen kan niet volgen (${envelopesTeVerwijderen.size})")
+          context.system.scheduler.scheduleOnce(leesIntervalBackPressure, self, LeesIndienNodig)
         }
       } else {
-        logger.debug(s"Niet lezen, want invalideren kan niet volgen (${envelopesTeInvalideren.size})")
-        context.system.scheduler.scheduleOnce(leesInterval, self, LeesIndienNodig)
+        logger.warn(s"Niet lezen, want invalideren kan niet volgen (${envelopesTeInvalideren.size})")
+        context.system.scheduler.scheduleOnce(leesIntervalBackPressure, self, LeesIndienNodig)
       }
 
     case Lees =>
-      service.lees(uitgezonderd = fileRefsInVerwerking.toSet).pipeTo(self)
+      service.lees(limit = 100, uitgezonderd = fileRefsInVerwerking.toSet).pipeTo(self)
 
     case Gelezen(envelopes: List[EnvelopeFile]) =>
       if (envelopes.nonEmpty) {
@@ -99,6 +104,15 @@ class GWCInvalidatorActor(envelopeStorage: EnvelopeStorage, geowebcacheService: 
 
 object GWCInvalidatorActor {
 
+  val maxQueueSize                             = 1000
+  val leesInterval: FiniteDuration             = 5.seconds
+  val leesIntervalBackPressure: FiniteDuration = 30.seconds
+
+  case object GetStatus
+  case class InvalidatorActorStatus(envelopesTeInvalideren: Int, envelopesTeVerwijderen: Int, fileRefsInVerwerking: Int) {
+    def okStatus: Boolean = envelopesTeInvalideren < maxQueueSize && envelopesTeVerwijderen < maxQueueSize
+  }
+
   case object LeesIndienNodig
   case object Lees
   case object Invalideer
@@ -111,8 +125,8 @@ object GWCInvalidatorActor {
   case class GWCInvalidatorActorServices(envelopeStorage: EnvelopeStorage, geowebcacheService: GeowebcacheService)(
       implicit exc: ExecutionContext) {
 
-    def lees(uitgezonderd: Set[String]): Future[Gelezen] = {
-      envelopeStorage.lees(limit = 100, uitgezonderd).map(Gelezen)
+    def lees(limit: Int, uitgezonderd: Set[String]): Future[Gelezen] = {
+      envelopeStorage.lees(limit, uitgezonderd).map(Gelezen)
     }
 
     def invalideer(envelopeFile: EnvelopeFile): Future[GeInvalideerd] = {
