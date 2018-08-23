@@ -28,14 +28,14 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 class HappyRegistrar(
-    db: DatabaseDef,
+    dbOpt: Option[DatabaseDef],
     actorSystem: ActorSystem,
     configuration: Configuration,
     application: Application,
     infoRegistry: InfoRegistry,
     componentRegistry: ComponentRegistry,
-    dataloaderService: DataloaderService,
-    verkeersbordenService: VerkeersbordenService,
+    dataloaderServiceOpt: Option[DataloaderService],
+    verkeersbordenServiceOpt: Option[VerkeersbordenService],
     envelopeStorage: EnvelopeStorage,
     gwcInvalidatorActorSupervisor: ActorRef @@ GWCInvalidatorActor
 ) {
@@ -52,37 +52,45 @@ class HappyRegistrar(
 
   def registerStatus() = {
 
-    componentRegistry.register(ComponentInfo("db", "Database", ""), new JdbcComponent(() => db.createSession().conn))
+    dbOpt.foreach { db =>
+      componentRegistry.register(ComponentInfo("db", "Database", ""), new JdbcComponent(() => db.createSession().conn))
+    }
 
-    componentRegistry.register(FeedPointersComponent.defaultInfo, new FeedPointersComponent(() => db.createSession().conn))
+    dbOpt.foreach { db =>
+      componentRegistry.register(FeedPointersComponent.defaultInfo, new FeedPointersComponent(() => db.createSession().conn))
+    }
 
-    componentRegistry.register(
-      ComponentInfo("dataloader", "Dataloader feed positie", ""),
-      new Component {
-        override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
-          dataloaderService.getVerkeersbordenFeedPosition("/rest/events/zi/verkeersborden/feed").map { r =>
-            status.ComponentValue(
-              status = OkStatus,
-              value  = r.toString
-            )
+    dataloaderServiceOpt.foreach { dataloaderService =>
+      componentRegistry.register(
+        ComponentInfo("dataloader", "Dataloader feed positie", ""),
+        new Component {
+          override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
+            dataloaderService.getVerkeersbordenFeedPosition("/rest/events/zi/verkeersborden/feed").map { r =>
+              status.ComponentValue(
+                status = OkStatus,
+                value  = r.toString
+              )
+            }
           }
         }
-      }
-    )
+      )
+    }
 
-    componentRegistry.register(
-      ComponentInfo("verkeersborden", "Verkeersborden feed", ""),
-      new Component {
-        override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
-          verkeersbordenService.getFeedPage("").map { body =>
-            status.ComponentValue(
-              status = OkStatus,
-              value  = body.take(100) + Some("...").filter(_ => body.length > 100).getOrElse("")
-            )
+    verkeersbordenServiceOpt.foreach { verkeersbordenService =>
+      componentRegistry.register(
+        ComponentInfo("verkeersborden", "Verkeersborden feed", ""),
+        new Component {
+          override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
+            verkeersbordenService.getFeedPage("").map { body =>
+              status.ComponentValue(
+                status = OkStatus,
+                value  = body.take(100) + Some("...").filter(_ => body.length > 100).getOrElse("")
+              )
+            }
           }
         }
-      }
-    )
+      )
+    }
 
     componentRegistry.register(
       ComponentInfo("envelopes", "Aantal envelopes te verwerken", ""),
@@ -134,6 +142,21 @@ class HappyRegistrar(
     infoRegistry.registerDynamic(InfoDetails("heapdump", "Heap dump genomen", ""), () => {
       new File("/tmp/heap.hprof").lastModified().toString
     })
+
+    def registerConfig(path: String): Unit = {
+      infoRegistry.register(
+        InfoDetails(s"config.$path", s"Config: $path", ""),
+        configuration.getOptional[String](path).getOrElse("Niet geconfigureerd")
+      )
+    }
+
+    registerConfig("dataloader.url")
+    registerConfig("verkeersborden.url")
+    registerConfig("geowebcache.url")
+    registerConfig("geowebcache.layer")
+    registerConfig("aws.s3.files.bucket.name")
+    registerConfig("aws.s3.files.bucket.object-prefix.reader")
+    registerConfig("aws.s3.files.bucket.object-prefix.writers")
 
   }
 

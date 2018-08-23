@@ -2,28 +2,22 @@ package be.wegenenverkeer.mosaic.infrastructure.apploader
 
 import java.net.URL
 
-import be.wegenenverkeer.atomium.format.Url
+import be.wegenenverkeer.metrics.Metrics
 import be.wegenenverkeer.metrics.controller.MetricsController
 import be.wegenenverkeer.metrics.filter.MetricFilter
-import be.wegenenverkeer.metrics.{Metrics, MetricsHolder}
 import be.wegenenverkeer.mosaic.AppMachtigingen
 import be.wegenenverkeer.mosaic.AppMachtigingen._
 import be.wegenenverkeer.mosaic.api.{AppPoAuth, WebApplicationController, WmsController}
+import be.wegenenverkeer.mosaic.infrastructure._
 import be.wegenenverkeer.playevolutions._
+import be.wegenenverkeer.playfilters.accesslog.PlayLoggingFilter
 import be.wegenenverkeer.poauth.domain.model._
 import be.wegenenverkeer.poauth.infrastructure.{MockPoProvider, PoClient}
 import be.wegenenverkeer.restfailure.errorhandler.RestExceptionAwareErorHandler
-import slick.basic.{BasicProfile, DatabaseConfig}
-import slick.jdbc.JdbcBackend.DatabaseDef
-import slick.jdbc.JdbcProfile
-import be.wegenenverkeer.mosaic.infrastructure.{AppAkkaModule, _}
-import be.wegenenverkeer.playfilters.accesslog.PlayLoggingFilter
-import be.wegenenverkeer.slick3._
 import com.softwaremill.macwire._
 import controllers.{Assets, AssetsConfigurationProvider, AssetsMetadataProvider}
 import org.webjars.play.WebJarAssets
 import play.api.ApplicationLoader.Context
-import play.api.db.slick.{DatabaseConfigProvider, DbName, SlickComponents, SlickModule}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.logback.LogbackLoggerConfigurator
 import play.api.mvc.{ControllerComponents, EssentialFilter}
@@ -39,7 +33,13 @@ class AppLoader extends ApplicationLoader {
 
   def load(context: Context): Application = {
 
-    val app = new BuiltInComponentsFromContext(context) with MacWireEvolutionsModule with AppComponents
+    val app = new BuiltInComponentsFromContext(context)
+      with MacWireEvolutionsModule
+      with AppComponents
+      with DbModule
+      with AppDbModule
+      with AppAtomium
+      with HappyDbDepsModule
 
     app.applicationLifecycle.addStopHook { () =>
       import scala.concurrent.ExecutionContext.Implicits.global
@@ -60,11 +60,8 @@ trait AppComponents
     extends BuiltInComponents
     with AppContext
     with AppModule
-    with AtomFeedModule
-    with SlickComponents
     with HappyModule
-    with AppAkkaModule
-    with AppAtomium {
+{
 
   def controllerComponents: ControllerComponents
 
@@ -103,22 +100,8 @@ trait AppComponents
 
   lazy val appPoAuth: AppPoAuth = new AppPoAuth(poProvider)
 
-  lazy val db: DatabaseDef = dbConfigProvider.get[JdbcProfile].db.asInstanceOf[DatabaseDef]
-
-  lazy val dbRunner: DbRunner =
-    new be.wegenenverkeer.slick3.DbRunner(db, be.wegenenverkeer.mosaic.infrastructure.SlickPgProfile, Some(MetricsHolder.metricRegistry))
-
-  lazy val feedBaseUrl = new Url(configuration.getOptional[String]("http.url").getOrElse(sys.error("http.url moet geconfigureerd worden")))
-
   override lazy val httpErrorHandler =
     new RestExceptionAwareErorHandler(environment, configuration, sourceMapper, Some(router))
-
-  lazy val dbConfigProvider = new DatabaseConfigProvider {
-    override def get[P <: BasicProfile]: DatabaseConfig[P] = {
-      val defaultDbName = configuration.underlying.getString(SlickModule.DefaultDbName)
-      slickApi.dbConfig[P](DbName(defaultDbName))
-    }
-  }
 
   new LogbackLoggerConfigurator() {
 

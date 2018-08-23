@@ -66,3 +66,7 @@ publishTo in ThisBuild := version { (v: String) =>
 
 publishMavenStyle in Debian := false
 publishMavenStyle := true
+
+// Dit zorgt ervoor dat de Implementation-Version wordt toegevoegd aan de MANIFEST van de "sans-externalized" jar
+// die in het Debian installatie bestand terechtkomt
+packageOptions += Package.ManifestAttributes(java.util.jar.Attributes.Name.IMPLEMENTATION_VERSION.toString -> (version in ThisBuild).value)

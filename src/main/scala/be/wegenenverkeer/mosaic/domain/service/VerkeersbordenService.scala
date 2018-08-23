@@ -14,7 +14,12 @@ import play.api.libs.json.Json
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class VerkeersbordenService(cacheManager: CacheManager, configuration: Configuration) extends Logging {
+trait VerkeersbordenService {
+  def getFeedPage(page: String)(implicit context: ExecutionContext): Future[String]
+  def getFeedPageCached(page: String)(implicit context: ExecutionContext): Future[String]
+}
+
+class VerkeersbordenServiceImpl(cacheManager: CacheManager, configuration: Configuration) extends VerkeersbordenService with Logging {
 
   val baseUrl: String =
     configuration.getOptional[String]("verkeersborden.url").getOrElse(sys.error("Heb een waarde nodig voor verkeersborden.url"))

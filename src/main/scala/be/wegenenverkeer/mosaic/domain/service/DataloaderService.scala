@@ -12,7 +12,13 @@ import play.api.Configuration
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DataloaderService(cacheManager: CacheManager, configuration: Configuration) extends Logging {
+trait DataloaderService {
+  def getVerkeersbordenFeedPosition(feedUrl: String)(implicit context: ExecutionContext): Future[FeedPosition]
+  def getDataloaderFeedPageCached(feedUrl: String)(implicit context: ExecutionContext): Future[FeedPosition]
+  def getVerkeersbordenJobStatus()(implicit context: ExecutionContext): Future[Option[JobStatus]]
+}
+
+class DataloaderServiceImpl(cacheManager: CacheManager, configuration: Configuration) extends DataloaderService with Logging {
 
   private val baseUrl = configuration.getOptional[String]("dataloader.url").getOrElse(sys.error("Heb een waarde nodig voor dataloader.url"))
 

@@ -155,7 +155,7 @@ class S3EnvelopeStorage(s3Bucket: S3Bucket, awsCredentialsProvider: AWSCredentia
         listFileKeys(limit, uitgezonderd).map(seq => Source.fromIterator(() => seq.iterator))
       }
       .mapAsync(4)(downloadEnvelopeFile)
-      .map {
+      .collect {
         case Success(envelopeFile) => envelopeFile
       }
       .runFold(List[EnvelopeFile]()) { (acc, envelopeFile) =>

@@ -18,13 +18,13 @@ trait HappyModule extends be.wegenenverkeer.appstatus.support.HappyModule {
 
   def application: Application
 
-  def db: DatabaseDef
-
   def actorSystem: ActorSystem
 
-  def dataloaderService: DataloaderService
+  def dbOpt: Option[DatabaseDef]
 
-  def verkeersbordenService: VerkeersbordenService
+  def dataloaderServiceOpt: Option[DataloaderService]
+
+  def verkeersbordenServiceOpt: Option[VerkeersbordenService]
 
   def envelopeStorage: EnvelopeStorage
 

@@ -38,9 +38,9 @@ abstract class AbstractTest
     val db: DatabaseDef = Database.forConfig("slick.dbs.testdbsetup").asInstanceOf[JdbcBackend.DatabaseDef]
 
     dropCreatePublicSchema(db)
-    createDomainTables(db)
-    createFeedTables(db)
-    createAkkaTables(db)
+//    createDomainTables(db)
+//    createFeedTables(db)
+//    createAkkaTables(db)
     db.close()
 
   }
@@ -178,9 +178,7 @@ abstract class AbstractTest
   class TestComponents
     extends BuiltInComponentsFromContext(ApplicationLoader.createContext(Environment.simple()))
       with AppModule
-      with AtomFeedModule
-      with SlickComponents
-      with AppAkkaModule {
+      with SlickComponents {
 
     def router: Router = Router.empty
 

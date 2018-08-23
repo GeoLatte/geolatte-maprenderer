@@ -11,7 +11,6 @@ import be.wegenenverkeer.mosaic.util.Logging
 import be.wegenenverkeer.slick3.DbRunner
 import com.fasterxml.jackson.databind.JsonNode
 import com.softwaremill.macwire._
-import io.funcqrs.akka.backend.AkkaBackend
 import play.api.Configuration
 
 import scala.concurrent.ExecutionContext
@@ -22,8 +21,6 @@ trait AppAtomium {
   def configuration: Configuration
 
   def actorSystem: ActorSystem
-
-  def backend: AkkaBackend
 
   def dbRunner: DbRunner
 
