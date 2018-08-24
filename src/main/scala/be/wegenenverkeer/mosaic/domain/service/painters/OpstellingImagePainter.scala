@@ -1,14 +1,16 @@
 package be.wegenenverkeer.mosaic.domain.service.painters
 
-import java.awt.BasicStroke
+import java.awt.image.BufferedImage
+import java.awt.{BasicStroke, Graphics2D}
 
 import be.wegenenverkeer.mosaic.domain.model._
 import be.wegenenverkeer.mosaic.util.Base64Conversion
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.math.Vector2D
-import org.geolatte.geom.{ C2D, JTSGeometryOperations, Point }
-import org.geolatte.maprenderer.map.{ MapGraphics, Painter, PlanarFeature }
+import org.geolatte.geom.{C2D, JTSGeometryOperations, Point}
+import org.geolatte.maprenderer.map.{MapGraphics, Painter, PlanarFeature}
 import org.geolatte.maprenderer.painters.EmbeddedImagePainter
+import org.geolatte.maprenderer.painters.EmbeddedImagePainter.ImageExtractor
 import org.geolatte.maprenderer.util.ImageUtils
 import org.slf4j.LoggerFactory
 
@@ -38,7 +40,11 @@ class OpstellingImagePainter(graphics: MapGraphics) extends Painter with Base64C
 
   private val logger = LoggerFactory.getLogger(classOf[OpstellingImagePainter])
 
+  import OpstellingImagePainter._
+
   def MAX_AFSTAND_ANKERPUNT = 100.0 // maximum afstand tussen opstelling en ankerpunt. Aanzicht wordt dichter gebracht indien groter.
+
+  val REFERENTIE_UPP = 0.125 // de mapUnitsPerPixel die als referentie dient om ankerpunten korter bij te zetten en images te verkleinen
 
   override def willPaint(): Boolean = {
     graphics.getMapUnitsPerPixel <= 2.0
@@ -51,8 +57,8 @@ class OpstellingImagePainter(graphics: MapGraphics) extends Painter with Base64C
         val opstellingPF = PlanarFeature.from(new OpstellingFeature(opstelling))
 
         graphics.getMapUnitsPerPixel match {
-          case res if res <= 0.125 => renderOpstellingMetAanzichten(opstellingPF, opstelling, klein = false)
-          case res if res <= 0.25  => renderOpstellingMetAanzichten(opstellingPF, opstelling, klein = true)
+          case res if res <= 0.125 => renderOpstellingMetAanzichten(opstellingPF, opstelling, res, klein = false)
+          case res if res <= 0.25  => renderOpstellingMetAanzichten(opstellingPF, opstelling, res, klein = true)
           case res if res <= 0.5   => renderOpstellingMetHoek(opstellingPF, opstelling)
           case res                 => renderOpstellingAlsPunt(opstellingPF)
         }
@@ -67,9 +73,12 @@ class OpstellingImagePainter(graphics: MapGraphics) extends Painter with Base64C
     painter.paint(planarFeature)
   }
 
-  private def renderOpstellingMetAanzichten(planarFeature: PlanarFeature, opstelling: Opstelling, klein: Boolean): Unit = {
+  private def renderOpstellingMetAanzichten(planarFeature: PlanarFeature,
+                                            opstelling: Opstelling,
+                                            mapUnitsPerPixel: Double,
+                                            klein: Boolean): Unit = {
     renderOpstellingMetHoek(planarFeature, opstelling)
-    opstelling.aanzichten.foreach(renderAanzicht(_, opstelling, klein))
+    opstelling.aanzichten.foreach(renderAanzicht(_, opstelling, mapUnitsPerPixel, klein))
   }
 
   private def renderOpstellingMetHoek(planarFeature: PlanarFeature, opstelling: Opstelling): Unit = {
@@ -79,31 +88,109 @@ class OpstellingImagePainter(graphics: MapGraphics) extends Painter with Base64C
     }
   }
 
-  private def renderAanzicht(aanzicht: Aanzicht, opstelling: Opstelling, klein: Boolean): Unit = {
+  private def renderAanzicht(aanzicht: Aanzicht, opstelling: Opstelling, mapUnitsPerPixel: Double, klein: Boolean): Unit = {
+
+    def imagesExtractor: ImageExtractor = { feature =>
+      val imageData =
+        if (klein) {
+          aanzicht.binaireData.platgeslagenvoorstellingklein
+        } else {
+          aanzicht.binaireData.platgeslagenvoorstelling
+        }
+
+      ImageUtils
+        .readImageFromBase64String(imageData.data)
+        .map(image => verkleinTeGroteImage(image, mapUnitsPerPixel))
+    }
+
     val painter = new EmbeddedImagePainter(
       graphics,
-      feature =>
-        ImageUtils.readImageFromBase64String(
-          if (klein) aanzicht.binaireData.platgeslagenvoorstellingklein.data else aanzicht.binaireData.platgeslagenvoorstelling.data
-      ),
-      feature => verzekerMaxAfstandAnkerpunt(opstelling.locatie.asGeolattePoint(), aanzicht.anker.asGeolattePoint()),
+      imagesExtractor,
+      feature => verzekerMaxAfstandAnkerpunt(opstelling.locatie.asGeolattePoint(), aanzicht.anker.asGeolattePoint(), mapUnitsPerPixel),
       feature => aanzicht.hoek * -1,
       new BasicStroke(Math.round(2 / graphics.getMapUnitsPerPixel))
     )
     painter.paint(PlanarFeature.from(new AanzichtFeature(opstelling, aanzicht)))
   }
 
-  private def verzekerMaxAfstandAnkerpunt(opstelling: Point[C2D], ankerpunt: Point[C2D]): Point[C2D] = {
+  private def verkleinTeGroteImage(image: BufferedImage, mapUnitsPerPixel: Double): BufferedImage = {
 
-    if (new JTSGeometryOperations().distance(opstelling, ankerpunt) > MAX_AFSTAND_ANKERPUNT) {
+    def mapUnitsToPixels(mapUnits: Double, upp: Double): Int = {
+      Math.round(mapUnits / upp).toInt
+    }
+
+    val maxPixels =
+      if (mapUnitsPerPixel >= REFERENTIE_UPP) {
+        // maxBordImageGrootteInMeter geldt voor zoomniveau met UPP >= 0.125 (verder uitgezoomd)
+        mapUnitsToPixels(maxBordImageGrootteInMeter, mapUnitsPerPixel)
+      } else {
+        // voor diepere zoomniveau's behouden we het aantal pixels dat maxBordImageGrootteInMeter is bij 0.125
+        mapUnitsToPixels(maxBordImageGrootteInMeter, REFERENTIE_UPP)
+      }
+
+    val origineleBreedte = image.getWidth
+    val origineleHoogte  = image.getHeight
+
+    if (origineleBreedte > 0 && origineleHoogte > 0 && (origineleBreedte > maxPixels || origineleHoogte > maxPixels)) {
+      val breedte = Math.min(origineleBreedte, maxPixels)
+      val hoogte  = Math.min(origineleHoogte, maxPixels)
+
+      val xSchaling = breedte / origineleBreedte.toFloat
+      val ySchaling = hoogte / origineleHoogte.toFloat
+
+      // kies de kleinste schaling en gebruik die voor x en y om de breedte-hoogte verhouding niet te wijzigen
+      val schalingBehoudVerhouding = Math.min(xSchaling, ySchaling)
+
+      val nieuweBreedteBehoudVerhouding = Math.round(schalingBehoudVerhouding * origineleBreedte)
+      val nieuweHoogteBehoudVerhouding  = Math.round(schalingBehoudVerhouding * origineleHoogte)
+
+      val raster      = image.getData.createCompatibleWritableRaster(nieuweBreedteBehoudVerhouding, nieuweHoogteBehoudVerhouding)
+      val nieuweImage = new BufferedImage(image.getColorModel, raster, image.isAlphaPremultiplied, null)
+
+      val graphics2D = nieuweImage.getGraphics.asInstanceOf[Graphics2D]
+      graphics2D.scale(schalingBehoudVerhouding, schalingBehoudVerhouding)
+      graphics2D.drawImage(image, 0, 0, null)
+      graphics2D.dispose()
+
+      nieuweImage
+    } else {
+      image
+    }
+  }
+
+  private def verzekerMaxAfstandAnkerpunt(opstelling: Point[C2D], ankerpunt: Point[C2D], mapUnitsPerPixel: Double): Point[C2D] = {
+
+    val schaalTov125  = mapUnitsPerPixel / REFERENTIE_UPP
+
+    val zoomNiveauMaximumAfstandInMeter =
+      if (mapUnitsPerPixel < REFERENTIE_UPP) {
+        MAX_AFSTAND_ANKERPUNT * schaalTov125
+      } else {
+        MAX_AFSTAND_ANKERPUNT
+      }
+
+    val afstandInMeter = new JTSGeometryOperations().distance(opstelling, ankerpunt)
+
+    val geschaaldeAfstand =
+      if (mapUnitsPerPixel < REFERENTIE_UPP) {
+        // altijd herschalen
+        afstandInMeter * schaalTov125
+      } else {
+        // niet herschalen
+        afstandInMeter
+      }
+
+    val teGebruikenAfstand = Math.min(geschaaldeAfstand, zoomNiveauMaximumAfstandInMeter)
+
+    if (teGebruikenAfstand < afstandInMeter) {
 
       // https://stackoverflow.com/questions/2353268/java-2d-moving-a-point-p-a-certain-distance-closer-to-another-point
 
       val opstellingJts = new Coordinate(opstelling.getPosition.getX, opstelling.getPosition.getY)
       val aanzichtJts   = new Coordinate(ankerpunt.getPosition.getX, ankerpunt.getPosition.getY)
 
-      val vectorOpMaxAfstand = Vector2D.create(opstellingJts, aanzichtJts).normalize().multiply(MAX_AFSTAND_ANKERPUNT)
-      val puntOpMaxAfstand = Vector2D.create(opstellingJts).add(vectorOpMaxAfstand)
+      val vectorOpMaxAfstand = Vector2D.create(opstellingJts, aanzichtJts).normalize().multiply(teGebruikenAfstand)
+      val puntOpMaxAfstand   = Vector2D.create(opstellingJts).add(vectorOpMaxAfstand)
 
       new Point(new C2D(puntOpMaxAfstand.getX, puntOpMaxAfstand.getY), CRS.LAMBERT72)
 
@@ -112,4 +199,8 @@ class OpstellingImagePainter(graphics: MapGraphics) extends Painter with Base64C
     }
   }
 
+}
+
+object OpstellingImagePainter {
+  val maxBordImageGrootteInMeter = 50
 }
