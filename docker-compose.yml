@@ -73,6 +73,18 @@ services:
     links:
     - dataloader-db:db
 
+  geoloket-db:
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/geoloket-postgres
+    hostname: db-geoloket
+    container_name: mosaic-geoloket-db
+
+  geoloket:
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/geoloket
+    hostname: geoloket
+    container_name: mosaic-geoloket
+    links:
+    - geoloket-db:db
+
   thor-db:
     image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/thor-postgres
     hostname: thor-db

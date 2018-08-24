@@ -129,7 +129,8 @@ class HappyRegistrar(
     infoRegistry.register(new JvmInfoProvider())
 
     //GIT
-    infoRegistry.register(GitInfoProvider(HappyRegistrar.getClass))
+    // sbt-git-stamp plugin niet compatibel ..
+    // infoRegistry.register(GitInfoProvider(HappyRegistrar.getClass))
 
     //Play
     infoRegistry.registerInfoFromPlay(() => application)
