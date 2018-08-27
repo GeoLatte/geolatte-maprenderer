@@ -5,8 +5,8 @@ import java.awt.{BasicStroke, Graphics2D}
 
 import be.wegenenverkeer.mosaic.domain.model._
 import be.wegenenverkeer.mosaic.util.Base64Conversion
-import com.vividsolutions.jts.geom.Coordinate
-import com.vividsolutions.jts.math.Vector2D
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.math.Vector2D
 import org.geolatte.geom.{C2D, JTSGeometryOperations, Point}
 import org.geolatte.maprenderer.map.{MapGraphics, Painter, PlanarFeature}
 import org.geolatte.maprenderer.painters.EmbeddedImagePainter
