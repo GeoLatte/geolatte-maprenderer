@@ -5,11 +5,11 @@ import java.awt.image.RenderedImage
 import java.io.File
 
 import be.wegenenverkeer.mosaic.domain.model.VerkeersbordenFormatters._
-import be.wegenenverkeer.mosaic.domain.model.{ CRS, GeoJson }
+import be.wegenenverkeer.mosaic.domain.model.{CRS, GeoJson}
 import be.wegenenverkeer.mosaic.domain.service.painters.OpstellingImagePainter
 import be.wegenenverkeer.mosaic.test.TestSupport.assertImageEquals
 import javax.imageio.ImageIO
-import org.geolatte.geom.{ C2D, Envelope }
+import org.geolatte.geom.{C2D, Envelope}
 import org.geolatte.maprenderer.java2D.AWTMapGraphics
 import org.scalatest.FunSuite
 import play.api.libs.json._
@@ -94,6 +94,7 @@ class OpstellingImagePainterTest extends FunSuite {
           val img = generateTile(minX, minY, maxX, maxY, geoJsons, tileSize)
 
           // gebruik onderstaande code om nieuwe expected images te genereren in /tmp
+//          import java.nio.file.Files
 //          val resolutieDir = new File(s"/tmp/resolutie/$resolution")
 //          Files.createDirectories(resolutieDir.toPath)
 //          ImageIO.write(img, "PNG", new File(resolutieDir, s"tile-$minX-$minY-$maxX-$maxY-expected.png"))
