@@ -143,7 +143,7 @@ lazy val geolatteGeom = Project(
 ).settings(
   projSettings(
     Seq(
-      "com.vividsolutions" % "jts-core"  % "1.14.0",
+      "org.locationtech.jts" % "jts-core"  % "1.16.0-RC1",
       "org.slf4j"          % "slf4j-api" % "1.6.1"
     ) ++ geomTestDeps))
 

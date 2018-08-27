@@ -22,7 +22,7 @@
 package org.geolatte.maprenderer.java2D;
 
 
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
