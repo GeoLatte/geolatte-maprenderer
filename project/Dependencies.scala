@@ -121,10 +121,11 @@ object Dependencies {
 
   val mapserverTestDeps = {
     Seq(
-      "junit"                  % "junit"        % "4.12"   % Test,
-      "org.slf4j"              % "slf4j-simple" % "1.7.25" % Test,
-      "com.github.tomakehurst" % "wiremock"     % "2.18.0" % Test,
-      "org.mockito"            % "mockito-all"  % "1.8.5"  % Test
+      "junit"                  % "junit"         % "4.12"   % Test,
+      "org.slf4j"              % "slf4j-simple"  % "1.7.25" % Test,
+      "com.github.tomakehurst" % "wiremock"      % "2.18.0" % Test,
+      "org.mockito"            % "mockito-all"   % "1.8.5"  % Test,
+      "org.hamcrest"           % "hamcrest-core" % "1.3"   % Test
     )
   }
 

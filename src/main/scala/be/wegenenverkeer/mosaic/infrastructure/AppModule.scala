@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.pattern.BackoffSupervisor
 import akka.stream.Materializer
 import be.wegenenverkeer.mosaic.api.AppPoAuth
-import be.wegenenverkeer.mosaic.domain.service.geowebcache.{GWCInvalidatorActor, GeowebcacheService}
+import be.wegenenverkeer.mosaic.domain.service.geowebcache.{GWCInvalidatorActor, GWCSeedActor, GeowebcacheService}
 import be.wegenenverkeer.mosaic.domain.service.storage.{EnvelopeStorage, MultipleWritersEnvelopeStorage, S3Bucket, S3EnvelopeStorage}
 import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.softwaremill.macwire._
@@ -67,6 +67,9 @@ trait AppModule {
 
     actorSystem.actorOf(gwcInvalidatorActorSupervisorProps, "gwcInvalidatorActorSupervisor").taggedWith[GWCInvalidatorActor]
   }
+
+  val gwcSeedActor: ActorRef @@ GWCSeedActor =
+    actorSystem.actorOf(GWCSeedActor.props(geowebcacheService), "GWCSeedActor").taggedWith[GWCSeedActor]
 }
 
 
