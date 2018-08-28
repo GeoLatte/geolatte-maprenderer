@@ -42,7 +42,7 @@ class OpstellingImagePainter(graphics: MapGraphics) extends Painter with Base64C
 
   import OpstellingImagePainter._
 
-  def MAX_AFSTAND_ANKERPUNT = 100.0 // maximum afstand tussen opstelling en ankerpunt. Aanzicht wordt dichter gebracht indien groter.
+  def MAX_AFSTAND_ANKERPUNT = 75.0 // maximum afstand tussen opstelling en ankerpunt. Aanzicht wordt dichter gebracht indien groter.
 
   val REFERENTIE_UPP = 0.125 // de mapUnitsPerPixel die als referentie dient om ankerpunten korter bij te zetten en images te verkleinen
 
