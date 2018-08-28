@@ -15,7 +15,7 @@ import be.wegenenverkeer.appstatus.status.components.JdbcComponent
 import be.wegenenverkeer.appstatus.status.{Component, ComponentInfo, ComponentRegistry, ComponentValue}
 import be.wegenenverkeer.appstatus.support.PlaySupport._
 import be.wegenenverkeer.mosaic.BuildInfo
-import be.wegenenverkeer.mosaic.domain.service.geowebcache.GWCInvalidatorActor
+import be.wegenenverkeer.mosaic.domain.service.geowebcache.{GWCInvalidatorActor, GWCSeedActor}
 import be.wegenenverkeer.mosaic.domain.service.geowebcache.GWCInvalidatorActor.InvalidatorActorStatus
 import be.wegenenverkeer.mosaic.domain.service.storage.EnvelopeStorage
 import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, VerkeersbordenService}
@@ -37,7 +37,8 @@ class HappyRegistrar(
     dataloaderServiceOpt: Option[DataloaderService],
     verkeersbordenServiceOpt: Option[VerkeersbordenService],
     envelopeStorage: EnvelopeStorage,
-    gwcInvalidatorActorSupervisor: ActorRef @@ GWCInvalidatorActor
+    gwcInvalidatorActorSupervisor: ActorRef @@ GWCInvalidatorActor,
+    gwcSeedActor: ActorRef @@ GWCSeedActor
 ) {
 
   val timeout: FiniteDuration   = 5.seconds
@@ -84,7 +85,7 @@ class HappyRegistrar(
             verkeersbordenService.getFeedPage("").map { body =>
               status.ComponentValue(
                 status = OkStatus,
-                value  = body.take(100) + Some("...").filter(_ => body.length > 100).getOrElse("")
+                value  = body.take(1000) + Some("...").filter(_ => body.length > 1000).getOrElse("")
               )
             }
           }
@@ -115,6 +116,21 @@ class HappyRegistrar(
             status.ComponentValue(
               status = if (actorStatus.okStatus) { OkStatus } else { WarningStatus("") },
               value  = Json.prettyPrint(Json.toJson(actorStatus)(Json.format[InvalidatorActorStatus]))
+            )
+          }
+        }
+      }
+    )
+
+    componentRegistry.register(
+      ComponentInfo("GWCSeedActor", "GWCSeedActor status", ""),
+      new Component {
+        override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
+          gwcSeedActor.ask(GWCSeedActor.GetStatus).map { s =>
+            val actorStatus: GWCSeedActor.Status = s.asInstanceOf[GWCSeedActor.Status]
+            status.ComponentValue(
+              status = if (actorStatus.okStatus) { OkStatus } else { WarningStatus(actorStatus.error.getOrElse("")) },
+              value  = Json.prettyPrint(Json.toJson(actorStatus)(Json.format[GWCSeedActor.Status]))
             )
           }
         }
@@ -158,6 +174,9 @@ class HappyRegistrar(
     registerConfig("aws.s3.files.bucket.name")
     registerConfig("aws.s3.files.bucket.object-prefix.reader")
     registerConfig("aws.s3.files.bucket.object-prefix.writers")
+    registerConfig("geowebcache.seed.zoomstart")
+    registerConfig("geowebcache.seed.zoomstop")
+    registerConfig("geowebcache.seed.threads")
 
   }
 

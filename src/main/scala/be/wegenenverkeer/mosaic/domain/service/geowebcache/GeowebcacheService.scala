@@ -3,7 +3,7 @@ package be.wegenenverkeer.mosaic.domain.service.geowebcache
 import java.net.URL
 
 import be.wegenenverkeer.api.geowebcache.GeowebcacheApi
-import be.wegenenverkeer.api.geowebcache.Type._
+import be.wegenenverkeer.api.geowebcache.Type
 import be.wegenenverkeer.api.geowebcache.dsl.scalaplay.client.ClientConfig
 import be.wegenenverkeer.mosaic.domain.service.painters.OpstellingImagePainter.maxBordImageGrootteInMeter
 import be.wegenenverkeer.mosaic.util.{Base64Conversion, Logging}
@@ -23,6 +23,12 @@ class GeowebcacheService(configuration: Configuration) extends Logging with Base
     configuration.getOptional[String]("geowebcache.password").getOrElse(sys.error("Heb een waarde nodig voor geowebcache.password"))
   private val layer =
     configuration.getOptional[String]("geowebcache.layer").getOrElse(sys.error("Heb een waarde nodig voor geowebcache.layer"))
+  private val seedZoomStart =
+    configuration.getOptional[Int]("geowebcache.seed.zoomstart").getOrElse(sys.error("Heb een waarde nodig voor geowebcache.seed.zoomstart"))
+  private val seedZoomStop =
+    configuration.getOptional[Int]("geowebcache.seed.zoomstop").getOrElse(sys.error("Heb een waarde nodig voor geowebcache.seed.zoomstop"))
+  private val seedThreads =
+    configuration.getOptional[Int]("geowebcache.seed.threads").getOrElse(sys.error("Heb een waarde nodig voor geowebcache.seed.threads"))
 
   val geowebcacheApi = GeowebcacheApi(
     url            = new URL(baseUrl),
@@ -35,8 +41,8 @@ class GeowebcacheService(configuration: Configuration) extends Logging with Base
   val bufferVoorBordGrootteInMeter: Double = {
     val maxAfstandAnkerpuntX = maxBordImageGrootteInMeter / 2
     val maxAfstandAnkerpuntY = maxBordImageGrootteInMeter
-    val diagonaal = Math.sqrt(Math.pow(maxAfstandAnkerpuntX, 2) + Math.pow(maxAfstandAnkerpuntY, 2))
-    val extraMarge = 5
+    val diagonaal            = Math.sqrt(Math.pow(maxAfstandAnkerpuntX, 2) + Math.pow(maxAfstandAnkerpuntY, 2))
+    val extraMarge           = 5
     diagonaal + extraMarge
   }
 
@@ -45,16 +51,41 @@ class GeowebcacheService(configuration: Configuration) extends Logging with Base
     geowebcacheApi.rest.seed
       .layer(layer)
       .post(
-        `type`      = truncate,
+        `type`      = Type.truncate,
         format      = "image/png",
         gridSetId   = "AWV-gridset-Lambert72",
-        minX        = envelope.lowerLeft.getX - bufferVoorBordGrootteInMeter,
-        minY        = envelope.lowerLeft.getY - bufferVoorBordGrootteInMeter,
-        maxX        = envelope.upperRight.getX + bufferVoorBordGrootteInMeter,
-        maxY        = envelope.upperRight.getY + bufferVoorBordGrootteInMeter,
+        minX        = (envelope.lowerLeft.getX - bufferVoorBordGrootteInMeter).toString,
+        minY        = (envelope.lowerLeft.getY - bufferVoorBordGrootteInMeter).toString,
+        maxX        = (envelope.upperRight.getX + bufferVoorBordGrootteInMeter).toString,
+        maxY        = (envelope.upperRight.getY + bufferVoorBordGrootteInMeter).toString,
         zoomStart   = 0,
         zoomStop    = 15,
         threadCount = 1
+      )
+      .flatMap { response =>
+        if (response.status == 200) {
+          Future.successful(Unit)
+        } else {
+          Future.failed(new RestException(RestFailure.fromStatus(response.status, response.stringBody.getOrElse("").asErrorMessage)))
+        }
+      }
+  }
+
+  def seed()(implicit exc: ExecutionContext): Future[Unit] = {
+
+    geowebcacheApi.rest.seed
+      .layer(layer)
+      .post(
+        `type`      = Type.seed,
+        format      = "image/png",
+        gridSetId   = "AWV-gridset-Lambert72",
+        minX        = "",
+        minY        = "",
+        maxX        = "",
+        maxY        = "",
+        zoomStart   = seedZoomStart,
+        zoomStop    = seedZoomStop,
+        threadCount = seedThreads
       )
       .flatMap { response =>
         if (response.status == 200) {
