@@ -93,10 +93,33 @@ Bovendien wordt de maximum grootte van een aanzicht ook beperkt tot 50 meter.
 Dit alles zorgt ervoor dat grote aanzichten of aanzichten die ver van een opstelling staan of, lichtjes anders voorgesteld worden in 
 vergelijking met de de grafische voorstelling in de Verkeersborden of Wegendatabank applicatie.
 
-##### Metatiling in Geowebcache
+##### Geowebcache
+
+De configuratie van Geowebcache die naar Mosaic wijst kan u hier vinden: [geowebcache.xml](https://collab.mow.vlaanderen.be/gitlab/Rood/opendata-geowebcache/blob/develop/geowebcache.xml)
+
+###### Metatiling
 
 Vermits de opstelling renderer reeds meer opstellingen ophaalt om te verzekeren dat opstellingen die buiten de tile liggen maar toch 
-gedeeltelijk op de tile getekend worden, is de meta tiling van Geowebcache redundant. Deze wordt dan ook uitgeschakeld in geowebcache.xml.
+gedeeltelijk op de tile getekend worden, is de meta tiling van Geowebcache redundant. Deze wordt dan ook uitgeschakeld in [geowebcache.xml](https://collab.mow.vlaanderen.be/gitlab/Rood/opendata-geowebcache/blob/develop/geowebcache.xml).
+
+    <metaWidthHeight> <!-- default 3x3 metatiling af, mosaic doet dit al voor ons (boundingBoxFactor 3) -->
+        <int>1</int>
+        <int>1</int>
+      </metaWidthHeight>
+
+
+###### Browser cache expiration
+
+Standaard voorziet Geowebcache een browser tile cache timeout van 1 uur - de browser zal pas een nieuwe request voor dezelfde tile 
+uitvoeren reeds aanwezige opgehaalde tile in de browsercache ouder is dan 1 uur. Indien de gebruiker echter een opstelling heeft aangepast, zal de nieuwe
+voorstelling pas verschijnen na 1 uur. Om deze delay te voorkomen werd geopteerd om op de diepere zoomniveau's waar de aanzichten zichtbaar 
+zijn, de browser expiration te verkleinen naar 10 minuten.
+
+      <expireClientsList>
+        <expirationRule minZoom="0" expiration="14400" /> <!-- browser expiration voor opstelling en aanzicht punten op 4 uur -->
+        <expirationRule minZoom="12" expiration="600" />  <!-- browser expiration voor borden op 10 minuten -->
+      </expireClientsList>
+
 
 ### Git subtrees
 
