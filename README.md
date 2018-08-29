@@ -16,14 +16,18 @@ De taken van Mosaic:
 
 #### Feed uitlezen
 
-Om de te invalideren gebieden te bepalen leest Mosaic de verkeersborden feed uit van de Verkeersborden applicatie. We willen echter 
-verhinderen dat er gebieden geinvalideerd worden waarvan de data nog niet in Featureserver is geupdatete door Dataloader. Om dit te 
-verhinderen wordt de syncstatus van Dataloader uitgelezen. Indien de Dataloader de entry in de feed nog niet verwerkt heeft (pagina van
+Om de te invalideren gebieden te bepalen leest Mosaic de [verkeersborden feed](https://apps.mow.vlaanderen.be/verkeersborden/rest/events/zi/verkeersborden/feed) uit van de Verkeersborden applicatie.
+
+
+We willen echter verhinderen dat er gebieden geinvalideerd worden waarvan de data nog niet in Featureserver is geupdatete door Dataloader. Om dit te 
+verhinderen wordt de [syncstatus van Dataloader](https://apps.mow.vlaanderen.be/dataloader/syncstatus/verkeersborden) uitgelezen . 
+
+Indien de Dataloader de entry in de feed nog niet verwerkt heeft (pagina van
 syncstatus is lager dan de feedpointer van Mosaic of de laatste verwerkte entry van Dataloader staat lager op de feed pagina dan die
 van Mosaic), zullen we wachten om de te invalideren envelope weg te schrijven.
 
 De envelopes in de feed van Verkeersborden bevat de bounding box van de opstelling locatie en al zijn aanzicht ankerpunten. De feed van 
-Verkeersborden werd uitgebreid om zowel de vroegere boundind box van de opstelling te bevatten als de vernieuwde bounding box (dit kan 
+Verkeersborden werd uitgebreid om zowel de vroegere bounding box van de opstelling als de vernieuwde bounding box te bevatten (dit kan 
 bij bvb een verplaatsing van de opstelling of van 1 van zijn ankerpunten). 
 
 
@@ -33,13 +37,17 @@ De geowebcache instantie die voor Mosaic zal draaien dient ook als opendata URL 
 Featureserver ook in het PUB segment dienen te draaien. De PUB omgeving kan echter niet aan de PROD omgeving. Mosaic-PUB dient echter
 te weten wanneer een bepaald gebied verouderde tiles bevat van opstellingen die recent aangepast worden. 
 
-Om dit te voorzien werd er gekozen om via een S3 bucket te communiceren. Om de werking van beide versies van Mosaic zo gelijkmogelijk te houden zal Mosaic-PROD ook uit een bucket
-lezen om zijn cache te invalideren. Mosaic-PROD schrijft dus alle te invalideren envelopes weg naar 2 buckets. Een 'prod' bucket en een 'pub'
-bucket. Mosaic-PROD leest alle te invalideren envelopes uit de 'prod' bucket. Na invalidatie wordt de envelope file verwijderd. Mosaic-PUB
-leest alle te invalideren envelopes uit de 'pub' bucket. Mosaic-PUB schrijft uiteraard zelf geen envelopes weg. De configuraties van beide
+Om dit te voorzien werd er gekozen om via een S3 bucket te communiceren. Om de werking van beide versies van Mosaic zo gelijkmogelijk te 
+houden zal Mosaic-PROD ook uit een bucket lezen om zijn cache te invalideren. 
+
+Mosaic-PROD schrijft dus alle te invalideren envelopes weg naar 2 buckets. 
+Een 'prod' bucket en een 'pub' bucket. Mosaic-PROD leest alle te invalideren envelopes uit de 'prod' bucket. Na invalidatie wordt de envelope file verwijderd. 
+
+Mosaic-PUB leest alle te invalideren envelopes uit de 'pub' bucket. Mosaic-PUB schrijft uiteraard zelf geen envelopes weg. De configuraties van beide
 omgevingen:
 
-  ##### Configuratie van PROD
+##### Configuratie van PROD
+  
     mosaic:
       s3:
         bucket: 'awv-mosaic-envelopes'
@@ -47,7 +55,8 @@ omgevingen:
           reader: 'prod'
           writers: 'prod,pub'
 
-  ##### Configuratie van PUB
+##### Configuratie van PUB
+  
     mosaic:
       s3:
         bucket: 'awv-mosaic-envelopes'
