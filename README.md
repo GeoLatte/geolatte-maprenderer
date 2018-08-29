@@ -20,7 +20,7 @@ Om de te invalideren gebieden te bepalen leest Mosaic de [verkeersborden feed](h
 
 
 We willen echter verhinderen dat er gebieden geinvalideerd worden waarvan de data nog niet in Featureserver is geupdatete door Dataloader. Om dit te 
-verhinderen wordt de [syncstatus van Dataloader](https://apps.mow.vlaanderen.be/dataloader/syncstatus/verkeersborden) uitgelezen . 
+verhinderen wordt de [syncstatus van Dataloader](https://apps.mow.vlaanderen.be/dataloader/syncstatus) uitgelezen . 
 
 Indien de Dataloader de entry in de feed nog niet verwerkt heeft (pagina van
 syncstatus is lager dan de feedpointer van Mosaic of de laatste verwerkte entry van Dataloader staat lager op de feed pagina dan die
