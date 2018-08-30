@@ -121,6 +121,15 @@ zijn, de browser expiration te verkleinen naar 10 minuten.
       </expireClientsList>
 
 
+###### Reseeding 's nachts
+
+Seeding van de geinvalideerde (=verwijderde) tiles wordt elke avond gestart na 20u indien de laatste reseed langer dan 18 uur geleden is. Enkel zoomniveau's
+tem zoomniveau 12 wordt geseed. Dwz tem het eerste zoomniveau waar de aanzichten zichtbaar zijn. Dit is in te stellen via de main.conf 
+configuratie file:
+
+      geowebcache.seed.zoomstart = 0
+      geowebcache.seed.zoomstop = 12
+
 ### Git subtrees
 
 De verkeersbordrendering en WMS stack maakt gebruik van de geolatte-maprenderer en -mapserver. Deze werden als
