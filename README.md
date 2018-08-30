@@ -86,9 +86,9 @@ De configuratie van die factor is terug te vinden in mapserver.conf.
       }
 
 Om te verhinderen dat de op te halen opstellingen een te grote bounding box vereisen, werd er geopteerd om de opstelling rendering voor
-de grootste opstellingen aan te passen. Zo wordt de afstand van ankerpunt naar opstelling beperkt tot 75 meter op het eerste zoomniveau
-waar de aanzichten zichtbaar zijn. Voor alle volgende zoomniveau's wordt de grafische lengte van de verbindingslijn gelijk gehouden.
-Bovendien wordt de maximum grootte van een aanzicht ook beperkt tot 50 meter. 
+de grootste opstellingen aan te passen. Zo wordt in de opstelling painter de afstand van het ankerpunt naar opstelling beperkt tot 75 meter 
+op het eerste zoomniveau waar de aanzichten zichtbaar zijn (dit gebeurt enkel in de painter, de opstelling data zelf werd niet aangepast). 
+Voor alle volgende zoomniveau's wordt de grafische lengte van de verbindingslijn gelijk gehouden. Bovendien wordt de maximum grootte van een aanzicht ook beperkt tot 50 meter. 
 
 Dit alles zorgt ervoor dat grote aanzichten of aanzichten die ver van een opstelling staan of, lichtjes anders voorgesteld worden in 
 vergelijking met de de grafische voorstelling in de Verkeersborden of Wegendatabank applicatie.
