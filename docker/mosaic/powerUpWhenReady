@@ -1,0 +1,7 @@
+#!/bin/bash
+
+until pg_isready -h db; do
+  echo "return code = $?"
+done
+
+/usr/bin/mosaic

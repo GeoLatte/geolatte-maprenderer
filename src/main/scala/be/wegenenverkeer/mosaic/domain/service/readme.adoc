@@ -1,0 +1,2 @@
+Het domain model wordt geholpen door de domain services die het deel van de business logica bevatten die niet rechtstreeks door
+een aggregate op zich afgehandeld kan worden.

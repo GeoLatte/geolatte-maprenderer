@@ -1,0 +1,22 @@
+${{header}}
+${{loader-functions}}
+${{control-functions}}
+
+addGroup ${{daemon_group}} "${{daemon_group_gid}}"
+addUser ${{daemon_user}} "${{daemon_user_uid}}" ${{daemon_group}} "${{app_name}} user-daemon" "${{daemon_shell}}"
+
+${{chown-paths}}
+
+
+echo "Generating config file"
+if [ -f /.dockerenv  ] ; then
+  mv /usr/share/mosaic/conf/mosaic.conf.docker /usr/share/mosaic/conf/mosaic.conf
+else
+  echo "Downloading config settings"
+  # Verzeker dat enviroment variabelen ingelezen zijn
+  . /etc/environment
+  # Haal config op
+  curl -s http://apigateway/configserver/mosaic/${OMGEVING}/master/omgeving.conf -o /usr/share/mosaic/conf/omgeving.conf
+fi
+
+chown -R ${{daemon_user}}:${{daemon_group}} /usr/share/mosaic

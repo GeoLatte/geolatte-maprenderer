@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://wegenenverkeer.be/api/verkeersborden/model/beheerder.json",
+  "type": "object",
+  "description": "Beheerder van een opstelling",
+  "properties": {
+    "gebiednaam": {
+      "type": "string"
+    }
+  }
+}

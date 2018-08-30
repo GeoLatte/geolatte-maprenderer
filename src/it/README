@@ -1,0 +1,11 @@
+Integratietesten runnen:
+
+sbt it:test
+
+
+Integratietesten draaien vanuit IntelliJ
+
+Project Structure->Modules->Paths
+Verander Test output path van .../target/scala-2.11/test-classes naar .../target/scala-2.11/it-classes
+
+http://stackoverflow.com/a/26151532

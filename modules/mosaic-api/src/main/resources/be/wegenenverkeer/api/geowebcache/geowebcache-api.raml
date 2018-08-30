@@ -1,0 +1,46 @@
+#%RAML 0.8
+---
+title: Geowebcache
+version: v1
+
+/rest/seed/{layer}:
+  description: Seed een (deel van) een layer
+  post:
+    body:
+      application/x-www-form-urlencoded:
+        formParameters:
+            threadCount:
+              type: integer
+              required: true
+            type:
+              type: string
+              required: true
+              enum: ["truncate", "seed", "reseed"]
+            gridSetId:
+              type: string
+              required: true
+            format:
+              type: string
+              required: true
+            zoomStart:
+              type: integer
+              required: true
+            zoomStop:
+              type: integer
+              required: true
+            minX:
+              type: string
+              required: true
+            minY:
+              type: string
+              required: true
+            maxX:
+              type: string
+              required: true
+            maxY:
+              type: string
+              required: true
+    responses:
+      200:
+        body:
+          text/html:

@@ -1,0 +1,7 @@
+project/project/target
+project/target
+target
+.idea/
+/logs/
+modules/mosaic-ui/node_modules
+/src/main/resources/local.conf

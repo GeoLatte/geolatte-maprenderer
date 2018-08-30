@@ -1,0 +1,2 @@
+Het domain model is het hart van de business modellering. Het domain model is opgedeeld in aggregates waarbij elke
+aggregate in een subpackage van domain.model gedefinieerd wordt.

@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-03/schema",
+  "id": "http://wegenenverkeer.be/api/mosaic/model/error.json",
+  "type": "object",
+  "description": "Een id.",
+  "properties": {
+    "message": {
+      "required": true,
+      "type": "string"
+    }
+  }
+}

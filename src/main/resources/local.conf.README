@@ -1,0 +1,28 @@
+#Wil je lokale specifieke vars zoals hieronder, kopieer dan deze file naar local.conf
+
+# de url waartegen de poauth library zich moet authenticeren
+# voor it tests is deze hetzelfde als de app zelf, tijdens normale dev verwachten wij dat je tegen "echte" lokale po draait
+po.url = "http://apigateway/po"
+
+#enable de FakeAcmFilter om een void op de request headers te zetten
+#tijdens lokale dev hebben we calls rechtstreeks van browser naar gdb, zonder acm tussen
+poauth.dangerous.fakeacmuser.void = "localadmin"
+poauth.dangerous.fakeacmuser.enabled = true
+
+poauth.dangerous.mockProvider.enabled=false
+
+play.evolutions.enabled=true
+play.evolutions.db.default.autoApply=true
+play.evolutions.db.default.autoApplyDowns=true
+
+# gebruik deze config om via management tunnel naar de featureserver te gaan
+geolatte-mapserver {
+  layers.verkeersborden.source.host = "http://apigateway.dev.awv.internal:5100/geolatte-nosqlfs/api/databases/featureserver/verkeersborden/"
+}
+
+dataloader.url = "http://apigateway.dev.awv.internal:5100/dataloader"
+verkeersborden.url = "http://apigateway.dev.awv.internal:5100/verkeersborden"
+geowebcache.url = "http://apigateway.dev.awv.internal:5100/opendata-geowebcache"
+
+aws.s3.files.bucket.object-prefix.reader = "mosaic-it"
+aws.s3.files.bucket.object-prefix.writers = "mosaic-it"
