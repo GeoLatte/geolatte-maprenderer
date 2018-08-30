@@ -1,11 +1,11 @@
-# job
+# syncstatus
 
-/{jobNaam}:
-  description: Vraag job status op
+/:
+  description: Vraag de syncstatus op
   get:
     is: [acceptjson]
     responses:
       200:
         body:
           application/json:
-            schema: jobStatus
+            schema: syncStatusResponse

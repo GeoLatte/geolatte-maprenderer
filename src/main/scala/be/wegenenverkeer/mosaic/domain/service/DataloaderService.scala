@@ -3,7 +3,7 @@ package be.wegenenverkeer.mosaic.domain.service
 import java.net.URL
 
 import be.wegenenverkeer.api.dataloader.dsl.scalaplay.client.ClientConfig
-import be.wegenenverkeer.api.dataloader.model.{ConfiguredStatus, JobStatus, SyncStatus}
+import be.wegenenverkeer.api.dataloader.model.SyncStatus
 import be.wegenenverkeer.atomium.extension.feedconsumer.FeedPosition
 import be.wegenenverkeer.mosaic.util.Logging
 import be.wegenenverkeer.restfailure.{RestException, RestFailure, _}
@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait DataloaderService {
   def getVerkeersbordenFeedPosition(feedUrl: String)(implicit context: ExecutionContext): Future[FeedPosition]
   def getDataloaderFeedPageCached(feedUrl: String)(implicit context: ExecutionContext): Future[FeedPosition]
-  def getVerkeersbordenJobStatus()(implicit context: ExecutionContext): Future[Option[JobStatus]]
+  def getVerkeersbordenSyncStatus()(implicit context: ExecutionContext): Future[Option[SyncStatus]]
 }
 
 class DataloaderServiceImpl(cacheManager: CacheManager, configuration: Configuration) extends DataloaderService with Logging {
@@ -41,29 +41,24 @@ class DataloaderServiceImpl(cacheManager: CacheManager, configuration: Configura
     }
   }
 
-  def getVerkeersbordenJobStatus()(implicit context: ExecutionContext): Future[Option[JobStatus]] = {
-    dataloaderApi.job.jobNaam("verkeersborden").get().map {
-      case response if response.status == 200 => Some(response.body.get)
+  def getVerkeersbordenSyncStatus()(implicit context: ExecutionContext): Future[Option[SyncStatus]] = {
+    dataloaderApi.syncstatus.get().map {
+      case response if response.status == 200 => response.body.get.find(_.jobNaam == "verkeersborden")
       case response if response.status == 404 => None
       case response                           => throw new RestException(RestFailure.fromStatus(response.status, response.stringBody.getOrElse("").asErrorMessage))
     }
   }
 
   def getVerkeersbordenFeedPosition(feedUrl: String)(implicit context: ExecutionContext): Future[FeedPosition] = {
-    getVerkeersbordenJobStatus.map { jobStatus =>
-      jobStatus
-        .collect {
-          case ConfiguredStatus(feedReaders, naam, _, _) =>
-            feedReaders.headOption
-              .flatMap(_.lastSuccess)
-              .collect {
-                case SyncStatus(url, Some(entryId)) =>
-                  val fixedUrl = url.split(feedUrl).last
-                  FeedPosition(naam, fixedUrl, entryId)
-              }
-              .getOrElse(throw new Exception(s"Kon feedposition niet vinden in $jobStatus"))
+    getVerkeersbordenSyncStatus.map { syncStatusOpt =>
+      syncStatusOpt
+        .map { syncStatus =>
+          val fixedUrl = syncStatus.feedUrl.split(feedUrl).lastOption.getOrElse(throw new Exception(s"Page niet gevonden in $syncStatus"))
+          val entryId  = syncStatus.entryId.getOrElse(throw new Exception(s"Kon entryId niet vinden in $syncStatus"))
+
+          FeedPosition(syncStatus.jobNaam, fixedUrl, entryId)
         }
-        .getOrElse(throw new Exception(s"Kon feedposition niet vinden in $jobStatus"))
+        .getOrElse(throw new Exception(s"Kon feedposition niet vinden in $syncStatusOpt"))
     }
   }
 

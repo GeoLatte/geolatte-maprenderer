@@ -5,11 +5,10 @@ version: v1
 
 schemas:
   - syncStatus:                        !include model/syncStatus.json
-  - feedReaderStatus:                  !include model/feedReaderStatus.json
-  - jobStatus:                         !include model/jobStatus.json
+  - syncStatusResponse:                !include model/syncStatusResponse.json
 
 traits:
   - acceptjson:                        !include traits/acceptjson.yaml
 
-/job:
-  !include job.raml
+/syncstatus:
+  !include syncstatus.raml

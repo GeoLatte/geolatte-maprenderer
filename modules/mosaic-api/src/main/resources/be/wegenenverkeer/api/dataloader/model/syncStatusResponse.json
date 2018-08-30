@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://wegenenverkeer.be/api/dataloader/model/syncStatusResponse.json",
+  "title": "Sync status response",
+  "description": "Schema voor een sync status response.",
+  "type": "array",
+  "items": {
+    "$ref": "syncStatus.json"
+  }
+}

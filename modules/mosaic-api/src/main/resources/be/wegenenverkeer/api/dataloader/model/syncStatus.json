@@ -5,7 +5,19 @@
   "title": "Sync status",
   "description": "Schema voor een sync status.",
   "properties": {
-    "url": {
+    "id": {
+      "type": "string"
+    },
+    "jobNaam": {
+      "type": "string"
+    },
+    "feedNaam": {
+      "type": "string"
+    },
+    "acceptHeader": {
+      "type": "string"
+    },
+    "feedUrl": {
       "type": "string"
     },
     "entryId": {
@@ -13,6 +25,10 @@
     }
   },
   "required": [
-    "url"
+    "jobNaam",
+    "feedNaam",
+    "acceptHeader",
+    "feedUrl",
+    "id"
   ]
 }
