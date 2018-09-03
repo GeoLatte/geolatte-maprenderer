@@ -9,7 +9,7 @@ import akka.stream.scaladsl.Source
 import be.wegenenverkeer.mosaic.util.Logging
 import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.AWSCredentialsProvider
-import com.amazonaws.event.{ProgressEvent, ProgressEventType, ProgressListener}
+import com.amazonaws.event.{ProgressEvent, ProgressEventType}
 import com.amazonaws.services.s3.model._
 import com.amazonaws.services.s3.transfer.internal.S3ProgressListener
 import com.amazonaws.services.s3.transfer.{PersistableTransfer, TransferManager, TransferManagerBuilder}
@@ -19,7 +19,7 @@ import org.geolatte.geom.{C2D, Envelope}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.util.{Failure, Random, Success, Try}
+import scala.util.{Failure, Success, Try}
 
 class S3EnvelopeStorage(s3Bucket: S3Bucket, awsCredentialsProvider: AWSCredentialsProvider)(implicit exc: ExecutionContext,
                                                                                             mat: Materializer)

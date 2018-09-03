@@ -2,3 +2,4 @@ include "main.conf"
 
 slick.dbs.default.db.url="jdbc:postgresql://db:5432/mosaic"
 
+play.application.loader = be.wegenenverkeer.mosaic.infrastructure.apploader.FileSystemAppLoader

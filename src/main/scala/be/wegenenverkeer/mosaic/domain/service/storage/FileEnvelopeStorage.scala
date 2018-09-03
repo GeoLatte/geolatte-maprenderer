@@ -1,4 +1,5 @@
 package be.wegenenverkeer.mosaic.domain.service.storage
+
 import java.io.{File, FileFilter, FileWriter}
 
 import be.wegenenverkeer.mosaic.util.Logging

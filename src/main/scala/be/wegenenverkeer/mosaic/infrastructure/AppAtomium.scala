@@ -5,7 +5,7 @@ import be.wegenenverkeer.atomium.client.ImplicitConversions._
 import be.wegenenverkeer.atomium.extension.feedconsumer._
 import be.wegenenverkeer.atomium.japi.client.{AtomiumClient, FeedEntry}
 import be.wegenenverkeer.mosaic.domain.service.atomium.VerkeersbordenChangeEventConsumer
-import be.wegenenverkeer.mosaic.domain.service.storage.EnvelopeStorage
+import be.wegenenverkeer.mosaic.domain.service.storage.EnvelopeWriter
 import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, VerkeersbordenService}
 import be.wegenenverkeer.mosaic.util.Logging
 import be.wegenenverkeer.slick3.DbRunner
@@ -43,7 +43,7 @@ trait AppAtomium {
 
   def verkeersbordenService: VerkeersbordenService
 
-  def envelopeStorage: EnvelopeStorage
+  def envelopeWriter: EnvelopeWriter
 
   lazy val verkeersbordenChangeEventConsumer: VerkeersbordenChangeEventConsumer = wire[VerkeersbordenChangeEventConsumer]
 

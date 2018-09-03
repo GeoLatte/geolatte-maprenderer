@@ -3,14 +3,14 @@ package be.wegenenverkeer.mosaic.domain.service.geowebcache
 import akka.actor.{Actor, PoisonPill, Props, Status}
 import akka.pattern.pipe
 import be.wegenenverkeer.mosaic.domain.service.geowebcache.GWCInvalidatorActor._
-import be.wegenenverkeer.mosaic.domain.service.storage.{EnvelopeFile, EnvelopeStorage}
+import be.wegenenverkeer.mosaic.domain.service.storage.{EnvelopeFile, EnvelopeReader}
 import be.wegenenverkeer.mosaic.util.Logging
 
 import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-class GWCInvalidatorActor(envelopeStorage: EnvelopeStorage, geowebcacheService: GeowebcacheService) extends Actor with Logging {
+class GWCInvalidatorActor(envelopeStorage: EnvelopeReader, geowebcacheService: GeowebcacheService) extends Actor with Logging {
 
   import context.dispatcher
 
@@ -122,23 +122,23 @@ object GWCInvalidatorActor {
   case class GeInvalideerd(fileRef: String)
   case class Verwijderd(fileRef: String)
 
-  case class GWCInvalidatorActorServices(envelopeStorage: EnvelopeStorage, geowebcacheService: GeowebcacheService)(
+  case class GWCInvalidatorActorServices(envelopeReader: EnvelopeReader, geowebcacheService: GeowebcacheService)(
       implicit exc: ExecutionContext) {
 
     def lees(limit: Int, uitgezonderd: Set[String]): Future[Gelezen] = {
-      envelopeStorage.lees(limit, uitgezonderd).map(Gelezen)
+      envelopeReader.lees(limit, uitgezonderd).map(Gelezen)
     }
 
     def invalideer(envelopeFile: EnvelopeFile): Future[GeInvalideerd] = {
-      geowebcacheService.invalidate(envelopeFile.envelope).map(_ => GeInvalideerd(envelopeFile.fileRef))
+      geowebcacheService.invalidate(envelopeFile.envelope).map(_ => GeInvalideerd(envelopeFile.ref))
     }
 
     def verwijder(fileRef: String): Future[Verwijderd] = {
-      envelopeStorage.verwijder(fileRef).map(_ => Verwijderd(fileRef))
+      envelopeReader.verwijder(fileRef).map(_ => Verwijderd(fileRef))
     }
   }
 
-  def props(envelopeStorage: EnvelopeStorage, geowebcacheService: GeowebcacheService) =
-    Props(new GWCInvalidatorActor(envelopeStorage, geowebcacheService))
+  def props(envelopeReader: EnvelopeReader, geowebcacheService: GeowebcacheService) =
+    Props(new GWCInvalidatorActor(envelopeReader, geowebcacheService))
 
 }

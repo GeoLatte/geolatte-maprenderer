@@ -14,6 +14,7 @@ import be.wegenenverkeer.playfilters.accesslog.PlayLoggingFilter
 import be.wegenenverkeer.poauth.domain.model._
 import be.wegenenverkeer.poauth.infrastructure.{MockPoProvider, PoClient}
 import be.wegenenverkeer.restfailure.errorhandler.RestExceptionAwareErorHandler
+import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.softwaremill.macwire._
 import controllers.{Assets, AssetsConfigurationProvider, AssetsMetadataProvider}
 import org.webjars.play.WebJarAssets
@@ -38,6 +39,7 @@ class AppLoader extends ApplicationLoader {
       with AppComponents
       with DbModule
       with AppDbModule
+      with AwsEnvelopeStorageModule
       with AppAtomium
       with HappyDbDepsModule
 
@@ -64,6 +66,8 @@ trait AppComponents
 {
 
   def controllerComponents: ControllerComponents
+
+  lazy val awsCredentialsProvider: AWSCredentialsProvider = new DefaultAWSCredentialsProviderChain()
 
   lazy val assetsConfiguration    = wire[AssetsConfigurationProvider].get
   lazy val assetsMetadata         = wire[AssetsMetadataProvider].get
