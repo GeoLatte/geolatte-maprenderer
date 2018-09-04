@@ -42,6 +42,7 @@ class SQSEnvelopeReader(queueUrl: String, awsCredentialsProvider: AWSCredentials
       .flatMap { message =>
         val envelopeTry = for {
           snsMessage <- parseSnsNotificationMessage(message.getBody)
+          _ = logger.info(s"Received message ${snsMessage.MessageId}")
           envelope <- parseEnvelopeString(snsMessage.Message)
         } yield envelope
 

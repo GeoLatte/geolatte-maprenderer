@@ -24,5 +24,4 @@ dataloader.url = "http://apigateway.dev.awv.internal:5100/dataloader"
 verkeersborden.url = "http://apigateway.dev.awv.internal:5100/verkeersborden"
 geowebcache.url = "http://apigateway.dev.awv.internal:5100/opendata-geowebcache"
 
-aws.sns.topic = "arn:aws:sns:eu-west-1:162510209540:mosaic-dev"
-aws.sqs.queue = "https://sqs.eu-west-1.amazonaws.com/162510209540/mosaic-dev"
+play.application.loader = be.wegenenverkeer.mosaic.infrastructure.apploader.FileSystemAppLoader
