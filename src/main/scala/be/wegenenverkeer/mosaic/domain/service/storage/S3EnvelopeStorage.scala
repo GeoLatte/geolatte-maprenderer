@@ -26,6 +26,9 @@ class S3EnvelopeStorage(s3Bucket: S3Bucket, awsCredentialsProvider: AWSCredentia
     extends EnvelopeStorage
     with Logging {
 
+  import EnvelopeReader._
+  import EnvelopeWriter._
+
   private val UTF8 = Charset.forName("UTF8")
 
   private val fileNameGen = new AtomicLong(System.currentTimeMillis())
@@ -141,7 +144,7 @@ class S3EnvelopeStorage(s3Bucket: S3Bucket, awsCredentialsProvider: AWSCredentia
     val content       = source.mkString
     source.close()
 
-    val envelope = stringToEnvelope(content)
+    val envelope = parseEnvelopeString(content)
     envelope.failed.foreach { t =>
       logger.warn(s"Fout bij het converteren van $fileKey naar envelope.", t)
     }
@@ -164,8 +167,8 @@ class S3EnvelopeStorage(s3Bucket: S3Bucket, awsCredentialsProvider: AWSCredentia
 
   }
 
-  override def verwijder(fileRef: String): Future[Unit] = Future {
-    s3Client.deleteObject(s3Bucket.bucketName, fileRef)
+  override def verwijder(envelopeFile: EnvelopeFile): Future[Unit] = Future {
+    s3Client.deleteObject(s3Bucket.bucketName, envelopeFile.verwijderRef)
   }
 
   override def aantalItemsBeschikbaar(): Future[Long] = {

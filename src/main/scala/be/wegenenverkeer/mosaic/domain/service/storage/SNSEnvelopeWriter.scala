@@ -12,6 +12,8 @@ class SNSEnvelopeWriter(topicArn: String, awsCredentialsProvider: AWSCredentials
     extends EnvelopeWriter
     with Logging {
 
+  import EnvelopeWriter._
+
   val snsClient: AmazonSNS = {
     AmazonSNSClientBuilder
       .standard()

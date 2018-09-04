@@ -9,13 +9,16 @@ import scala.util.Try
 
 trait EnvelopeStorage extends EnvelopeWriter with EnvelopeReader
 
-case class EnvelopeFile(envelope: Envelope[C2D], fileRef: String, receiptHandle: Option[String] = None) {
-  def ref: String = receiptHandle.getOrElse(fileRef)
+case class EnvelopeFile(envelope: Envelope[C2D], fileId: String, receiptHandle: Option[String] = None) {
+  def verwijderRef: String = receiptHandle.getOrElse(fileId)
 }
 
 trait EnvelopeWriter {
 
   def schrijf(envelope: Envelope[C2D]): Future[Unit]
+}
+
+object EnvelopeWriter {
 
   def envelopeToString(envelope: Envelope[C2D]): String = {
     val min = envelope.lowerLeft()
@@ -29,11 +32,15 @@ trait EnvelopeReader {
 
   def lees(limit: Int, uitgezonderd: Set[String]): Future[List[EnvelopeFile]]
 
-  def verwijder(fileRef: String): Future[Unit]
+  def verwijder(envelopeFile: EnvelopeFile): Future[Unit]
 
   def aantalItemsBeschikbaar(): Future[Long]
 
-  def stringToEnvelope(content: String): Try[Envelope[C2D]] = Try {
+}
+
+object EnvelopeReader {
+
+  def parseEnvelopeString(content: String): Try[Envelope[C2D]] = Try {
     val coords = Json.parse(content).validate[Seq[Double]].getOrElse(throw new Exception(s"Could not parse envelope $content"))
 
     val minX :: minY :: maxX :: maxY :: Nil = coords

@@ -17,8 +17,8 @@ class GWCInvalidatorActor(envelopeStorage: EnvelopeReader, geowebcacheService: G
   val service = GWCInvalidatorActorServices(envelopeStorage, geowebcacheService)
 
   val envelopesTeInvalideren: mutable.Queue[EnvelopeFile] = mutable.Queue[EnvelopeFile]()
-  val envelopesTeVerwijderen: mutable.Queue[String]       = mutable.Queue[String]()
-  val fileRefsInVerwerking: mutable.Set[String]           = mutable.Set[String]()
+  val envelopesTeVerwijderen: mutable.Queue[EnvelopeFile] = mutable.Queue[EnvelopeFile]()
+  val fileIdsInVerwerking: mutable.Set[String]           = mutable.Set[String]()
 
   // start lees 'loop'
   context.system.scheduler.scheduleOnce(0.seconds, self, LeesIndienNodig)
@@ -36,7 +36,7 @@ class GWCInvalidatorActor(envelopeStorage: EnvelopeReader, geowebcacheService: G
       sender ! InvalidatorActorStatus(
         envelopesTeInvalideren = envelopesTeInvalideren.size,
         envelopesTeVerwijderen = envelopesTeVerwijderen.size,
-        fileRefsInVerwerking   = fileRefsInVerwerking.size
+        fileRefsInVerwerking   = fileIdsInVerwerking.size
       )
 
     case LeesIndienNodig =>
@@ -53,13 +53,13 @@ class GWCInvalidatorActor(envelopeStorage: EnvelopeReader, geowebcacheService: G
       }
 
     case Lees =>
-      service.lees(limit = 100, uitgezonderd = fileRefsInVerwerking.toSet).pipeTo(self)
+      service.lees(limit = 100, uitgezonderd = fileIdsInVerwerking.toSet).pipeTo(self)
 
     case Gelezen(envelopes: List[EnvelopeFile]) =>
       if (envelopes.nonEmpty) {
         logger.debug(s"${envelopes.size} envelope file(s) gelezen")
 
-        fileRefsInVerwerking ++= envelopes.map(_.fileRef)
+        fileIdsInVerwerking ++= envelopes.map(_.fileId)
         self ! LeesIndienNodig
 
         envelopesTeInvalideren.enqueue(envelopes: _*) // deze zullen opgepikt worden door een invalideer 'loop'
@@ -77,22 +77,22 @@ class GWCInvalidatorActor(envelopeStorage: EnvelopeReader, geowebcacheService: G
         context.system.scheduler.scheduleOnce(5.seconds, self, Invalideer)
       }
 
-    case GeInvalideerd(fileRef) =>
+    case GeInvalideerd(envelopFile) =>
       self ! Invalideer // invalideer de volgende
-      envelopesTeVerwijderen.enqueue(fileRef) // deze zullen opgepikt worden door een verwijder 'loop'
+      envelopesTeVerwijderen.enqueue(envelopFile) // deze zullen opgepikt worden door een verwijder 'loop'
 
     case Verwijder =>
       if (envelopesTeVerwijderen.nonEmpty) {
-        val fileRef = envelopesTeVerwijderen.dequeue()
-        logger.debug(s"Verwijderen file uit S3: $fileRef")
-        service.verwijder(fileRef).pipeTo(self)
+        val envelopFile = envelopesTeVerwijderen.dequeue()
+        logger.debug(s"Verwijderen file: ${envelopFile.fileId}")
+        service.verwijder(envelopFile).pipeTo(self)
       } else {
         // check opnieuw binnen 5 sec
         context.system.scheduler.scheduleOnce(5.seconds, self, Verwijder)
       }
 
-    case Verwijderd(fileRef) =>
-      fileRefsInVerwerking -= fileRef
+    case Verwijderd(envelopFile) =>
+      fileIdsInVerwerking -= envelopFile.fileId
       self ! Verwijder // verwijder de volgende
 
     case Status.Failure(f) =>
@@ -119,8 +119,8 @@ object GWCInvalidatorActor {
   case object Verwijder
 
   case class Gelezen(envelopFiles: List[EnvelopeFile])
-  case class GeInvalideerd(fileRef: String)
-  case class Verwijderd(fileRef: String)
+  case class GeInvalideerd(envelopFile: EnvelopeFile)
+  case class Verwijderd(envelopFile: EnvelopeFile)
 
   case class GWCInvalidatorActorServices(envelopeReader: EnvelopeReader, geowebcacheService: GeowebcacheService)(
       implicit exc: ExecutionContext) {
@@ -130,11 +130,11 @@ object GWCInvalidatorActor {
     }
 
     def invalideer(envelopeFile: EnvelopeFile): Future[GeInvalideerd] = {
-      geowebcacheService.invalidate(envelopeFile.envelope).map(_ => GeInvalideerd(envelopeFile.ref))
+      geowebcacheService.invalidate(envelopeFile.envelope).map(_ => GeInvalideerd(envelopeFile))
     }
 
-    def verwijder(fileRef: String): Future[Verwijderd] = {
-      envelopeReader.verwijder(fileRef).map(_ => Verwijderd(fileRef))
+    def verwijder(envelopeFile: EnvelopeFile): Future[Verwijderd] = {
+      envelopeReader.verwijder(envelopeFile).map(_ => Verwijderd(envelopeFile))
     }
   }
 
