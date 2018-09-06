@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 import akka.actor.{ActorRef, ActorSystem}
 import akka.pattern.ask
 import akka.util.Timeout
-import be.wegenenverkeer.appstatus.info.providers.{GitInfoProvider, JvmInfoProvider}
+import be.wegenenverkeer.appstatus.info.providers.JvmInfoProvider
 import be.wegenenverkeer.appstatus.info.{InfoDetails, InfoRegistry}
 import be.wegenenverkeer.appstatus.rood.FeedPointersComponent
 import be.wegenenverkeer.appstatus.status
@@ -15,9 +15,9 @@ import be.wegenenverkeer.appstatus.status.components.JdbcComponent
 import be.wegenenverkeer.appstatus.status.{Component, ComponentInfo, ComponentRegistry, ComponentValue}
 import be.wegenenverkeer.appstatus.support.PlaySupport._
 import be.wegenenverkeer.mosaic.BuildInfo
-import be.wegenenverkeer.mosaic.domain.service.geowebcache.{GWCInvalidatorActor, GWCSeedActor}
 import be.wegenenverkeer.mosaic.domain.service.geowebcache.GWCInvalidatorActor.InvalidatorActorStatus
-import be.wegenenverkeer.mosaic.domain.service.storage.EnvelopeStorage
+import be.wegenenverkeer.mosaic.domain.service.geowebcache.{GWCInvalidatorActor, GWCSeedActor}
+import be.wegenenverkeer.mosaic.domain.service.storage.EnvelopeReader
 import be.wegenenverkeer.mosaic.domain.service.{DataloaderService, VerkeersbordenService}
 import com.softwaremill.tagging.@@
 import play.api.libs.json.Json
@@ -36,7 +36,7 @@ class HappyRegistrar(
     componentRegistry: ComponentRegistry,
     dataloaderServiceOpt: Option[DataloaderService],
     verkeersbordenServiceOpt: Option[VerkeersbordenService],
-    envelopeStorage: EnvelopeStorage,
+    envelopeReader: EnvelopeReader,
     gwcInvalidatorActorSupervisor: ActorRef @@ GWCInvalidatorActor,
     gwcSeedActor: ActorRef @@ GWCSeedActor
 ) {
@@ -97,7 +97,7 @@ class HappyRegistrar(
       ComponentInfo("envelopes", "Aantal envelopes te verwerken", ""),
       new Component {
         override def check(implicit excCtx: ExecutionContext): Future[ComponentValue] = {
-          envelopeStorage.aantalItemsBeschikbaar().map { aantal =>
+          envelopeReader.aantalItemsBeschikbaar().map { aantal =>
             status.ComponentValue(
               status = OkStatus,
               value  = aantal.toString
@@ -171,9 +171,8 @@ class HappyRegistrar(
     registerConfig("verkeersborden.url")
     registerConfig("geowebcache.url")
     registerConfig("geowebcache.layer")
-    registerConfig("aws.s3.files.bucket.name")
-    registerConfig("aws.s3.files.bucket.object-prefix.reader")
-    registerConfig("aws.s3.files.bucket.object-prefix.writers")
+    registerConfig("aws.sns.topic")
+    registerConfig("aws.sqs.queue")
     registerConfig("geowebcache.seed.zoomstart")
     registerConfig("geowebcache.seed.zoomstop")
     registerConfig("geowebcache.seed.threads")

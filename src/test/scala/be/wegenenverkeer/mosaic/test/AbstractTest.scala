@@ -6,9 +6,10 @@ import be.wegenenverkeer.atomium.format.Url
 import be.wegenenverkeer.mosaic.api.AppPoAuth
 import be.wegenenverkeer.mosaic.infrastructure.SlickPgProfile.api._
 import be.wegenenverkeer.mosaic.infrastructure._
-import be.wegenenverkeer.slick3.DbRunner
+import be.wegenenverkeer.mosaic.infrastructure.apploader.FileSystemEnvelopeStorageModule
 import be.wegenenverkeer.poauth.infrastructure.MockPoProvider
 import be.wegenenverkeer.restfailure.{RestException, RestFailure}
+import be.wegenenverkeer.slick3.DbRunner
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import play.api.db.slick.SlickComponents
 import play.api.mvc.EssentialFilter
@@ -178,6 +179,7 @@ abstract class AbstractTest
   class TestComponents
     extends BuiltInComponentsFromContext(ApplicationLoader.createContext(Environment.simple()))
       with AppModule
+      with FileSystemEnvelopeStorageModule
       with SlickComponents {
 
     def router: Router = Router.empty
@@ -191,6 +193,7 @@ abstract class AbstractTest
     lazy val appPoAuth: AppPoAuth = new AppPoAuth(new MockPoProvider(Map.empty))
 
     lazy val feedBaseUrl: Url = new Url("http://local.awv/gebruikersdb")
+
   }
 
   implicit class FutureHttpOps[T](val future: Future[T]) {

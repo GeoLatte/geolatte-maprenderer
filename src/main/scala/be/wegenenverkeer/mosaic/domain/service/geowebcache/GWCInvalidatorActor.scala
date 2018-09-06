@@ -3,22 +3,22 @@ package be.wegenenverkeer.mosaic.domain.service.geowebcache
 import akka.actor.{Actor, PoisonPill, Props, Status}
 import akka.pattern.pipe
 import be.wegenenverkeer.mosaic.domain.service.geowebcache.GWCInvalidatorActor._
-import be.wegenenverkeer.mosaic.domain.service.storage.{EnvelopeFile, EnvelopeStorage}
+import be.wegenenverkeer.mosaic.domain.service.storage.{EnvelopeFile, EnvelopeReader}
 import be.wegenenverkeer.mosaic.util.Logging
 
 import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-class GWCInvalidatorActor(envelopeStorage: EnvelopeStorage, geowebcacheService: GeowebcacheService) extends Actor with Logging {
+class GWCInvalidatorActor(envelopeStorage: EnvelopeReader, geowebcacheService: GeowebcacheService) extends Actor with Logging {
 
   import context.dispatcher
 
   val service = GWCInvalidatorActorServices(envelopeStorage, geowebcacheService)
 
   val envelopesTeInvalideren: mutable.Queue[EnvelopeFile] = mutable.Queue[EnvelopeFile]()
-  val envelopesTeVerwijderen: mutable.Queue[String]       = mutable.Queue[String]()
-  val fileRefsInVerwerking: mutable.Set[String]           = mutable.Set[String]()
+  val envelopesTeVerwijderen: mutable.Queue[EnvelopeFile] = mutable.Queue[EnvelopeFile]()
+  val fileIdsInVerwerking: mutable.Set[String]           = mutable.Set[String]()
 
   // start lees 'loop'
   context.system.scheduler.scheduleOnce(0.seconds, self, LeesIndienNodig)
@@ -36,7 +36,7 @@ class GWCInvalidatorActor(envelopeStorage: EnvelopeStorage, geowebcacheService: 
       sender ! InvalidatorActorStatus(
         envelopesTeInvalideren = envelopesTeInvalideren.size,
         envelopesTeVerwijderen = envelopesTeVerwijderen.size,
-        fileRefsInVerwerking   = fileRefsInVerwerking.size
+        fileRefsInVerwerking   = fileIdsInVerwerking.size
       )
 
     case LeesIndienNodig =>
@@ -53,13 +53,13 @@ class GWCInvalidatorActor(envelopeStorage: EnvelopeStorage, geowebcacheService: 
       }
 
     case Lees =>
-      service.lees(limit = 100, uitgezonderd = fileRefsInVerwerking.toSet).pipeTo(self)
+      service.lees(limit = 100, uitgezonderd = fileIdsInVerwerking.toSet).pipeTo(self)
 
     case Gelezen(envelopes: List[EnvelopeFile]) =>
       if (envelopes.nonEmpty) {
         logger.debug(s"${envelopes.size} envelope file(s) gelezen")
 
-        fileRefsInVerwerking ++= envelopes.map(_.fileRef)
+        fileIdsInVerwerking ++= envelopes.map(_.fileId)
         self ! LeesIndienNodig
 
         envelopesTeInvalideren.enqueue(envelopes: _*) // deze zullen opgepikt worden door een invalideer 'loop'
@@ -77,22 +77,22 @@ class GWCInvalidatorActor(envelopeStorage: EnvelopeStorage, geowebcacheService: 
         context.system.scheduler.scheduleOnce(5.seconds, self, Invalideer)
       }
 
-    case GeInvalideerd(fileRef) =>
+    case GeInvalideerd(envelopFile) =>
       self ! Invalideer // invalideer de volgende
-      envelopesTeVerwijderen.enqueue(fileRef) // deze zullen opgepikt worden door een verwijder 'loop'
+      envelopesTeVerwijderen.enqueue(envelopFile) // deze zullen opgepikt worden door een verwijder 'loop'
 
     case Verwijder =>
       if (envelopesTeVerwijderen.nonEmpty) {
-        val fileRef = envelopesTeVerwijderen.dequeue()
-        logger.debug(s"Verwijderen file uit S3: $fileRef")
-        service.verwijder(fileRef).pipeTo(self)
+        val envelopFile = envelopesTeVerwijderen.dequeue()
+        logger.debug(s"Verwijderen file: ${envelopFile.fileId}")
+        service.verwijder(envelopFile).pipeTo(self)
       } else {
         // check opnieuw binnen 5 sec
         context.system.scheduler.scheduleOnce(5.seconds, self, Verwijder)
       }
 
-    case Verwijderd(fileRef) =>
-      fileRefsInVerwerking -= fileRef
+    case Verwijderd(envelopFile) =>
+      fileIdsInVerwerking -= envelopFile.fileId
       self ! Verwijder // verwijder de volgende
 
     case Status.Failure(f) =>
@@ -119,26 +119,26 @@ object GWCInvalidatorActor {
   case object Verwijder
 
   case class Gelezen(envelopFiles: List[EnvelopeFile])
-  case class GeInvalideerd(fileRef: String)
-  case class Verwijderd(fileRef: String)
+  case class GeInvalideerd(envelopFile: EnvelopeFile)
+  case class Verwijderd(envelopFile: EnvelopeFile)
 
-  case class GWCInvalidatorActorServices(envelopeStorage: EnvelopeStorage, geowebcacheService: GeowebcacheService)(
+  case class GWCInvalidatorActorServices(envelopeReader: EnvelopeReader, geowebcacheService: GeowebcacheService)(
       implicit exc: ExecutionContext) {
 
     def lees(limit: Int, uitgezonderd: Set[String]): Future[Gelezen] = {
-      envelopeStorage.lees(limit, uitgezonderd).map(Gelezen)
+      envelopeReader.lees(limit, uitgezonderd).map(Gelezen)
     }
 
     def invalideer(envelopeFile: EnvelopeFile): Future[GeInvalideerd] = {
-      geowebcacheService.invalidate(envelopeFile.envelope).map(_ => GeInvalideerd(envelopeFile.fileRef))
+      geowebcacheService.invalidate(envelopeFile.envelope).map(_ => GeInvalideerd(envelopeFile))
     }
 
-    def verwijder(fileRef: String): Future[Verwijderd] = {
-      envelopeStorage.verwijder(fileRef).map(_ => Verwijderd(fileRef))
+    def verwijder(envelopeFile: EnvelopeFile): Future[Verwijderd] = {
+      envelopeReader.verwijder(envelopeFile).map(_ => Verwijderd(envelopeFile))
     }
   }
 
-  def props(envelopeStorage: EnvelopeStorage, geowebcacheService: GeowebcacheService) =
-    Props(new GWCInvalidatorActor(envelopeStorage, geowebcacheService))
+  def props(envelopeReader: EnvelopeReader, geowebcacheService: GeowebcacheService) =
+    Props(new GWCInvalidatorActor(envelopeReader, geowebcacheService))
 
 }

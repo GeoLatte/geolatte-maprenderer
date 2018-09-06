@@ -9,7 +9,7 @@ import akka.stream.scaladsl.Source
 import be.wegenenverkeer.mosaic.util.Logging
 import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.AWSCredentialsProvider
-import com.amazonaws.event.{ProgressEvent, ProgressEventType, ProgressListener}
+import com.amazonaws.event.{ProgressEvent, ProgressEventType}
 import com.amazonaws.services.s3.model._
 import com.amazonaws.services.s3.transfer.internal.S3ProgressListener
 import com.amazonaws.services.s3.transfer.{PersistableTransfer, TransferManager, TransferManagerBuilder}
@@ -19,12 +19,15 @@ import org.geolatte.geom.{C2D, Envelope}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.util.{Failure, Random, Success, Try}
+import scala.util.{Failure, Success, Try}
 
 class S3EnvelopeStorage(s3Bucket: S3Bucket, awsCredentialsProvider: AWSCredentialsProvider)(implicit exc: ExecutionContext,
                                                                                             mat: Materializer)
     extends EnvelopeStorage
     with Logging {
+
+  import EnvelopeReader._
+  import EnvelopeWriter._
 
   private val UTF8 = Charset.forName("UTF8")
 
@@ -141,7 +144,7 @@ class S3EnvelopeStorage(s3Bucket: S3Bucket, awsCredentialsProvider: AWSCredentia
     val content       = source.mkString
     source.close()
 
-    val envelope = stringToEnvelope(content)
+    val envelope = parseEnvelopeString(content)
     envelope.failed.foreach { t =>
       logger.warn(s"Fout bij het converteren van $fileKey naar envelope.", t)
     }
@@ -164,8 +167,8 @@ class S3EnvelopeStorage(s3Bucket: S3Bucket, awsCredentialsProvider: AWSCredentia
 
   }
 
-  override def verwijder(fileRef: String): Future[Unit] = Future {
-    s3Client.deleteObject(s3Bucket.bucketName, fileRef)
+  override def verwijder(envelopeFile: EnvelopeFile): Future[Unit] = Future {
+    s3Client.deleteObject(s3Bucket.bucketName, envelopeFile.verwijderRef)
   }
 
   override def aantalItemsBeschikbaar(): Future[Long] = {

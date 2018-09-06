@@ -1,4 +1,5 @@
 package be.wegenenverkeer.mosaic.domain.service.storage
+
 import java.io.{File, FileFilter, FileWriter}
 
 import be.wegenenverkeer.mosaic.util.Logging
@@ -9,6 +10,9 @@ import scala.io.Source
 import scala.util.Try
 
 class FileEnvelopeStorage()(implicit exc: ExecutionContext) extends EnvelopeStorage with Logging {
+
+  import EnvelopeReader._
+  import EnvelopeWriter._
 
   val tmpDir: File  = File.createTempFile("tmp", "tmp").getParentFile
   val baseDir: File = new File(tmpDir, "mosaic")
@@ -39,7 +43,7 @@ class FileEnvelopeStorage()(implicit exc: ExecutionContext) extends EnvelopeStor
         source.close()
         content
       }.flatMap { content =>
-        stringToEnvelope(content).map(envelope => EnvelopeFile(envelope, file.getPath))
+        parseEnvelopeString(content).map(envelope => EnvelopeFile(envelope, file.getPath))
       }
       t.failed.foreach { t =>
         logger.warn(s"Fout bij het converteren van $file naar envelope.", t)
@@ -49,8 +53,8 @@ class FileEnvelopeStorage()(implicit exc: ExecutionContext) extends EnvelopeStor
 
   }
 
-  override def verwijder(fileRef: String): Future[Unit] = Future {
-    new File(fileRef).delete()
+  override def verwijder(envelopeFile: EnvelopeFile): Future[Unit] = Future {
+    new File(envelopeFile.verwijderRef).delete()
   }
 
   override def aantalItemsBeschikbaar(): Future[Long] = Future {

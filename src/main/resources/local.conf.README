@@ -24,5 +24,4 @@ dataloader.url = "http://apigateway.dev.awv.internal:5100/dataloader"
 verkeersborden.url = "http://apigateway.dev.awv.internal:5100/verkeersborden"
 geowebcache.url = "http://apigateway.dev.awv.internal:5100/opendata-geowebcache"
 
-aws.s3.files.bucket.object-prefix.reader = "mosaic-it"
-aws.s3.files.bucket.object-prefix.writers = "mosaic-it"
+play.application.loader = be.wegenenverkeer.mosaic.infrastructure.apploader.FileSystemAppLoader

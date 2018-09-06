@@ -16,7 +16,7 @@ object Dependencies {
   val logbackVersion      = "0.2.3"
   val scalaExtVersion     = "1.0.0"
   val scalaMetricsVersion = "3.5.9"
-  val awsVersion          = "1.11.347"
+  val awsVersion          = "1.11.401"
   // ----------------------------------------------------
 
   val mosaicApiDeps = Seq(
@@ -35,9 +35,11 @@ object Dependencies {
 
   val otherDeps = {
     Seq(
-      "com.jsuereth" %% "scala-arm"       % "2.0",
-      "nl.grons"     %% "metrics-scala"   % scalaMetricsVersion,
-      "com.amazonaws" % "aws-java-sdk-s3" % awsVersion
+      "com.jsuereth" %% "scala-arm"        % "2.0",
+      "nl.grons"     %% "metrics-scala"    % scalaMetricsVersion,
+      "com.amazonaws" % "aws-java-sdk-s3"  % awsVersion,
+      "com.amazonaws" % "aws-java-sdk-sqs" % awsVersion,
+      "com.amazonaws" % "aws-java-sdk-sns" % awsVersion
     )
   }
 
