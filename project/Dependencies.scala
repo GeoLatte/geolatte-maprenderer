@@ -74,7 +74,7 @@ object Dependencies {
   // AWV Play extensions
   val awvDeps = {
 
-    val appStatusVersion = "3.0.4-SNAPSHOT"
+    val appStatusVersion = "3.0.4"
     val hateoasVersion   = "2.0.2"
 
     Seq(
@@ -150,7 +150,7 @@ object Dependencies {
       "be.wegenenverkeer"          %% "atomium-play26"                    % version,
       "be.wegenenverkeer"          %% "atomium-client-scala"              % version,
       "io.reactivex"               %% "rxscala"                           % "0.26.5",
-      "be.wegenenverkeer"          %% "atomium-extension-feed-consumer26" % "1.0.3-SNAPSHOT",
+      "be.wegenenverkeer"          %% "atomium-extension-feed-consumer26" % "1.0.4",
       "com.fasterxml.jackson.core" % "jackson-core"                       % jacksonVersion,
       "com.fasterxml.jackson.core" % "jackson-databind"                   % jacksonVersion,
       "com.fasterxml.jackson.core" % "jackson-annotations"                % jacksonVersion
