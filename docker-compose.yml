@@ -48,7 +48,7 @@ services:
     - verkeersborden-db:db
 
   geolatte-nosqlfs-db:
-    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/geolatte-nosqlfs-postgres
+    image: 162510209540.dkr.ecr.eu-west-1.amazonaws.com/rood/nosql-postgres
     hostname: geolatte-nosqlfs-db
     container_name: mosaic-geolatte-nosqlfs-db
 
