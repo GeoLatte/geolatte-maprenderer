@@ -1,9 +1,0 @@
-{
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "http://wegenenverkeer.be/api/verkeersborden/model/geojson/bbox.json",
-    "description": "A bounding box as defined by GeoJSON",
-    "type": "array",
-    "items": {
-        "type": "number"
-    }
-}

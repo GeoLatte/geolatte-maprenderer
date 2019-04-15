@@ -1,7 +1,0 @@
-displayName: error404
-responses:
-  404:
-    description: Not Found - Het request kan niet afgehandeld worden omdat de gevraagde resource niet bestaat.
-    body:
-      application/json:
-        schema: !include ../model/error.json

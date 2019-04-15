@@ -1,5 +1,0 @@
-displayName: acceptwdbjson
-headers:
-  accept:
-    displayName: Accept
-    enum: ["application/vnd.awv.wdb-v3.0+json"]

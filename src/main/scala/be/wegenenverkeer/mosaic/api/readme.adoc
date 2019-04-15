@@ -1,2 +1,0 @@
-De afhandeling van rest resources gebeurt in dit package. Dit is een dunne laag die enkel de REST-specifieke communicatie afhandeld
-en dient als een doorgeefluik naar application services of process managers in de application package.

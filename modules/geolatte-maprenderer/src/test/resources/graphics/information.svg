@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 62 62" width="620" height="620" version="1.0">
-	<circle id="shadow" r="26.5" cy="29.5" cx="32.5"  transform="matrix(1.0648, 0, 0, 1.06482, -2.1, 1.0864)"/>
-	<circle id="field" r="25.8" cx="31" cy="31"  stroke-width="2"/>
-	<g id="info" fill="white">
-		<polygon points="23,25 35,25 35,44 39,44 39,48 23,48 23,44 27,44 27,28 23,28 23,25"/>
-		<circle r="4" cx="31" cy="17"/>
-	</g>
-</svg>

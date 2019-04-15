@@ -1,7 +1,5 @@
-project/project/target
-project/target
+*.idea
+*.iml
+*.ipr
+*.iws
 target
-.idea/
-/logs/
-modules/mosaic-ui/node_modules
-/src/main/resources/local.conf

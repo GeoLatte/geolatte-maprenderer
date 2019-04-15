@@ -1,155 +1,102 @@
-# Mosaic
+# Geolatte Mapserver
 
-## Architectuur
+Geolatte Mapserver is a mapserver-as-a-library that provides support for Web Mapping Server (WMS) operations. It makes
+minimal assumptions with respect to its environment, and can be easily extended or adapted due to its modular architecture.
 
-[Link naar laatste versie architectuurdiagramma](https://drive.google.com/file/d/1KqRnKhuCO_8MxiXwb0ElCmtxnSd9_Qo1/view)
+## Getting Started
 
+TODO
 
-![Image van Architectuurdiagramma](mosaic-architectuur.png)
+## Architecture
 
-#### Algemeen
+Mapserver provides a small number of general abstractions that model how mapping requests
+are turned into map image responses. The model is based on the [OGC WMS specifications](http://www.opengeospatial.org/standards/wms) and can best be explained by describing how Mapserver responds to a request for a 
+map. 
 
-De taken van Mosaic:
-  - aanbieden van een WMS stack om opstellingen te renderen
-  - de verkeersborden feed uitlezen om de tiles die een verouderde voorstelling van de opstelling bevat te verwijderen
-  - 's nachts automatisch de gebieden reseeden die geinvalideerd werden
+ 1. The `OwsHttpService` receives an WMS Http Request. (The "Ows" in the class name refers to the 
+OGC Web services")
 
-#### Feed uitlezen
+ 2. The `OwsHttpService` uses its `ProtocolAdapter` to turn the protocol and version specific 
+ request (WMS v1.3 or WMTS 1.0) into a protocol-independent `GetMapRequest`, and create a
+ `RequestHandler` for it, which it invokes asynchronously.
+ 
+ 3. The `GetMapRequestHandler` will interpret the `GetMapRequest` and retrieve the map `Layer` 
+ specified in the request from the `LayerRegistry`. It will ask the Layer for a map using the specified
+ bounding box, styles, image dimensions  and other mapping parameters.
+ 
+ 4. the `Layer` creates the image based on these specifications. 
+ 
+ 5. The `OwsHttpService` turns this image into a `HttpResponse`.
 
-Om de te invalideren gebieden te bepalen leest Mosaic de [verkeersborden feed](https://apps.mow.vlaanderen.be/verkeersborden/rest/events/zi/verkeersborden/feed) uit van de Verkeersborden applicatie.
+## Layers
 
+Currently Mapserver supports three types of `Layer`. The first, `TileMapLayer`, is backed by a pre-rendered 
+[TileMap](https://wiki.osgeo.org/wiki/Tile_Map_Service_Specification). When handling map requests,
+the best fitting tilemap level is selected and the requested image bbox is created by mosaicing, 
+cropping and stretching the image as required.  
 
-We willen echter verhinderen dat er gebieden geinvalideerd worden waarvan de data nog niet in Featureserver is geupdatete door Dataloader. Om dit te 
-verhinderen wordt de [syncstatus van Dataloader](https://apps.mow.vlaanderen.be/dataloader/syncstatus) uitgelezen . 
+The second type is the `DynamicLayer` which will render the requested map directly using the 
+[Geolatte MapRenderer](https://github.com/GeoLatte/geolatte-maprenderer) as the rendering backend, `FeatureSource` as a
+ source of geographic objects (features), and a `Painter` that specifies how the feature should be rendered 
+ on the rendering backend. 
+ 
+ The third type, `RenderableTileMapLayer` combines the behavior of the two. It uses a `TileMap` like the first, but will 
+ generate tiles dynamically using the same resources as the `DynamicLayer`. 
 
-Indien de Dataloader de entry in de feed nog niet verwerkt heeft (pagina van
-syncstatus is lager dan de feedpointer van Mosaic of de laatste verwerkte entry van Dataloader staat lager op de feed pagina dan die
-van Mosaic), zullen we wachten om de te invalideren envelope weg te schrijven.
+### Service Provider Interfaces
 
-De envelopes in de feed van Verkeersborden bevat de bounding box van de opstelling locatie en al zijn aanzicht ankerpunten. De feed van 
-Verkeersborden werd uitgebreid om zowel de vroegere bounding box van de opstelling als de vernieuwde bounding box te bevatten (dit kan 
-bij bvb een verplaatsing van de opstelling of van 1 van zijn ankerpunten). 
+Mapserver requires a number of Services that are injected through the [SPI mechanism](https://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html).
+The package `org.geolatte.mapserver.spi` contains the Provider interfaces for required
+services. These are:
 
-
-#### PROD & PUB
-
-De geowebcache instantie die voor Mosaic zal draaien dient ook als opendata URL te ontsloten worden. Dwz dat Geowebcache, Mosaic en de 
-Featureserver ook in het PUB segment dienen te draaien. De PUB omgeving kan echter niet aan de PROD omgeving. Mosaic-PUB dient echter
-te weten wanneer een bepaald gebied verouderde tiles bevat van opstellingen die recent aangepast worden. 
-
-Om dit te voorzien werd er gekozen om via een S3 bucket te communiceren. Om de werking van beide versies van Mosaic zo gelijkmogelijk te 
-houden zal Mosaic-PROD ook uit een bucket lezen om zijn cache te invalideren. 
-
-Mosaic-PROD schrijft dus alle te invalideren envelopes weg naar 2 buckets. 
-Een 'prod' bucket en een 'pub' bucket. Mosaic-PROD leest alle te invalideren envelopes uit de 'prod' bucket. Na invalidatie wordt de envelope file verwijderd. 
-
-Mosaic-PUB leest alle te invalideren envelopes uit de 'pub' bucket. Mosaic-PUB schrijft uiteraard zelf geen envelopes weg. De configuraties van beide
-omgevingen:
-
-##### Configuratie van PROD
+  - `ImagingProvider`: to provide an implementation of the `Imaging` interface, which models a set of
+ image manipulation operations required for mapserver
+ 
+  - `PainterFactoryProvider`: to provide factories to create Maprenderer `Painter`s to be used when
+ rendering features from a `FeatureSource`. 
+ 
+  - `ProtocolAdapterProvider`: to provide adapters that can translate protocol-specific requests into generalised 
+ protocol-independent requests.
+ 
+  - `LayerRegistryProvider`: to provide the `LayerRegistry` for the Mapserver
   
-    mosaic:
-      s3:
-        bucket: 'awv-mosaic-envelopes'
-        prefix:
-          reader: 'prod'
-          writers: 'prod,pub'
+  - `FeatureSourceFactoryProvider`: to provide factories for `FeatureSource`s.
+   
+  - `ServiceMetadataProvider` provides general service metadata (required by the `GetCapabilitiesRequest`)
+ 
+On system startup (boot) the classpath will be examined to find implementations for these
+providers, and use them to register the provided services in the static `ServiceLocator` instance. 
+The first implementation found will be used as `Provider`, except for the `FeatoureSourceFactoryProvider` 
+and the `PainterFactoryProvider` where all provided services will be registered. 
 
-##### Configuratie van PUB
-  
-    mosaic:
-      s3:
-        bucket: 'awv-mosaic-envelopes'
-        prefix:
-          reader: 'pub'
-          writers: ''
+This repository contains default implementations for most of these SPI interfaces. 
 
+- [mapserver-imageops](/mapserver-imageops)  provides a `Imaging` implementation based on ImageIO and AWT Graphics.
 
-De buckets zijn hier te raadplegen: https://s3.console.aws.amazon.com/s3/home?region=eu-west-1#
-#####TODO: Pas url aan? bucket bestaat nog niet?
+- [mapserver-protocols](/mapserver-protocols) provides a `ProtocolAdapter` for the WMS v1.3.0 specification
 
-#### Verkeersbordrendering
+- [mapserver-rxhttpfeaturesource](/mapserver-rxhttpfeaturesource) provides a `FeatureSourceFactory` using reactive HTTP against a 
+[Geolatte Featureserver](https://github.com/geolatte/geolatte-featureserver)
 
-Bij het ophalen van de te renderen opstellingen van een tile, dienen niet enkel de opstellingen die in een tile liggen opgehaald te worden,
-maar ook alle opstellingen waarvan een grafisch element in de desbetreffende tile kan liggen. Hiervoor gebruiken we een bounding box factor
-waarmee we de bounding box breedte en hoogte zullen vermenigvuldigen. Hoe hoger het zoomniveau, hoe hoger deze bounding box factor zal zijn.
-De configuratie van die factor is terug te vinden in mapserver.conf.
+- [mapserverconfig](/mapserverconfig) provides both `ServiceMetadata` and a `LayerRegistry` from configuration files
+using [Lightbend's Config](https://github.com/lightbend/config)
 
-      bboxFactors = {
-        "2.0" = 1.05 // opstelling als punt
-        "1.0" = 1.05 // opstelling als punt
-        "0.5" = 1.1 // opstelling met hoek (iets buiten bounding box voor hoeklijn)
-        "0.25" = 3.5 // opstelling met aanzicht klein
-        "0.125" = 7.0 // opstelling met aanzicht groot
-        "0.0625" = 7.5 // opstelling met aanzicht groot
-        "0.03125" = 7.5 // opstelling met aanzicht groot
-      }
+Users of the library are required to provide their own `PainterFactory` implementations (although
+later we plan to incorporate an [SLD](http://www.opengeospatial.org/standards/sld)-based implemntation
+in this project)
 
-Om te verhinderen dat de op te halen opstellingen een te grote bounding box vereisen, werd er geopteerd om de opstelling rendering voor
-de grootste opstellingen aan te passen. Zo wordt in de opstelling painter de afstand van het ankerpunt naar opstelling beperkt tot 75 meter 
-op het eerste zoomniveau waar de aanzichten zichtbaar zijn (dit gebeurt enkel in de painter, de opstelling data zelf werd niet aangepast). 
-Voor alle volgende zoomniveau's wordt de grafische lengte van de verbindingslijn gelijk gehouden. Bovendien wordt de maximum grootte van een aanzicht ook beperkt tot 50 meter. 
+## Integrating Mapserver into your application 
 
-Dit alles zorgt ervoor dat grote aanzichten of aanzichten die ver van een opstelling staan of, lichtjes anders voorgesteld worden in 
-vergelijking met de de grafische voorstelling in de Verkeersborden of Wegendatabank applicatie.
+You need at least to add the [mapserver](/mapserver) artifact as a dependency, and then
+packages with all the required service providers. Use the provided implementations, or roll your own.
 
-##### Geowebcache
+Then create an adapter that turns the HTTP request (response) instances of your framework or 
+ application into `org.geolatte.mapserver.http.HttpRequest (Response)` instances.
+ 
+ 
+Finally plug in the  `OwsHttpService` instance into your server application. Alternatively, you could implement your
+own `HttpService` or use the `RequestHandlerFactories` directly. 
 
-De configuratie van Geowebcache die naar Mosaic wijst kan u hier vinden: [geowebcache.xml](https://collab.mow.vlaanderen.be/gitlab/Rood/opendata-geowebcache/blob/develop/geowebcache.xml)
+For a example of how everything fits together, have a look at the [map-server](/map-server) integration
+test classes.
 
-###### Metatiling
-
-Vermits de opstelling renderer reeds meer opstellingen ophaalt om te verzekeren dat opstellingen die buiten de tile liggen maar toch 
-gedeeltelijk op de tile getekend worden, is de meta tiling van Geowebcache redundant. Deze wordt dan ook uitgeschakeld in [geowebcache.xml](https://collab.mow.vlaanderen.be/gitlab/Rood/opendata-geowebcache/blob/develop/geowebcache.xml).
-
-    <metaWidthHeight> <!-- default 3x3 metatiling af, mosaic doet dit al voor ons (boundingBoxFactor 3) -->
-        <int>1</int>
-        <int>1</int>
-      </metaWidthHeight>
-
-
-###### Browser cache expiration
-
-Standaard voorziet Geowebcache een browser tile cache timeout van 1 uur - de browser zal pas een nieuwe request voor dezelfde tile 
-uitvoeren reeds aanwezige opgehaalde tile in de browsercache ouder is dan 1 uur. Indien de gebruiker echter een opstelling heeft aangepast, zal de nieuwe
-voorstelling pas verschijnen na 1 uur. Om deze delay te voorkomen werd geopteerd om op de diepere zoomniveau's waar de aanzichten zichtbaar 
-zijn, de browser expiration te verkleinen naar 10 minuten.
-
-      <expireClientsList>
-        <expirationRule minZoom="0" expiration="14400" /> <!-- browser expiration voor opstelling en aanzicht punten op 4 uur -->
-        <expirationRule minZoom="12" expiration="600" />  <!-- browser expiration voor borden op 10 minuten -->
-      </expireClientsList>
-
-
-###### Reseeding 's nachts
-
-Seeding van de geinvalideerde (=verwijderde) tiles wordt elke avond gestart na 20u indien de laatste reseed langer dan 18 uur geleden is. Enkel zoomniveau's
-tem zoomniveau 12 wordt geseed. Dwz tem het eerste zoomniveau waar de aanzichten zichtbaar zijn. Dit is in te stellen via de main.conf 
-configuratie file:
-
-      geowebcache.seed.zoomstart = 0
-      geowebcache.seed.zoomstop = 12
-
-### Git subtrees
-
-De verkeersbordrendering en WMS stack maakt gebruik van de geolatte-maprenderer en -mapserver. Deze werden als
-subtrees toegevoegd aan het project om makkelijk de laatste nieuwe changes te syncen naar dit project.
-
-### Voeg remote repo's toe
-    git remote add geolatte-geom git@github.com:GeoLatte/geolatte-geom.git
-    git remote add geolatte-maprenderer git@github.com:GeoLatte/geolatte-maprenderer.git
-    git remote add geolatte-mapserver git@github.com:GeoLatte/geolatte-mapserver.git
-
-### Initiëel toevoegen van subtree aan project
-    git subtree add --prefix=modules/geolatte-geom geolatte-geom transform --squash
-    git subtree add --prefix=modules/geolatte-maprenderer geolatte-maprenderer master --squash
-    git subtree add --prefix=modules/geolatte-mapserver geolatte-mapserver master --squash
-
-### Wijzigingen binnentrekken van subtrees
-    git fetch geolatte-geom transform
-    git fetch geolatte-maprenderer master
-    git fetch geolatte-mapserver master
-
-    git subtree pull --prefix=modules/geolatte-geom geolatte-geom transform --squash
-    git subtree pull --prefix=modules/geolatte-maprenderer geolatte-maprenderer master --squash
-    git subtree pull --prefix=modules/geolatte-mapserver geolatte-mapserver master --squash
