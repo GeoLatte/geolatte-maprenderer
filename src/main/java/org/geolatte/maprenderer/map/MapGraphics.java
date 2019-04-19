@@ -21,6 +21,8 @@
 
 package org.geolatte.maprenderer.map;
 
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Envelope;
 import org.geolatte.geom.crs.CrsId;
 
 import java.awt.*;
@@ -40,5 +42,7 @@ public abstract class MapGraphics extends Graphics2D {
     abstract public CrsId getSpatialReference();
 
     abstract public double getMapUnitsPerPixel();
+
+    abstract public Envelope<C2D> getExtent();
 
 }
