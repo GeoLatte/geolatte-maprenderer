@@ -48,6 +48,7 @@ public class AWTMapGraphics extends MapGraphics {
     private Graphics2D g2;
     private final CrsId spatialReference;
     private final BufferedImage image;
+    private final Envelope<C2D> extent;
 
 
     private static ColorModel makeColorModel(boolean transparency) {
@@ -66,8 +67,9 @@ public class AWTMapGraphics extends MapGraphics {
         this.height = (int) dimension.getHeight();
         WritableRaster raster = colorModel.createCompatibleWritableRaster(this.width, this.height);
         this.image = new BufferedImage(colorModel, raster, colorModel.isAlphaPremultiplied(), null);
+        this.extent = extent;
         initGraphics();
-        setToExtent(extent);
+        checkExtent();
     }
 
     public AWTMapGraphics(Dimension dimension, Envelope extent, boolean transparency) {
@@ -123,7 +125,7 @@ public class AWTMapGraphics extends MapGraphics {
         return hints;
     }
 
-    private void setToExtent(Envelope<C2D> extent) {
+    private void checkExtent() {
         if (extent.getCoordinateReferenceSystem().getCrsId().getCode() != getSpatialReference().getCode())
             throw new IllegalArgumentException("Spatial Reference of extent object must be EPSG: " + getSpatialReference().getCode());
         AffineTransform atf = new AffineTransform();
@@ -152,6 +154,11 @@ public class AWTMapGraphics extends MapGraphics {
     @Override
     public double getMapUnitsPerPixel() {
         return this.mapUnitsPerPixel;
+    }
+
+    @Override
+    public Envelope<C2D> getExtent() {
+      return extent;
     }
 
     @Override
